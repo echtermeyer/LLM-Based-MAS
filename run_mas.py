@@ -17,12 +17,20 @@ RESET = "\033[0m"
 
 RESULTS_DIR = Path("results/mas")
 
-parser = argparse.ArgumentParser(description="Run synchronous-round MAS debate on a GPQA Diamond question.")
+parser = argparse.ArgumentParser(
+    description="Run synchronous-round MAS debate on a GPQA Diamond question."
+)
 parser.add_argument("--model", choices=Models.NAMES, default="gpt-4o")
 parser.add_argument("--n", type=int, default=3, help="Number of agents")
-parser.add_argument("--t", type=int, default=5, help="Number of rounds (agents run t=0..T)")
-parser.add_argument("--temperature", type=float, default=1.0, help="Sampling temperature (default: 1.0)")
-parser.add_argument("--index", type=int, default=56, help="0-based question index (56 = Q57)")
+parser.add_argument(
+    "--t", type=int, default=5, help="Number of rounds (agents run t=0..T)"
+)
+parser.add_argument(
+    "--temperature", type=float, default=1.0, help="Sampling temperature (default: 1.0)"
+)
+parser.add_argument(
+    "--index", type=int, default=56, help="0-based question index (56 = Q57)"
+)
 args = parser.parse_args()
 
 # --- Load and prepare ---
@@ -39,7 +47,9 @@ for label, text in shuffled.options.items():
         print(f"  {label}: {text.strip()}")
 
 # --- Run MAS ---
-print(f"\n{BOLD}Running MAS — N={args.n} agents, T={args.t} rounds, model={args.model}, temperature={args.temperature}{RESET}\n")
+print(
+    f"\n{BOLD}Running MAS — N={args.n} agents, T={args.t} rounds, model={args.model}, temperature={args.temperature}{RESET}\n"
+)
 llm = Models.create(args.model, args.temperature)
 mas = MultiAgentSystem(n=args.n, t=args.t, llm=llm)
 
@@ -50,13 +60,17 @@ def print_round(round_entry) -> None:
         print(f"  {YELLOW}Phase A:{RESET}")
         for entry in round_entry.phase_a:
             msg = entry.draft_message
-            print(f"    Agent{entry.id + 1}: {GRAY}{msg[:80]}{'…' if len(msg) > 80 else ''}{RESET}")
+            print(
+                f"    Agent{entry.id + 1}: {GRAY}{msg[:80]}{'…' if len(msg) > 80 else ''}{RESET}"
+            )
     print(f"  {YELLOW}Phase B:{RESET}")
     for entry in round_entry.phase_b:
         correct = entry.belief == shuffled.correct_option
         color = GREEN if correct else RED
-        print(f"    Agent{entry.id + 1}: belief={color}{entry.belief}{RESET}  "
-              f"| public_message={GRAY}{entry.public_message[:80]}{'…' if len(entry.public_message) > 80 else ''}{RESET}")
+        print(
+            f"    Agent{entry.id + 1}: belief={color}{entry.belief}{RESET}  "
+            f"| public_message={GRAY}{entry.public_message[:80]}{'…' if len(entry.public_message) > 80 else ''}{RESET}"
+        )
     print()
 
 
@@ -77,7 +91,9 @@ color = GREEN if majority_correct else RED
 mark = "✓" if majority_correct else "✗"
 
 print(f"{BOLD}Final round (t={final_round.round}) beliefs:{RESET} {dict(vote_counts)}")
-print(f"{BOLD}Majority vote:{RESET} {color}[{mark}] {majority_answer}{RESET}  (correct: {shuffled.correct_option})")
+print(
+    f"{BOLD}Majority vote:{RESET} {color}[{mark}] {majority_answer}{RESET}  (correct: {shuffled.correct_option})"
+)
 
 # --- Save result ---
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
