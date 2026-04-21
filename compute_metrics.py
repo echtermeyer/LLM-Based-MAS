@@ -6,12 +6,25 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import numpy as np
+import pandas as pd
 import torch
 from sentence_transformers import SentenceTransformer
 
 MODEL_NAME = "BAAI/bge-large-en-v1.5"
 ROOT = Path(__file__).parent
 DEFAULT_OUT_DIR = ROOT / "results/mas_eval"
+DATASET_PATH = ROOT / "dataset" / "gpqa_diamond.csv"
+
+_df_cache: Optional[pd.DataFrame] = None
+
+
+def _get_explanation(question_id: str) -> Optional[str]:
+    """Return the expert Explanation text for the given question_id (iloc index)."""
+    global _df_cache
+    if _df_cache is None:
+        _df_cache = pd.read_csv(DATASET_PATH)
+    val = _df_cache.iloc[int(question_id)]["Explanation"]
+    return str(val) if pd.notna(val) else None
 
 
 class Embedder:
@@ -90,6 +103,7 @@ class EmbeddingsBlock:
     dim: int
     question: np.ndarray
     per_round: List[Dict]
+    gt_reasoning: Optional[np.ndarray] = None
 
     def __post_init__(self) -> None:
         self._index: Dict[int, Dict[int, AgentEmbeddings]] = {}
@@ -100,7 +114,7 @@ class EmbeddingsBlock:
         return self._index[r][i]
 
     def to_dict(self) -> Dict:
-        return {
+        d: Dict = {
             "model": self.model,
             "model_revision": self.model_revision,
             "dim": self.dim,
@@ -108,9 +122,14 @@ class EmbeddingsBlock:
             "question": self.question.tolist(),
             "per_round": self.per_round,
         }
+        if self.gt_reasoning is not None:
+            d["gt_reasoning"] = self.gt_reasoning.tolist()
+        return d
 
 
-def compute_embeddings(run_view: RunView, embedder: Embedder) -> EmbeddingsBlock:
+def compute_embeddings(
+    run_view: RunView, embedder: Embedder, gt_reasoning_text: Optional[str] = None
+) -> EmbeddingsBlock:
     texts: List[str] = [run_view.question.strip()]
     slots: List[tuple] = [("q", None, None)]
 
@@ -124,8 +143,12 @@ def compute_embeddings(run_view: RunView, embedder: Embedder) -> EmbeddingsBlock
             texts.append(rv.priv_texts[i].strip())
             slots.append((rv.round, i, "priv"))
 
+    if gt_reasoning_text is not None:
+        texts.append(gt_reasoning_text.strip())
+
     vecs = embedder.embed(texts)
     question_vec = vecs[0]
+    gt_reasoning_vec = vecs[-1] if gt_reasoning_text is not None else None
     bucket: Dict[int, Dict[int, Dict]] = {rv.round: {} for rv in run_view.rounds}
 
     for idx, (r, i, f) in enumerate(slots[1:], 1):
@@ -153,6 +176,7 @@ def compute_embeddings(run_view: RunView, embedder: Embedder) -> EmbeddingsBlock
         dim=question_vec.shape[0],
         question=question_vec,
         per_round=per_round,
+        gt_reasoning=gt_reasoning_vec,
     )
 
 
@@ -176,6 +200,8 @@ def compute_scalars(run_view: RunView, emb: EmbeddingsBlock) -> Dict:
     shift = [[None] * R for _ in range(N)]
     on_topic = [[None] * R for _ in range(N)]
     influence = [[None] * R for _ in range(N)]
+    correct_align_pub = [[None] * R for _ in range(N)]
+    correct_align_priv = [[None] * R for _ in range(N)]
 
     agree = [[[None] * R for _ in range(N)] for _ in range(N)]
     sim_pub = [[[None] * R for _ in range(N)] for _ in range(N)]
@@ -183,6 +209,7 @@ def compute_scalars(run_view: RunView, emb: EmbeddingsBlock) -> Dict:
     toward = [[[None] * R for _ in range(N)] for _ in range(N)]
 
     q_vec = np.array(emb.question)
+    gt_r_vec = np.array(emb.gt_reasoning) if emb.gt_reasoning is not None else None
 
     for rv in rounds:
         r, ri = rv.round, round_idx[rv.round]
@@ -202,6 +229,13 @@ def compute_scalars(run_view: RunView, emb: EmbeddingsBlock) -> Dict:
             # on_topic_i(r) = cos(pub, q)
             if pub_i is not None:
                 on_topic[i][ri] = float(pub_i @ q_vec)
+
+            # correct_align_{pub,priv}_i(r) = cos({pub,priv}, gt_reasoning)
+            if gt_r_vec is not None:
+                if pub_i is not None:
+                    correct_align_pub[i][ri] = float(pub_i @ gt_r_vec)
+                if priv_i is not None:
+                    correct_align_priv[i][ri] = float(priv_i @ gt_r_vec)
 
             if prev_rv is not None:
                 pub_prev = _vec(emb, prev_rv.round, i, "pub")
@@ -275,6 +309,7 @@ def compute_scalars(run_view: RunView, emb: EmbeddingsBlock) -> Dict:
     mean_correct, majority_correct, majority_tie = [], [], []
     unanimous_correct, fraction_agreeing_pairs = [], []
     entropy, mean_diss, mean_sim_pub, mean_sim_priv = [], [], [], []
+    mean_correct_align_pub, mean_correct_align_priv = [], []
 
     for rv in rounds:
         r, ri = rv.round, round_idx[rv.round]
@@ -323,6 +358,12 @@ def compute_scalars(run_view: RunView, emb: EmbeddingsBlock) -> Dict:
         ]
         mean_sim_priv.append(float(np.mean(sv)) if sv else None)
 
+        cap = [correct_align_pub[i][ri] for i in range(N) if correct_align_pub[i][ri] is not None]
+        mean_correct_align_pub.append(float(np.mean(cap)) if cap else None)
+
+        cap2 = [correct_align_priv[i][ri] for i in range(N) if correct_align_priv[i][ri] is not None]
+        mean_correct_align_priv.append(float(np.mean(cap2)) if cap2 else None)
+
     return {
         "per_agent_per_round": {
             "correct": correct,
@@ -333,6 +374,8 @@ def compute_scalars(run_view: RunView, emb: EmbeddingsBlock) -> Dict:
             "shift": shift,
             "on_topic": on_topic,
             "influence": influence,
+            "correct_align_pub": correct_align_pub,
+            "correct_align_priv": correct_align_priv,
         },
         "per_pair_per_round": {
             "agree": agree,
@@ -350,6 +393,8 @@ def compute_scalars(run_view: RunView, emb: EmbeddingsBlock) -> Dict:
             "mean_diss": mean_diss,
             "mean_sim_pub": mean_sim_pub,
             "mean_sim_priv": mean_sim_priv,
+            "mean_correct_align_pub": mean_correct_align_pub,
+            "mean_correct_align_priv": mean_correct_align_priv,
         },
     }
 
@@ -358,7 +403,8 @@ def augment(run: Dict, embedder: Optional[Embedder] = None) -> Dict:
     if embedder is None:
         embedder = Embedder()
     run_view = RunView.from_dict(run)
-    emb = compute_embeddings(run_view, embedder)
+    gt_reasoning_text = _get_explanation(run["question_id"])
+    emb = compute_embeddings(run_view, embedder, gt_reasoning_text)
     return {
         **run,
         "embeddings": emb.to_dict(),

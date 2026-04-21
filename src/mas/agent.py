@@ -22,7 +22,8 @@ _PERSONA_TEMPLATE = (
     "  - Phase A: broadcast a draft message. Use it to ask clarifying questions, challenge a "
     "neighbor's reasoning, or share partial work. Do not commit to a belief in Phase A.\n"
     "  - Phase B: you see your neighbors' Phase A drafts. Answer any questions directed at you, "
-    "then produce your updated belief, reasoning, and public message.\n\n"
+    "then produce your updated belief, reasoning, and public message."
+    "You must be very critical with other agents reasoning as they might be incorrect. Furthermore, you might be incorrect as well.\n\n"
     'Phase A output schema:  {{"draft_message": "..."}}\n'
     'Phase B output schema:  {{"belief": "<A|B|C|D>", "belief_reasoning": "...", "public_message": "..."}}\n\n'
     "Fields:\n"
