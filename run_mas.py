@@ -7,13 +7,7 @@ from pathlib import Path
 from src.benchmark.dataloader import DataLoader, prepare_samples
 from src.mas import MultiAgentSystem
 from src.models.llms import Models
-
-GREEN = "\033[92m"
-RED = "\033[91m"
-YELLOW = "\033[93m"
-GRAY = "\033[90m"
-BOLD = "\033[1m"
-RESET = "\033[0m"
+from src.utils.console import BOLD, GRAY, GREEN, RED, RESET, print_round
 
 RESULTS_DIR = Path("results/mas")
 
@@ -33,7 +27,6 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-# --- Load and prepare ---
 sample = DataLoader().load_single(args.index)
 shuffled = prepare_samples([sample])[0]
 
@@ -46,43 +39,20 @@ for label, text in shuffled.options.items():
     else:
         print(f"  {label}: {text.strip()}")
 
-# --- Run MAS ---
 print(
     f"\n{BOLD}Running MAS — N={args.n} agents, T={args.t} rounds, model={args.model}, temperature={args.temperature}{RESET}\n"
 )
 llm = Models.create(args.model, args.temperature)
 mas = MultiAgentSystem(n=args.n, t=args.t, llm=llm)
 
-
-def print_round(round_entry) -> None:
-    print(f"{BOLD}Round t={round_entry.round}{RESET}")
-    if round_entry.phase_a is not None:
-        print(f"  {YELLOW}Phase A:{RESET}")
-        for entry in round_entry.phase_a:
-            msg = entry.draft_message
-            print(
-                f"    Agent{entry.id + 1}: {GRAY}{msg[:80]}{'…' if len(msg) > 80 else ''}{RESET}"
-            )
-    print(f"  {YELLOW}Phase B:{RESET}")
-    for entry in round_entry.phase_b:
-        correct = entry.belief == shuffled.correct_option
-        color = GREEN if correct else RED
-        print(
-            f"    Agent{entry.id + 1}: belief={color}{entry.belief}{RESET}  "
-            f"| public_message={GRAY}{entry.public_message[:80]}{'…' if len(entry.public_message) > 80 else ''}{RESET}"
-        )
-    print()
-
-
 result = mas.run(
     question=shuffled.question,
     options=shuffled.options,
     question_id=str(args.index),
     ground_truth=shuffled.correct_option,
-    on_round_complete=print_round,
+    on_round_complete=lambda r: print_round(r, shuffled.correct_option),
 )
 
-# --- Final round summary ---
 final_round = result.trajectory[-1]
 vote_counts = Counter(e.belief for e in final_round.phase_b)
 majority_answer, _ = vote_counts.most_common(1)[0]
@@ -95,7 +65,6 @@ print(
     f"{BOLD}Majority vote:{RESET} {color}[{mark}] {majority_answer}{RESET}  (correct: {shuffled.correct_option})"
 )
 
-# --- Save result ---
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 filename = f"{timestamp}_{args.model}_N{args.n}_T{args.t}_temp{args.temperature}_q{args.index}.json"

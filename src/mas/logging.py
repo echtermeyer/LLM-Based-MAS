@@ -53,12 +53,23 @@ class RunResult:
             "N": self.N,
             "T": self.T,
             "topology": self.topology,
-            "agents": [{"id": a.id, "model": a.model, "persona": a.persona} for a in self.agents],
+            "agents": [
+                {"id": a.id, "model": a.model, "persona": a.persona}
+                for a in self.agents
+            ],
             "trajectory": [
                 {
                     "round": r.round,
-                    **({"phase_a": [{"id": e.id, "draft_message": e.draft_message} for e in r.phase_a]}
-                       if r.phase_a is not None else {}),
+                    **(
+                        {
+                            "phase_a": [
+                                {"id": e.id, "draft_message": e.draft_message}
+                                for e in r.phase_a
+                            ]
+                        }
+                        if r.phase_a is not None
+                        else {}
+                    ),
                     "phase_b": [
                         {
                             "id": e.id,

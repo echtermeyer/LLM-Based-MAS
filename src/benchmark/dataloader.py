@@ -40,21 +40,25 @@ class DataLoader:
         )
 
     def load(self, n: int = 3) -> List[QuestionSample]:
+        """Return the first n QuestionSamples from the dataset."""
         samples = []
         for _, row in self._df.head(n).iterrows():
-            samples.append(QuestionSample(
-                question=row["Question"],
-                correct_answer=row["Correct Answer"],
-                incorrect_answers=[
-                    row["Incorrect Answer 1"],
-                    row["Incorrect Answer 2"],
-                    row["Incorrect Answer 3"],
-                ],
-            ))
+            samples.append(
+                QuestionSample(
+                    question=row["Question"],
+                    correct_answer=row["Correct Answer"],
+                    incorrect_answers=[
+                        row["Incorrect Answer 1"],
+                        row["Incorrect Answer 2"],
+                        row["Incorrect Answer 3"],
+                    ],
+                )
+            )
         return samples
 
 
 def prepare_samples(samples: List[QuestionSample]) -> List[ShuffledSample]:
+    """For each QuestionSample, shuffle the correct and incorrect answers and assign option labels A-D."""
     shuffled = []
     for sample in samples:
         answers = [sample.correct_answer] + sample.incorrect_answers
@@ -62,9 +66,11 @@ def prepare_samples(samples: List[QuestionSample]) -> List[ShuffledSample]:
         labels = ["A", "B", "C", "D"]
         options = dict(zip(labels, answers))
         correct_option = labels[answers.index(sample.correct_answer)]
-        shuffled.append(ShuffledSample(
-            question=sample.question,
-            options=options,
-            correct_option=correct_option,
-        ))
+        shuffled.append(
+            ShuffledSample(
+                question=sample.question,
+                options=options,
+                correct_option=correct_option,
+            )
+        )
     return shuffled

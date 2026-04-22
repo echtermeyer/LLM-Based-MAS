@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Type
 
 from src.mas.agent import Agent, PhaseAOutput, PhaseBOutput
 from src.mas.logging import PhaseAEntry, PhaseBEntry, RoundEntry
@@ -13,19 +13,6 @@ def run_round(
     round_index: int,
     prev_phase_b_public_messages: Optional[List[str]],
 ) -> RoundEntry:
-    """
-    Execute one full round.
-
-    Round 0: Phase B only — agents see the question and emit their initial belief.
-    Round r≥1: Phase A (parallel) then Phase B (parallel).
-      - Phase A receives neighbors' Phase B public_messages from round r-1.
-      - Phase B receives neighbors' Phase A draft_messages from round r.
-
-    Parameters
-    ----------
-    prev_phase_b_public_messages: public_messages from the previous round's Phase B,
-                                  indexed by agent id. None on round 0.
-    """
     if round_index == 0:
         phase_b_outputs = _run_parallel(
             agents,
@@ -34,38 +21,46 @@ def run_round(
         return RoundEntry(
             round=0,
             phase_a=None,
-            phase_b=_to_phase_b_entries(agents, phase_b_outputs),
+            phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs),
         )
 
-    # --- Phase A ---
-    def call_phase_a(agent: Agent) -> Tuple[int, PhaseAOutput]:
-        neighbor_msgs = [
-            (j, prev_phase_b_public_messages[j])
-            for j in neighbors(adjacency, agent.id)
-        ]
-        return agent.id, agent.respond_phase_a(round_index, neighbor_msgs)
+    phase_a_outputs: Dict[int, PhaseAOutput] = _run_parallel(
+        agents,
+        lambda agent: (
+            agent.id,
+            agent.respond_phase_a(
+                round_index,
+                [
+                    (j, prev_phase_b_public_messages[j])
+                    for j in neighbors(adjacency, agent.id)
+                ],
+            ),
+        ),
+    )
 
-    phase_a_outputs: Dict[int, PhaseAOutput] = _run_parallel(agents, call_phase_a)
-
-    # --- Phase B ---
-    def call_phase_b(agent: Agent) -> Tuple[int, PhaseBOutput]:
-        neighbor_drafts = [
-            (j, phase_a_outputs[j].draft_message)
-            for j in neighbors(adjacency, agent.id)
-        ]
-        return agent.id, agent.respond_phase_b(round_index, question_prompt, neighbor_drafts)
-
-    phase_b_outputs: Dict[int, PhaseBOutput] = _run_parallel(agents, call_phase_b)
+    phase_b_outputs: Dict[int, PhaseBOutput] = _run_parallel(
+        agents,
+        lambda agent: (
+            agent.id,
+            agent.respond_phase_b(
+                round_index,
+                question_prompt,
+                [
+                    (j, phase_a_outputs[j].draft_message)
+                    for j in neighbors(adjacency, agent.id)
+                ],
+            ),
+        ),
+    )
 
     return RoundEntry(
         round=round_index,
-        phase_a=[PhaseAEntry(id=a.id, draft_message=phase_a_outputs[a.id].draft_message) for a in agents],
-        phase_b=_to_phase_b_entries(agents, phase_b_outputs),
+        phase_a=_to_entries(PhaseAEntry, agents, phase_a_outputs),
+        phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs),
     )
 
 
 def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:
-    """Run fn(agent) for all agents in parallel, return {agent_id: result}."""
     results: Dict[int, object] = {}
     with ThreadPoolExecutor(max_workers=len(agents)) as executor:
         futures = {executor.submit(fn, agent): agent for agent in agents}
@@ -75,13 +70,5 @@ def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:
     return results
 
 
-def _to_phase_b_entries(agents: List[Agent], outputs: Dict[int, PhaseBOutput]) -> List[PhaseBEntry]:
-    return [
-        PhaseBEntry(
-            id=a.id,
-            belief=outputs[a.id].belief,
-            belief_reasoning=outputs[a.id].belief_reasoning,
-            public_message=outputs[a.id].public_message,
-        )
-        for a in agents
-    ]
+def _to_entries(cls: Type, agents: List[Agent], outputs: Dict) -> list:
+    return [cls(id=a.id, **outputs[a.id].model_dump()) for a in agents]

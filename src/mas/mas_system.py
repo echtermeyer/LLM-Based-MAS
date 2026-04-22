@@ -33,7 +33,9 @@ class MultiAgentSystem:
         self._n = n
         self._t = t
         self._llm = llm
-        self._adjacency: List[List[int]] = adjacency if adjacency is not None else fully_connected(n)
+        self._adjacency: List[List[int]] = (
+            adjacency if adjacency is not None else fully_connected(n)
+        )
         self._agents: List[Agent] = [Agent(agent_id=i, llm=llm) for i in range(n)]
 
     def run(
@@ -69,7 +71,9 @@ class MultiAgentSystem:
                 prev_phase_b_public_messages=prev_phase_b_public_messages,
             )
             trajectory.append(round_entry)
-            prev_phase_b_public_messages = [e.public_message for e in round_entry.phase_b]
+            prev_phase_b_public_messages = [
+                e.public_message for e in round_entry.phase_b
+            ]
             if on_round_complete is not None:
                 on_round_complete(round_entry)
 

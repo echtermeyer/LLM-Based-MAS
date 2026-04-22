@@ -23,44 +23,44 @@ from gen_ai_hub.proxy.langchain.amazon import (
 from gen_ai_hub.proxy.langchain.google_genai import init_chat_model as _google_genai
 
 _DEFAULT_TEMPERATURE = 1.0
+_MAX_TOKENS = 16_384
 
-# Factories keyed by CLI model name — each takes a temperature and returns a fresh model instance.
+
 _FACTORIES: Dict[str, Callable[[float], BaseChatModel]] = {
-    "gpt-4o": lambda t: init_llm("gpt-4o", temperature=t, max_tokens=8192),
+    "gpt-4o": lambda t: init_llm("gpt-4o", temperature=t, max_tokens=_MAX_TOKENS),
     "claude-sonnet-4": lambda t: init_llm(
         "anthropic--claude-4-sonnet",
         model_id="anthropic.claude-sonnet-4-20250514-v1:0",
         init_func=_amazon_converse,
-        max_tokens=8192,
+        max_tokens=_MAX_TOKENS,
         temperature=t,
     ),
     "claude-sonnet-4.5": lambda t: init_llm(
         "anthropic--claude-4.5-sonnet",
         model_id="anthropic.claude-sonnet-4-5-20251101-v1:0",
         init_func=_amazon_converse,
-        max_tokens=8192,
+        max_tokens=_MAX_TOKENS,
         top_p=None,
         temperature=t,
     ),
     "gemini-pro": lambda t: init_llm(
-        "gemini-2.5-pro", init_func=_google_genai, max_tokens=8192, temperature=t
+        "gemini-2.5-pro", init_func=_google_genai, max_tokens=_MAX_TOKENS, temperature=t
     ),
     "nova-pro": lambda t: init_llm(
         "amazon--nova-pro",
         model_id="amazon.nova-pro-v1:0",
         init_func=_amazon_converse,
-        max_tokens=8192,
+        max_tokens=_MAX_TOKENS,
         top_p=None,
         temperature=t,
     ),
     "mistral-large": lambda t: init_llm(
-        "mistralai--mistral-large-instruct", temperature=t, max_tokens=32768
+        "mistralai--mistral-large-instruct", temperature=t, max_tokens=_MAX_TOKENS
     ),
 }
 
 
 class Models:
-    # Pre-instantiated at default temperature — used by run_benchmark.py and test_models.py.
     GPT_4O = _FACTORIES["gpt-4o"](_DEFAULT_TEMPERATURE)
     CLAUDE_SONNET_4 = _FACTORIES["claude-sonnet-4"](_DEFAULT_TEMPERATURE)
     CLAUDE_SONNET_45 = _FACTORIES["claude-sonnet-4.5"](_DEFAULT_TEMPERATURE)
@@ -70,11 +70,19 @@ class Models:
 
     NAMES = list(_FACTORIES.keys())
 
-    ALL = [GPT_4O, CLAUDE_SONNET_4, CLAUDE_SONNET_45, GEMINI_PRO, NOVA_PRO, MISTRAL_LARGE]
+    ALL = [
+        GPT_4O,
+        CLAUDE_SONNET_4,
+        CLAUDE_SONNET_45,
+        GEMINI_PRO,
+        NOVA_PRO,
+        MISTRAL_LARGE,
+    ]
 
     @classmethod
-    def create(cls, name: str, temperature: float = _DEFAULT_TEMPERATURE) -> BaseChatModel:
-        """Return a fresh model instance with the given temperature."""
+    def create(
+        cls, name: str, temperature: float = _DEFAULT_TEMPERATURE
+    ) -> BaseChatModel:
         if name not in _FACTORIES:
             raise ValueError(f"Unknown model '{name}'. Available: {cls.NAMES}")
         return _FACTORIES[name](temperature)

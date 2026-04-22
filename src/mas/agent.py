@@ -2,36 +2,33 @@ from typing import List, Literal, Tuple
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class PhaseAOutput(BaseModel):
-    draft_message: str
+    draft_message: str = Field(
+        description="Question, challenge, or partial work to share with neighbors"
+    )
 
 
 class PhaseBOutput(BaseModel):
-    belief: Literal["A", "B", "C", "D"]
-    belief_reasoning: str
-    public_message: str
+    belief: Literal["A", "B", "C", "D"] = Field(description="Your current best answer")
+    belief_reasoning: str = Field(
+        description="Your private chain-of-thought (not shared with others)"
+    )
+    public_message: str = Field(
+        description="The message you broadcast to your neighbors next round"
+    )
 
 
-_PERSONA_TEMPLATE = (
-    "You are {name}, part of a collaborative group solving a multiple-choice question. "
-    "Work with your fellow agents to find the correct answer.\n\n"
-    "Each round (after round 0) has two phases:\n"
-    "  - Phase A: broadcast a draft message. Use it to ask clarifying questions, challenge a "
-    "neighbor's reasoning, or share partial work. Do not commit to a belief in Phase A.\n"
-    "  - Phase B: you see your neighbors' Phase A drafts. Answer any questions directed at you, "
-    "then produce your updated belief, reasoning, and public message."
-    "You must be very critical with other agents reasoning as they might be incorrect. Furthermore, you might be incorrect as well.\n\n"
-    'Phase A output schema:  {{"draft_message": "..."}}\n'
-    'Phase B output schema:  {{"belief": "<A|B|C|D>", "belief_reasoning": "...", "public_message": "..."}}\n\n'
-    "Fields:\n"
-    "  - belief: your current best answer (A/B/C/D)\n"
-    "  - belief_reasoning: your private chain-of-thought (not shared with others)\n"
-    "  - public_message: the message you broadcast to your neighbors next round\n"
-    "  - draft_message: Phase A only — question, challenge, or partial work to share"
-)
+_PERSONA_TEMPLATE = """\
+You are {name}, part of a collaborative group solving a multiple-choice question. Work with your fellow agents to find the correct answer.
+
+Each round (after round 0) has two phases:
+  - Phase A: broadcast a draft message. Use it to ask clarifying questions, challenge a neighbor's reasoning, or share partial work. Do not commit to a belief in Phase A.
+  - Phase B: you see your neighbors' Phase A drafts. Answer any questions directed at you, then produce your updated belief, reasoning, and public message.
+You must be very critical with other agents reasoning as they might be incorrect. Furthermore, you might be incorrect as well.\
+"""
 
 
 class Agent:
@@ -44,28 +41,9 @@ class Agent:
         self._system = SystemMessage(content=self.persona)
         self._history: List[BaseMessage] = []
 
-    def respond_phase_b(
-        self,
-        round_index: int,
-        question_prompt: str,
-        neighbor_draft_messages: List[Tuple[int, str]],
-    ) -> PhaseBOutput:
-        """
-        Phase B (or round-0 initialization): update belief.
-
-        Round 0: history starts with HumanMessage(question).
-        Round r≥1: appends the Phase B user turn (neighbor drafts from Phase A).
-        """
-        if round_index == 0:
-            self._history.append(HumanMessage(content=question_prompt))
-        else:
-            self._history.append(
-                HumanMessage(
-                    content=_format_phase_b_turn(round_index, neighbor_draft_messages)
-                )
-            )
-
-        output: PhaseBOutput = self._llm_b.invoke([self._system] + self._history)
+    def _step(self, llm, content: str):
+        self._history.append(HumanMessage(content=content))
+        output = llm.invoke([self._system] + self._history)
         self._history.append(AIMessage(content=output.model_dump_json()))
         return output
 
@@ -74,40 +52,34 @@ class Agent:
         round_index: int,
         neighbor_public_messages: List[Tuple[int, str]],
     ) -> PhaseAOutput:
-        """
-        Phase A (round r≥1 only): broadcast a draft message.
-        Appends the Phase A user turn (neighbors' previous phase-B public messages).
-        """
-        self._history.append(
-            HumanMessage(
-                content=_format_phase_a_turn(round_index, neighbor_public_messages)
-            )
+        return self._step(
+            self._llm_a,
+            _format_turn(
+                f"Round {round_index} Phase A. Neighbor public messages from round {round_index - 1}:",
+                neighbor_public_messages,
+                "Now produce your Phase A draft message.",
+            ),
         )
 
-        output: PhaseAOutput = self._llm_a.invoke([self._system] + self._history)
-        self._history.append(AIMessage(content=output.model_dump_json()))
-        return output
+    def respond_phase_b(
+        self,
+        round_index: int,
+        question_prompt: str,
+        neighbor_draft_messages: List[Tuple[int, str]],
+    ) -> PhaseBOutput:
+        content = (
+            question_prompt
+            if round_index == 0
+            else _format_turn(
+                f"Round {round_index} Phase B. Neighbor drafts from round {round_index} Phase A:",
+                neighbor_draft_messages,
+                "Now produce your Phase B belief update.",
+            )
+        )
+        return self._step(self._llm_b, content)
 
 
-def _format_phase_a_turn(
-    round_index: int, neighbor_public_messages: List[Tuple[int, str]]
-) -> str:
-    lines = [
-        f"Round {round_index} Phase A. Neighbor public messages from round {round_index - 1}:"
-    ]
-    for agent_id, message in neighbor_public_messages:
-        lines.append(f"- Agent{agent_id + 1}: {message}")
-    lines.append("\nNow produce your Phase A draft message.")
-    return "\n".join(lines)
-
-
-def _format_phase_b_turn(
-    round_index: int, neighbor_draft_messages: List[Tuple[int, str]]
-) -> str:
-    lines = [
-        f"Round {round_index} Phase B. Neighbor drafts from round {round_index} Phase A:"
-    ]
-    for agent_id, message in neighbor_draft_messages:
-        lines.append(f"- Agent{agent_id + 1}: {message}")
-    lines.append("\nNow produce your Phase B belief update.")
+def _format_turn(header: str, messages: List[Tuple[int, str]], instruction: str) -> str:
+    lines = [header] + [f"- Agent{agent_id + 1}: {msg}" for agent_id, msg in messages]
+    lines.append(f"\n{instruction}")
     return "\n".join(lines)

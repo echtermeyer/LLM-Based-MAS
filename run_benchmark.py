@@ -5,13 +5,7 @@ from pathlib import Path
 from src.models.llms import Models
 from src.benchmark.dataloader import DataLoader, prepare_samples
 from src.benchmark.benchmarker import Benchmarker, BenchmarkResult
-
-GREEN = "\033[92m"
-RED = "\033[91m"
-YELLOW = "\033[93m"
-GRAY = "\033[90m"
-BOLD = "\033[1m"
-RESET = "\033[0m"
+from src.utils.console import BOLD, GRAY, RESET, print_results
 
 RESULTS_DIR = Path("results/benchmarking")
 
@@ -34,18 +28,6 @@ args = parser.parse_args()
 samples = prepare_samples(DataLoader().load(n=args.n))
 models_to_run = MODEL_CHOICES if args.all_models else {args.model: MODEL_CHOICES[args.model]}
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-
-def print_results(model_name: str, results: list[BenchmarkResult]):
-    correct = sum(r.correct for r in results)
-    print(f"\n{BOLD}Model: {model_name} — Score: {correct}/{len(results)}{RESET}\n")
-    for i, r in enumerate(results, 1):
-        if r.correct:
-            print(f"{GREEN}[✓] Q{i}: expected={r.correct_option}, got={r.model_answer}{RESET}")
-        else:
-            print(f"{RED}[✗] Q{i}: expected={r.correct_option}, got={r.model_answer}{RESET}")
-            print(f"{YELLOW}Question:{RESET} {r.question}")
-            print(f"{YELLOW}Reasoning:{RESET} {GRAY}{r.reasoning}{RESET}\n")
 
 
 def save_results(model_name: str, results: list[BenchmarkResult]):
