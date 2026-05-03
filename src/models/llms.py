@@ -23,7 +23,7 @@ from gen_ai_hub.proxy.langchain.amazon import (
 from gen_ai_hub.proxy.langchain.google_genai import init_chat_model as _google_genai
 
 _DEFAULT_TEMPERATURE = 1.0
-_MAX_TOKENS = 16_384
+_MAX_TOKENS = 32_768
 
 
 _FACTORIES: Dict[str, Callable[[float], BaseChatModel]] = {
