@@ -3,7 +3,6 @@ from typing import Callable, Dict, List, Optional
 
 from langchain_core.language_models import BaseChatModel
 
-from src.benchmark.benchmarker import _format_prompt
 from src.mas.agent import Agent
 from src.mas.logging import AgentMeta, RoundEntry, RunResult
 from src.mas.round_runner import run_round
@@ -15,7 +14,7 @@ class MultiAgentSystem:
     Synchronous-round multi-agent debate system.
 
     At each round t, all N agents update in parallel based on the previous
-    round's public messages. belief_reasoning is private and never shared.
+    round's public messages. reasoning is private and never shared.
     """
 
     def __init__(
@@ -44,35 +43,23 @@ class MultiAgentSystem:
         options: Dict[str, str],
         question_id: str,
         ground_truth: str,
+        question_prompts: List[str],
         on_round_complete: Optional[Callable[[RoundEntry], None]] = None,
     ) -> RunResult:
-        """
-        Run T+1 rounds (t=0 … t=T) and return the full trajectory as a RunResult.
-
-        Parameters
-        ----------
-        question:            raw question text
-        options:             shuffled option mapping, e.g. {"A": "...", "B": "...", ...}
-        question_id:         identifier for logging (e.g. dataset index as string)
-        ground_truth:        correct option letter
-        on_round_complete:   optional callback invoked immediately after each round finishes,
-                             useful for printing live progress
-        """
-        question_prompt = _format_prompt(question, options)
         trajectory = []
-        prev_phase_b_public_messages: Optional[List[str]] = None
+        prev_phase_b_messages: Optional[List[str]] = None
 
         for t in range(self._t + 1):
             round_entry = run_round(
                 agents=self._agents,
-                question_prompt=question_prompt,
+                question_prompts=question_prompts,
                 adjacency=self._adjacency,
                 round_index=t,
-                prev_phase_b_public_messages=prev_phase_b_public_messages,
+                prev_phase_b_messages=prev_phase_b_messages,
             )
             trajectory.append(round_entry)
-            prev_phase_b_public_messages = [
-                e.public_message for e in round_entry.phase_b
+            prev_phase_b_messages = [
+                e.message for e in round_entry.phase_b
             ]
             if on_round_complete is not None:
                 on_round_complete(round_entry)

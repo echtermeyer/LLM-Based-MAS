@@ -5,15 +5,15 @@ from typing import Dict, List, Optional
 @dataclass
 class PhaseAEntry:
     id: int
-    draft_message: str
+    draft: str
 
 
 @dataclass
 class PhaseBEntry:
     id: int
-    belief: str
-    belief_reasoning: str
-    public_message: str
+    vote: str
+    reasoning: str
+    message: str
 
 
 @dataclass
@@ -63,7 +63,7 @@ class RunResult:
                     **(
                         {
                             "phase_a": [
-                                {"id": e.id, "draft_message": e.draft_message}
+                                {"id": e.id, "draft": e.draft}
                                 for e in r.phase_a
                             ]
                         }
@@ -73,9 +73,9 @@ class RunResult:
                     "phase_b": [
                         {
                             "id": e.id,
-                            "belief": e.belief,
-                            "belief_reasoning": e.belief_reasoning,
-                            "public_message": e.public_message,
+                            "vote": e.vote,
+                            "reasoning": e.reasoning,
+                            "message": e.message,
                         }
                         for e in r.phase_b
                     ],

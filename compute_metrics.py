@@ -25,11 +25,12 @@ def _load_explanation(question_id: str) -> Optional[str]:
 def process_file(path: Path, embedder: Embedder, out_dir: Path) -> Path:
     wrapper = json.loads(path.read_text())
 
-    question_vec, gt_vec = embed_shared(
-        wrapper["question"],
-        _load_explanation(wrapper["question_id"]),
-        embedder,
+    explanation = (
+        _load_explanation(wrapper["question_id"])
+        if wrapper.get("dataset", "gpqa") == "gpqa"
+        else None
     )
+    question_vec, gt_vec = embed_shared(wrapper["question"], explanation, embedder)
 
     rep_metrics = []
     for rep in wrapper["repetitions"]:

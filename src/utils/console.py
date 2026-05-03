@@ -16,17 +16,17 @@ def print_round(round_entry: RoundEntry, correct_option: str) -> None:
     if round_entry.phase_a is not None:
         print(f"  {YELLOW}Phase A:{RESET}")
         for entry in round_entry.phase_a:
-            msg = entry.draft_message
+            msg = entry.draft
             print(
                 f"    Agent{entry.id + 1}: {GRAY}{msg[:80]}{'…' if len(msg) > 80 else ''}{RESET}"
             )
     print(f"  {YELLOW}Phase B:{RESET}")
     for entry in round_entry.phase_b:
-        correct = entry.belief == correct_option
+        correct = entry.vote == correct_option
         color = GREEN if correct else RED
         print(
-            f"    Agent{entry.id + 1}: belief={color}{entry.belief}{RESET}  "
-            f"| public_message={GRAY}{entry.public_message[:80]}{'…' if len(entry.public_message) > 80 else ''}{RESET}"
+            f"    Agent{entry.id + 1}: vote={color}{entry.vote}{RESET}  "
+            f"| message={GRAY}{entry.message[:80]}{'…' if len(entry.message) > 80 else ''}{RESET}"
         )
     print()
 

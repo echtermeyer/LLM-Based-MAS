@@ -81,16 +81,16 @@ T = data["T"]
 R = T + 1
 GT = data["ground_truth"]
 
-# beliefs[r][i] = belief of agent i at round r
-beliefs: dict[int, dict[int, str]] = {
-    entry["round"]: {e["id"]: e["belief"] for e in entry["phase_b"]}
+# votes[r][i] = vote of agent i at round r
+votes: dict[int, dict[int, str]] = {
+    entry["round"]: {e["id"]: e["vote"] for e in entry["phase_b"]}
     for entry in data["trajectory"]
 }
 
 # Fraction of agents holding each option at each round
 fracs: dict[str, list[float]] = {
     opt: [
-        sum(1 for i in range(N) if beliefs[r].get(i) == opt) / N
+        sum(1 for i in range(N) if votes[r].get(i) == opt) / N
         for r in range(R)
     ]
     for opt in OPTIONS
@@ -257,8 +257,8 @@ def build_network_fig(r: int) -> go.Figure:
             )
 
     # Draw nodes
-    node_colors = [OPTION_COLORS[beliefs[r][i]] for i in range(N)]
-    border_colors = [COLOR_CORRECT if beliefs[r][i] == GT else COLOR_WRONG for i in range(N)]
+    node_colors = [OPTION_COLORS[votes[r][i]] for i in range(N)]
+    border_colors = [COLOR_CORRECT if votes[r][i] == GT else COLOR_WRONG for i in range(N)]
     received_sums = [
         sum(
             toward_sc[i][j][r]
@@ -268,7 +268,7 @@ def build_network_fig(r: int) -> go.Figure:
         for j in range(N)
     ]
     hover_texts = [
-        f"Agent {j}<br>Belief: {beliefs[r][j]}<br>{'CORRECT' if beliefs[r][j] == GT else 'Wrong'}"
+        f"Agent {j}<br>Vote: {votes[r][j]}<br>{'CORRECT' if votes[r][j] == GT else 'Wrong'}"
         f"<br>∑toward→j: {received_sums[j]:.3f}"
         for j in range(N)
     ]
@@ -344,7 +344,7 @@ def _base_layout(title: str, xlab: str, ylab: str, height: int = 320) -> dict:
     )
 
 
-def build_belief_fig(r: int) -> go.Figure:
+def build_vote_fig(r: int) -> go.Figure:
     rounds_axis = list(range(R))
     fig = go.Figure()
     for opt in OPTIONS:
@@ -435,7 +435,7 @@ def build_heatmap_fig(r: int) -> go.Figure:
 def build_diss_fig(r: int) -> go.Figure:
     agent_labels = [f"Agent {i}" for i in range(N)]
     diss_vals_r = [diss[i][r] if diss[i][r] is not None else 0.0 for i in range(N)]
-    bar_colors = [OPTION_COLORS[beliefs[r][i]] for i in range(N)]
+    bar_colors = [OPTION_COLORS[votes[r][i]] for i in range(N)]
     fig = go.Figure(go.Bar(
         x=agent_labels, y=diss_vals_r,
         marker_color=bar_colors,
@@ -517,8 +517,8 @@ with plots_col:
     row2_left, row2_right = st.columns(2)
 
     with row1_left:
-        st.plotly_chart(build_belief_fig(current_round), use_container_width=True)
-        st.caption("p_a(r) = (1/N) Σ 1[belief_i(r) = a] — fraction of agents holding each answer at each round. Stacked areas sum to 1.")
+        st.plotly_chart(build_vote_fig(current_round), use_container_width=True)
+        st.caption("p_a(r) = (1/N) Σ 1[vote_i(r) = a] — fraction of agents holding each answer at each round. Stacked areas sum to 1.")
 
     with row1_right:
         st.plotly_chart(build_convergence_fig(current_round), use_container_width=True)
@@ -526,11 +526,11 @@ with plots_col:
 
     with row2_left:
         st.plotly_chart(build_heatmap_fig(current_round), use_container_width=True)
-        st.caption("sim_pub(i,j,r) = cos(pub_i(r), pub_j(r)) — cosine similarity of agents' public messages. Diagonal undefined (self-similarity). Color range fixed across all rounds.")
+        st.caption("sim_pub(i,j,r) = cos(msg_i(r), msg_j(r)) — cosine similarity of agents' messages. Diagonal undefined (self-similarity). Color range fixed across all rounds.")
 
     with row2_right:
         st.plotly_chart(build_diss_fig(current_round), use_container_width=True)
-        st.caption("diss(i,r) = 1 − cos(pub_i(r), priv_i(r)) — gap between an agent's public message and its private reasoning. Bar color = agent's current public belief.")
+        st.caption("diss(i,r) = 1 − cos(msg_i(r), reasoning_i(r)) — gap between an agent's message and its private reasoning. Bar color = agent's current vote.")
 
 # --- Auto-advance (must be after all columns are rendered) ---
 if st.session_state.playing:

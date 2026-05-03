@@ -178,7 +178,7 @@ def compute_scalars(rep: Dict, emb: Dict, gt_vec: Optional[np.ndarray]) -> Dict:
     round_nums = [e["round"] for e in rep["trajectory"]]
     ri_of = {r: ri for ri, r in enumerate(round_nums)}
     beliefs_by_round = {
-        e["round"]: {pb["id"]: pb["belief"] for pb in e["phase_b"]}
+        e["round"]: {pb["id"]: pb["vote"] for pb in e["phase_b"]}
         for e in rep["trajectory"]
     }
 

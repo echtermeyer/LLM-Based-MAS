@@ -8,15 +8,15 @@ from src.mas.topology import neighbors
 
 def run_round(
     agents: List[Agent],
-    question_prompt: str,
+    question_prompts: List[str],
     adjacency: List[List[int]],
     round_index: int,
-    prev_phase_b_public_messages: Optional[List[str]],
+    prev_phase_b_messages: Optional[List[str]],
 ) -> RoundEntry:
     if round_index == 0:
         phase_b_outputs = _run_parallel(
             agents,
-            lambda agent: (agent.id, agent.respond_phase_b(0, question_prompt, [])),
+            lambda agent: (agent.id, agent.respond_phase_b(0, question_prompts[agent.id], [])),
         )
         return RoundEntry(
             round=0,
@@ -31,7 +31,7 @@ def run_round(
             agent.respond_phase_a(
                 round_index,
                 [
-                    (j, prev_phase_b_public_messages[j])
+                    (j, prev_phase_b_messages[j])
                     for j in neighbors(adjacency, agent.id)
                 ],
             ),
@@ -44,9 +44,9 @@ def run_round(
             agent.id,
             agent.respond_phase_b(
                 round_index,
-                question_prompt,
+                question_prompts[agent.id],
                 [
-                    (j, phase_a_outputs[j].draft_message)
+                    (j, phase_a_outputs[j].draft)
                     for j in neighbors(adjacency, agent.id)
                 ],
             ),
