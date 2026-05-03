@@ -6,7 +6,7 @@ from langchain_core.language_models import BaseChatModel
 from pydantic import BaseModel
 from tqdm import tqdm
 
-from src.benchmark.dataloader import QuestionSample, ShuffledSample
+from src.benchmark.gpqa_loader import QuestionSample, ShuffledSample
 
 
 class MCAnswer(BaseModel):
@@ -37,27 +37,35 @@ class Benchmarker:
     def __init__(self, llm: BaseChatModel):
         self._llm = llm.with_structured_output(MCAnswer)
 
-    def run(self, samples: List[ShuffledSample], verbose: bool = False) -> List[BenchmarkResult]:
+    def run(
+        self, samples: List[ShuffledSample], verbose: bool = False
+    ) -> List[BenchmarkResult]:
         results = []
         iterable = samples if verbose else tqdm(samples, desc="Running", unit="q")
         for sample in iterable:
             try:
-                response: MCAnswer = self._llm.invoke(_format_prompt(sample.question, sample.options))
-                results.append(BenchmarkResult(
-                    question=sample.question,
-                    options=sample.options,
-                    correct_option=sample.correct_option,
-                    model_answer=response.answer,
-                    reasoning=response.reasoning,
-                    correct=response.answer == sample.correct_option,
-                ))
+                response: MCAnswer = self._llm.invoke(
+                    _format_prompt(sample.question, sample.options)
+                )
+                results.append(
+                    BenchmarkResult(
+                        question=sample.question,
+                        options=sample.options,
+                        correct_option=sample.correct_option,
+                        model_answer=response.answer,
+                        reasoning=response.reasoning,
+                        correct=response.answer == sample.correct_option,
+                    )
+                )
             except OutputParserException as e:
-                results.append(BenchmarkResult(
-                    question=sample.question,
-                    options=sample.options,
-                    correct_option=sample.correct_option,
-                    model_answer="ERROR",
-                    reasoning=str(e),
-                    correct=False,
-                ))
+                results.append(
+                    BenchmarkResult(
+                        question=sample.question,
+                        options=sample.options,
+                        correct_option=sample.correct_option,
+                        model_answer="ERROR",
+                        reasoning=str(e),
+                        correct=False,
+                    )
+                )
         return results
