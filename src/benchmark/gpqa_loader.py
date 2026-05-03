@@ -22,7 +22,7 @@ class ShuffledSample:
     correct_option: str
 
 
-class DataLoader:
+class GPQALoader:
     def __init__(self, path: Path = DATASET_PATH):
         self._df = pd.read_csv(path)
 

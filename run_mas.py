@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from src.benchmark.benchmarker import _format_prompt
-from src.benchmark.dataloader import DataLoader, prepare_samples
+from src.benchmark.gpqa_loader import GPQALoader, prepare_samples
 from src.benchmark.hiddenbench_loader import HiddenBenchLoader
 from src.mas import MultiAgentSystem
 from src.models.llms import Models
@@ -18,11 +18,20 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("--dataset", choices=["gpqa", "hiddenbench"], default="gpqa")
 parser.add_argument("--model", choices=Models.NAMES, default="gpt-4o")
-parser.add_argument("--n", type=int, default=None, help="Agents (gpqa only; derived from task for hiddenbench)")
-parser.add_argument("--t", type=int, default=5, help="Number of rounds (agents run t=0..T)")
+parser.add_argument(
+    "--n",
+    type=int,
+    default=None,
+    help="Agents (gpqa only; derived from task for hiddenbench)",
+)
+parser.add_argument(
+    "--t", type=int, default=5, help="Number of rounds (agents run t=0..T)"
+)
 parser.add_argument("--temperature", type=float, default=1.0)
 parser.add_argument("--index", type=int, default=56, help="0-based question/task index")
-parser.add_argument("--r", type=int, default=1, help="Number of independent repetitions")
+parser.add_argument(
+    "--r", type=int, default=1, help="Number of independent repetitions"
+)
 args = parser.parse_args()
 
 if args.dataset == "hiddenbench":
@@ -30,7 +39,9 @@ if args.dataset == "hiddenbench":
     task = loader.load_single(args.index)
     n = len(task.hidden_info)
     if args.n is not None:
-        print(f"{GRAY}Note: --n ignored for hiddenbench; N={n} derived from {n} hidden facts.{RESET}")
+        print(
+            f"{GRAY}Note: --n ignored for hiddenbench; N={n} derived from {n} hidden facts.{RESET}"
+        )
     question_prompts, options, correct_option = loader.prepare_task(task, n)
     question = task.description
     question_id = str(args.index)
@@ -48,7 +59,7 @@ if args.dataset == "hiddenbench":
     print(f"\n{BOLD}N={n}{RESET} (derived from {n} hidden facts)")
 else:
     n = args.n if args.n is not None else 3
-    sample = DataLoader().load_single(args.index)
+    sample = GPQALoader().load_single(args.index)
     shuffled = prepare_samples([sample])[0]
     question_prompts = [_format_prompt(shuffled.question, shuffled.options)] * n
     question = shuffled.question
@@ -95,8 +106,12 @@ for rep in range(args.r):
     color = GREEN if majority_correct else RED
     mark = "✓" if majority_correct else "✗"
 
-    print(f"{BOLD}Final round (t={final_round.round}) votes:{RESET} {dict(vote_counts)}")
-    print(f"{BOLD}Majority vote:{RESET} {color}[{mark}] {majority_answer}{RESET}  (correct: {correct_option})\n")
+    print(
+        f"{BOLD}Final round (t={final_round.round}) votes:{RESET} {dict(vote_counts)}"
+    )
+    print(
+        f"{BOLD}Majority vote:{RESET} {color}[{mark}] {majority_answer}{RESET}  (correct: {correct_option})\n"
+    )
 
     rep_dict = result.to_dict()
     rep_dict["repetition"] = rep
