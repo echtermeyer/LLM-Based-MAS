@@ -18,6 +18,7 @@ class MultiAgentSystem:
         llm: BaseChatModel,
         w: Optional[int] = 1,
         adjacency: Optional[List[List[int]]] = None,
+        verbose: bool = False,
     ) -> None:
         if n < 1:
             raise ValueError(f"n must be >= 1, got {n}")
@@ -29,6 +30,7 @@ class MultiAgentSystem:
         self._n = n
         self._t = t
         self._w = w
+        self._verbose = verbose
         self._llm = llm
         self._adjacency: List[List[int]] = (
             adjacency if adjacency is not None else fully_connected(n)
@@ -46,7 +48,7 @@ class MultiAgentSystem:
         names = [f"Agent{i + 1}" for i in range(self._n)]
         random.shuffle(names)
         agents = [
-            Agent(agent_id=i, name=names[i], llm=self._llm, w=self._w)
+            Agent(agent_id=i, name=names[i], llm=self._llm, w=self._w, verbose=self._verbose)
             for i in range(self._n)
         ]
 

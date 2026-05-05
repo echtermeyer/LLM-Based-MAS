@@ -20,6 +20,7 @@ def run_round(
             agents,
             lambda agent: (agent.id, agent.init_round(question_prompts[agent.id])),
         )
+        _flush_verbose(agents)
         return RoundEntry(
             round=0,
             phase_a=None,
@@ -38,6 +39,7 @@ def run_round(
             ),
         ),
     )
+    _flush_verbose(agents)
 
     phase_b_outputs: Dict[int, PhaseBOutput] = _run_parallel(
         agents,
@@ -55,6 +57,7 @@ def run_round(
             ),
         ),
     )
+    _flush_verbose(agents)
 
     return RoundEntry(
         round=round_index,
@@ -116,3 +119,8 @@ def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:
 
 def _to_entries(cls, agents: List[Agent], outputs: Dict) -> list:
     return [cls(id=a.id, **outputs[a.id].model_dump()) for a in agents]
+
+
+def _flush_verbose(agents: List[Agent]) -> None:
+    for agent in sorted(agents, key=lambda a: a.id):
+        agent.flush_verbose()

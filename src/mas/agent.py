@@ -69,7 +69,7 @@ _ROUND_0_INST = (
 
 class Agent:
     def __init__(
-        self, agent_id: int, name: str, llm: BaseChatModel, w: Optional[int]
+        self, agent_id: int, name: str, llm: BaseChatModel, w: Optional[int], verbose: bool = False
     ) -> None:
         self.id = agent_id
         self.name = name
@@ -78,13 +78,22 @@ class Agent:
         self._llm_b = llm.with_structured_output(PhaseBOutput)
         self._system = SystemMessage(content=self.persona)
         self._w = w
+        self._verbose = verbose
         self._own_history: List[OwnRecord] = []
+        self._verbose_buffer: List[str] = []
+
+    def flush_verbose(self) -> None:
+        for block in self._verbose_buffer:
+            print(block)
+        self._verbose_buffer.clear()
 
     def init_round(self, question_context: str) -> PhaseBOutput:
         content = f"{question_context}\n\n{_ROUND_0_INST}"
         output: PhaseBOutput = self._llm_b.invoke(
             [self._system, HumanMessage(content=content)]
         )
+        if self._verbose:
+            self._verbose_buffer.append(_print_call(self.name, "Round 0 / Phase B (init)", self.persona, content, output.model_dump()))
         self._own_history.append(
             OwnRecord(
                 round=0,
@@ -99,11 +108,15 @@ class Agent:
     def phase_a(
         self, question_context: str, peer_window: List[PeerRecord]
     ) -> PhaseAOutput:
+        round_index = len(self._own_history)
         content = (
             _build_context(question_context, self._windowed(), peer_window)
             + f"\n\n{_PHASE_A_INST}"
         )
-        return self._llm_a.invoke([self._system, HumanMessage(content=content)])
+        output = self._llm_a.invoke([self._system, HumanMessage(content=content)])
+        if self._verbose:
+            self._verbose_buffer.append(_print_call(self.name, f"Round {round_index} / Phase A", self.persona, content, output.model_dump()))
+        return output
 
     def phase_b(
         self,
@@ -112,6 +125,7 @@ class Agent:
         peer_window: List[PeerRecord],
         peer_drafts: List[Tuple[str, str]],
     ) -> PhaseBOutput:
+        round_index = len(self._own_history)
         ctx = _build_context(question_context, self._windowed(), peer_window)
         drafts_block = (
             f"\n\n--- Your Phase A draft this round ---\n{own_draft}"
@@ -122,6 +136,8 @@ class Agent:
         output: PhaseBOutput = self._llm_b.invoke(
             [self._system, HumanMessage(content=content)]
         )
+        if self._verbose:
+            self._verbose_buffer.append(_print_call(self.name, f"Round {round_index} / Phase B", self.persona, content, output.model_dump()))
         self._own_history.append(
             OwnRecord(
                 round=len(self._own_history),
@@ -137,6 +153,33 @@ class Agent:
         if self._w is None:
             return list(self._own_history)
         return self._own_history[-self._w :]
+
+
+_SEP = "─" * 72
+_BOLD = "\033[1m"
+_YELLOW = "\033[93m"
+_RESET = "\033[0m"
+
+
+def _print_call(
+    agent_name: str,
+    label: str,
+    system_content: str,
+    input_content: str,
+    output: Dict[str, str],
+) -> str:
+    lines = [
+        f"\n{_BOLD}{_SEP}{_RESET}",
+        f"{_BOLD}{agent_name}  │  {label}{_RESET}",
+        f"{_BOLD}{_SEP}{_RESET}",
+        f"{_YELLOW}[SYSTEM]{_RESET}\n{system_content}",
+        f"\n{_YELLOW}[INPUT]{_RESET}\n{input_content}",
+        f"\n{_YELLOW}[OUTPUT]{_RESET}",
+    ]
+    for k, v in output.items():
+        lines.append(f"{_BOLD}{k}:{_RESET} {v}")
+    lines.append(f"{_BOLD}{_SEP}{_RESET}\n")
+    return "\n".join(lines)
 
 
 def _build_context(
@@ -159,7 +202,7 @@ def _build_context(
         parts.append(f"--- Round {rnd} ---")
         if rnd in own_by_round:
             rec = own_by_round[rnd]
-            line = f"You: vote={rec.vote} | message: {rec.message}"
+            line = f"You: vote={rec.vote} | reasoning: {rec.reasoning} | message: {rec.message}"
             if rec.draft is not None:
                 line += f" | draft: {rec.draft}"
             parts.append(line)

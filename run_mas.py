@@ -38,6 +38,7 @@ parser.add_argument(
     default=1,
     help="Memory window W (rounds of history visible per call; -1 for infinite)",
 )
+parser.add_argument("--verbose", action="store_true", help="Print full prompts and responses")
 args = parser.parse_args()
 if args.w != -1 and args.w < 1:
     parser.error("--w must be >= 1 or -1 (infinite)")
@@ -98,14 +99,14 @@ for rep in range(args.r):
     if args.r > 1:
         print(f"{BOLD}--- Repetition {rep + 1}/{args.r} ---{RESET}\n")
 
-    mas = MultiAgentSystem(n=n, t=args.t, llm=llm, w=w)
+    mas = MultiAgentSystem(n=n, t=args.t, llm=llm, w=w, verbose=args.verbose)
     result = mas.run(
         question=question,
         options=options,
         question_id=question_id,
         ground_truth=correct_option,
         question_prompts=question_prompts,
-        on_round_complete=lambda r: print_round(r, correct_option),
+        on_round_complete=lambda r: print_round(r, correct_option, verbose=args.verbose),
     )
 
     final_round = result.trajectory[-1]
