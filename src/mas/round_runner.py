@@ -1,7 +1,8 @@
+import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Tuple
 
-from src.mas.agent import Agent, PhaseAOutput, PhaseBOutput
+from src.mas.agent import Agent, PeerRecord, PhaseAOutput, PhaseBOutput
 from src.mas.logging import PhaseAEntry, PhaseBEntry, RoundEntry
 from src.mas.topology import neighbors
 
@@ -11,12 +12,13 @@ def run_round(
     question_prompts: List[str],
     adjacency: List[List[int]],
     round_index: int,
-    prev_phase_b_messages: Optional[List[str]],
+    trajectory: List[RoundEntry],
+    w: Optional[int],
 ) -> RoundEntry:
     if round_index == 0:
         phase_b_outputs = _run_parallel(
             agents,
-            lambda agent: (agent.id, agent.respond_phase_b(0, question_prompts[agent.id], [])),
+            lambda agent: (agent.id, agent.init_round(question_prompts[agent.id])),
         )
         return RoundEntry(
             round=0,
@@ -28,12 +30,11 @@ def run_round(
         agents,
         lambda agent: (
             agent.id,
-            agent.respond_phase_a(
-                round_index,
-                [
-                    (j, prev_phase_b_messages[j])
-                    for j in neighbors(adjacency, agent.id)
-                ],
+            agent.phase_a(
+                question_prompts[agent.id],
+                _build_peer_window(
+                    neighbors(adjacency, agent.id), trajectory, round_index, w, agents
+                ),
             ),
         ),
     )
@@ -42,13 +43,15 @@ def run_round(
         agents,
         lambda agent: (
             agent.id,
-            agent.respond_phase_b(
-                round_index,
+            agent.phase_b(
                 question_prompts[agent.id],
-                [
-                    (j, phase_a_outputs[j].draft)
-                    for j in neighbors(adjacency, agent.id)
-                ],
+                phase_a_outputs[agent.id].draft,
+                _build_peer_window(
+                    neighbors(adjacency, agent.id), trajectory, round_index, w, agents
+                ),
+                _shuffled_peer_drafts(
+                    neighbors(adjacency, agent.id), agents, phase_a_outputs
+                ),
             ),
         ),
     )
@@ -58,6 +61,47 @@ def run_round(
         phase_a=_to_entries(PhaseAEntry, agents, phase_a_outputs),
         phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs),
     )
+
+
+def _build_peer_window(
+    neighbor_ids: List[int],
+    trajectory: List[RoundEntry],
+    round_index: int,
+    w: Optional[int],
+    agents: List[Agent],
+) -> List[PeerRecord]:
+    limit = round_index if w is None else min(round_index, w)
+    records = []
+    for k in range(1, limit + 1):
+        r = round_index - k
+        rentry = trajectory[r]
+        pb_by_id = {e.id: e for e in rentry.phase_b}
+        pa_by_id = {e.id: e for e in rentry.phase_a} if rentry.phase_a else {}
+        peers_this_round = []
+        for j in neighbor_ids:
+            pb = pb_by_id[j]
+            peers_this_round.append(
+                PeerRecord(
+                    name=agents[j].name,
+                    round=r,
+                    vote=pb.vote,
+                    message=pb.message,
+                    draft=pa_by_id[j].draft if j in pa_by_id else None,
+                )
+            )
+        random.shuffle(peers_this_round)
+        records.extend(peers_this_round)
+    return records
+
+
+def _shuffled_peer_drafts(
+    neighbor_ids: List[int],
+    agents: List[Agent],
+    phase_a_outputs: Dict[int, PhaseAOutput],
+) -> List[Tuple[str, str]]:
+    ns = list(neighbor_ids)
+    random.shuffle(ns)
+    return [(agents[j].name, phase_a_outputs[j].draft) for j in ns]
 
 
 def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:
@@ -70,5 +114,5 @@ def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:
     return results
 
 
-def _to_entries(cls: Type, agents: List[Agent], outputs: Dict) -> list:
+def _to_entries(cls, agents: List[Agent], outputs: Dict) -> list:
     return [cls(id=a.id, **outputs[a.id].model_dump()) for a in agents]

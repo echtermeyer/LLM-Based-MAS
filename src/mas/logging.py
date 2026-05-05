@@ -39,6 +39,7 @@ class RunResult:
     ground_truth: str
     N: int
     T: int
+    W: Optional[int]
     topology: List[List[int]]
     agents: List[AgentMeta]
     trajectory: List[RoundEntry]
@@ -52,6 +53,7 @@ class RunResult:
             "ground_truth": self.ground_truth,
             "N": self.N,
             "T": self.T,
+            "W": self.W,
             "topology": self.topology,
             "agents": [
                 {"id": a.id, "model": a.model, "persona": a.persona}

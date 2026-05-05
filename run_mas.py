@@ -32,7 +32,16 @@ parser.add_argument("--index", type=int, default=56, help="0-based question/task
 parser.add_argument(
     "--r", type=int, default=1, help="Number of independent repetitions"
 )
+parser.add_argument(
+    "--w",
+    type=int,
+    default=1,
+    help="Memory window W (rounds of history visible per call; -1 for infinite)",
+)
 args = parser.parse_args()
+if args.w != -1 and args.w < 1:
+    parser.error("--w must be >= 1 or -1 (infinite)")
+w = None if args.w == -1 else args.w
 
 if args.dataset == "hiddenbench":
     loader = HiddenBenchLoader()
@@ -78,8 +87,8 @@ else:
             print(f"  {label}: {text.strip()}")
 
 print(
-    f"\n{BOLD}Running MAS — N={n} agents, T={args.t} rounds, model={args.model}, "
-    f"temperature={args.temperature}, R={args.r} repetitions{RESET}\n"
+    f"\n{BOLD}Running MAS — N={n} agents, T={args.t} rounds, W={'∞' if w is None else w}, "
+    f"model={args.model}, temperature={args.temperature}, R={args.r} repetitions{RESET}\n"
 )
 
 llm = Models.create(args.model, args.temperature)
@@ -89,7 +98,7 @@ for rep in range(args.r):
     if args.r > 1:
         print(f"{BOLD}--- Repetition {rep + 1}/{args.r} ---{RESET}\n")
 
-    mas = MultiAgentSystem(n=n, t=args.t, llm=llm)
+    mas = MultiAgentSystem(n=n, t=args.t, llm=llm, w=w)
     result = mas.run(
         question=question,
         options=options,
@@ -132,6 +141,7 @@ output = {
     "ground_truth": first["ground_truth"],
     "N": first["N"],
     "T": first["T"],
+    "W": first["W"],
     "temperature": args.temperature,
     "model": args.model,
     "R": args.r,
@@ -141,7 +151,8 @@ output = {
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-filename = f"{timestamp}_{args.dataset}_{args.model}_N{n}_T{args.t}_temp{args.temperature}_q{args.index}_R{args.r}.json"
+w_tag = "inf" if w is None else str(w)
+filename = f"{timestamp}_{args.dataset}_{args.model}_N{n}_T{args.t}_W{w_tag}_temp{args.temperature}_q{args.index}_R{args.r}.json"
 path = RESULTS_DIR / filename
 path.write_text(json.dumps(output, indent=2))
 print(f"\n{GRAY}Saved → {path}{RESET}")
