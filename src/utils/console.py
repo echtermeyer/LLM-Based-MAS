@@ -39,12 +39,17 @@ def print_round(round_entry: RoundEntry, correct_option: str, verbose: bool = Fa
     if round_entry.phase_a is not None:
         print(f"  {YELLOW}Phase A:{RESET}")
         for entry in round_entry.phase_a:
-            msg = entry.draft
             if verbose:
-                print(f"    Agent{entry.id + 1}:\n      draft: {GRAY}{msg}{RESET}")
-            else:
                 print(
-                    f"    Agent{entry.id + 1}: {GRAY}{msg[:80]}{'…' if len(msg) > 80 else ''}{RESET}"
+                    f"    Agent{entry.id + 1}:\n"
+                    f"      defense: {GRAY}{entry.defense}{RESET}\n"
+                    f"      challenge: {GRAY}{entry.challenge}{RESET}\n"
+                    f"      question: {GRAY}{entry.question}{RESET}"
+                )
+            else:
+                preview = entry.defense
+                print(
+                    f"    Agent{entry.id + 1}: {GRAY}{preview[:80]}{'…' if len(preview) > 80 else ''}{RESET}"
                 )
     print(f"  {YELLOW}Phase B:{RESET}")
     for entry in round_entry.phase_b:

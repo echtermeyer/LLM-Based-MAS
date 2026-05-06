@@ -2,7 +2,7 @@ import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional, Tuple
 
-from src.mas.agent import Agent, PeerRecord, PhaseAOutput, PhaseBOutput
+from src.mas.agent import Agent, PeerRecord, PhaseAOutput, PhaseBOutput, _format_phase_a
 from src.mas.logging import PhaseAEntry, PhaseBEntry, RoundEntry
 from src.mas.topology import neighbors
 
@@ -47,7 +47,7 @@ def run_round(
             agent.id,
             agent.phase_b(
                 question_prompts[agent.id],
-                phase_a_outputs[agent.id].draft,
+                _format_phase_a(phase_a_outputs[agent.id]),
                 _build_peer_window(
                     neighbors(adjacency, agent.id), trajectory, round_index, w, agents
                 ),
@@ -89,7 +89,11 @@ def _build_peer_window(
                     round=r,
                     vote=pb.vote,
                     message=pb.message,
-                    draft=pa_by_id[j].draft if j in pa_by_id else None,
+                    draft=(
+                        f"defense: {pa_by_id[j].defense}\n"
+                        f"challenge: {pa_by_id[j].challenge}\n"
+                        f"question: {pa_by_id[j].question}"
+                    ) if j in pa_by_id else None,
                 )
             )
         random.shuffle(peers_this_round)
@@ -104,7 +108,7 @@ def _shuffled_peer_drafts(
 ) -> List[Tuple[str, str]]:
     ns = list(neighbor_ids)
     random.shuffle(ns)
-    return [(agents[j].name, phase_a_outputs[j].draft) for j in ns]
+    return [(agents[j].name, _format_phase_a(phase_a_outputs[j])) for j in ns]
 
 
 def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:

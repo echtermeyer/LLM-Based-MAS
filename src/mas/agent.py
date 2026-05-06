@@ -8,10 +8,29 @@ from pydantic import BaseModel, Field
 
 
 class PhaseAOutput(BaseModel):
-    draft: str = Field(
+    defense: str = Field(
         description=(
-            "Interim communicative act — clarification, agreement, question, "
-            "partial argument, or observation. Not a final commitment."
+            "One concrete reason your CURRENT vote is correct (≤ 2 sentences). "
+            "State a NEW point or a specific computational/conceptual claim. "
+            "Do NOT restate or summarize your previous reasoning — peers already have it."
+        )
+    )
+    challenge: str = Field(
+        description=(
+            "Either: quote or paraphrase ONE specific claim from a peer's MOST RECENT round "
+            "that you disagree with, and state why (≤ 2 sentences). "
+            "Or: write \"concede: [the claim you accept]\" followed by any remaining specific "
+            "numerical/conceptual disagreement (if any). "
+            "Do not challenge claims a peer has already retracted. "
+            'If no current peer claim is challengeable, write "none" and explain why.'
+        )
+    )
+    question: str = Field(
+        description=(
+            "One specific question to a named peer about their reasoning (≤ 2 sentences). "
+            "Must reference a concrete claim or number — "
+            '"How does your sum of 9.6 produce 251 fm without 1/k?" is specific; '
+            '"What about units?" is not.'
         )
     )
 
@@ -19,7 +38,15 @@ class PhaseAOutput(BaseModel):
 class PhaseBOutput(BaseModel):
     reasoning: str = Field(description="Your private chain-of-thought (never shared)")
     vote: Literal["A", "B", "C", "D"] = Field(description="Your current best answer")
-    message: str = Field(description="Public message broadcast to neighbors next round")
+    message: str = Field(
+        description=(
+            "Begin by addressing any questions peers directed at you in this round's Phase A. "
+            "For each such question, provide a specific number or short computation if a number "
+            "was asked for, or explicitly state \"I cannot produce this value because X.\" "
+            "Do not substitute peer consensus for an answer; do not paraphrase the question back. "
+            "After answering, state your conclusion as usual."
+        )
+    )
 
 
 @dataclass
@@ -45,21 +72,22 @@ You are {name}, part of a collaborative group working on a multiple-choice probl
 Your goal is to reach the correct answer together.
 
 Each round (after round 0) has two phases:
-  - Phase A: broadcast a draft message to your neighbors. Share thoughts, ask questions, \
-respond to peers. Do not commit to a final answer.
-  - Phase B: you see your neighbors' Phase A drafts. Produce your updated vote, \
+  - Phase A: output three structured fields — defense (a new concrete reason your current \
+vote is correct), challenge (dispute a specific current peer claim, or concede it and name \
+any remaining disagreement), question (a targeted question to a named peer referencing a \
+concrete claim or number). Do not change your vote in this phase.
+  - Phase B: you see your neighbors' Phase A outputs. Produce your updated vote, \
 private reasoning, and public message.
 
 Be critical — your neighbors may be wrong, and so may you.\
 """
 
-_PHASE_A_INST = (
-    "Produce an interim communicative act in response to peers' last messages — "
-    "clarification, agreement, question, partial argument, or observation. "
-    "This is not your final position."
-)
+_PHASE_A_INST = "Produce your Phase A structured output. Do not change your vote in this phase."
 
-_PHASE_B_INST = "Update your belief, private reasoning, and public message."
+_PHASE_B_INST = (
+    "Update your belief, private reasoning, and public message. "
+    "If you change your vote, cite the specific Phase A draft (own or peer) that caused the update."
+)
 
 _ROUND_0_INST = (
     "Carefully read the question and options. "
@@ -156,6 +184,14 @@ class Agent:
 
 
 _SEP = "─" * 72
+
+
+def _format_phase_a(output: PhaseAOutput) -> str:
+    return (
+        f"defense: {output.defense}\n"
+        f"challenge: {output.challenge}\n"
+        f"question: {output.question}"
+    )
 _BOLD = "\033[1m"
 _YELLOW = "\033[93m"
 _RESET = "\033[0m"
