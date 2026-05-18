@@ -24,7 +24,7 @@ def embed_repetition(rep: Dict, embedder: Embedder) -> Dict:
     for entry in rep["trajectory"]:
         r = entry["round"]
         for e in entry.get("phase_a", []):
-            texts.append(e["draft"].strip())
+            texts.append(e["defense"].strip())
             slots.append((r, e["id"], "draft"))
         for e in entry["phase_b"]:
             texts.append(e["message"].strip())

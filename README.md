@@ -11,6 +11,8 @@
 Save the output including the color coding:
 ```
 unbuffer python run_mas.py --dataset gpqa --index 56 --n 2 --t 2 --w 1 --model gpt-4o --verbose 2>&1 | tee run_output.txt
+unbuffer python run_mas.py --dataset hiddenbench --index 0 --n 3 --t 2 --w 1 --model gpt-4o --verbose 2>&1 | tee run_output.txt
+
 ```
 Read the log in the terminal with unlimited output length:
 ```

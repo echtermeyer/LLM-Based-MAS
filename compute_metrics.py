@@ -53,6 +53,12 @@ def process_file(path: Path, embedder: Embedder, out_dir: Path) -> Path:
     return dest
 
 
+def augment_files(paths: list, out_dir: Path = DEFAULT_OUT_DIR) -> None:
+    embedder = Embedder()
+    for path in paths:
+        process_file(Path(path), embedder, out_dir)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("inputs", nargs="+", type=Path)
