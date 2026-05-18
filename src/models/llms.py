@@ -22,53 +22,69 @@ from gen_ai_hub.proxy.langchain.amazon import (
 )
 from gen_ai_hub.proxy.langchain.google_genai import init_chat_model as _google_genai
 
-_DEFAULT_TEMPERATURE = 1.0
-_MAX_TOKENS = 16_000
+_MAX_TOKENS = 128_000
 
+_TEMPERATURES: Dict[str, float] = {
+    "gpt-4o": 1.0,
+    "claude-sonnet-4": 1.0,
+    "claude-sonnet-4.5": 1.0,
+    "gemini-pro": 1.0,
+    "nova-pro": 1.0,
+    "mistral-large": 0.7,  # See https://huggingface.co/mistralai/Mistral-Medium-3.5-128B
+}
 
-_FACTORIES: Dict[str, Callable[[float], BaseChatModel]] = {
-    "gpt-4o": lambda t: init_llm("gpt-4o", temperature=t, max_tokens=_MAX_TOKENS),
-    "claude-sonnet-4": lambda t: init_llm(
+_FACTORIES: Dict[str, Callable[[], BaseChatModel]] = {
+    "gpt-4o": lambda: init_llm(
+        "gpt-4o", temperature=_TEMPERATURES["gpt-4o"], max_tokens=_MAX_TOKENS
+    ),
+    "claude-sonnet-4": lambda: init_llm(
         "anthropic--claude-4-sonnet",
         model_id="anthropic.claude-sonnet-4-20250514-v1:0",
         init_func=_amazon_converse,
         max_tokens=_MAX_TOKENS,
-        temperature=t,
+        temperature=_TEMPERATURES["claude-sonnet-4"],
     ),
-    "claude-sonnet-4.5": lambda t: init_llm(
+    "claude-sonnet-4.5": lambda: init_llm(
         "anthropic--claude-4.5-sonnet",
         model_id="anthropic.claude-sonnet-4-5-20251101-v1:0",
         init_func=_amazon_converse,
         max_tokens=_MAX_TOKENS,
         top_p=None,
-        temperature=t,
+        temperature=_TEMPERATURES["claude-sonnet-4.5"],
     ),
-    "gemini-pro": lambda t: init_llm(
-        "gemini-2.5-pro", init_func=_google_genai, max_tokens=_MAX_TOKENS, temperature=t
+    "gemini-pro": lambda: init_llm(
+        "gemini-2.5-pro",
+        init_func=_google_genai,
+        max_tokens=_MAX_TOKENS,
+        temperature=_TEMPERATURES["gemini-pro"],
     ),
-    "nova-pro": lambda t: init_llm(
+    "nova-pro": lambda: init_llm(
         "amazon--nova-pro",
         model_id="amazon.nova-pro-v1:0",
         init_func=_amazon_converse,
         max_tokens=_MAX_TOKENS,
         top_p=None,
-        temperature=t,
+        temperature=_TEMPERATURES["nova-pro"],
     ),
-    "mistral-large": lambda t: init_llm(
-        "mistralai--mistral-large-instruct", temperature=t, max_tokens=_MAX_TOKENS
+    "mistral-large": lambda: init_llm(
+        "mistralai--mistral-medium-instruct",
+        temperature=_TEMPERATURES["mistral-large"],
+        max_tokens=_MAX_TOKENS,
+        model_kwargs={"reasoning_effort": "none"},
     ),
 }
 
 
 class Models:
-    GPT_4O = _FACTORIES["gpt-4o"](_DEFAULT_TEMPERATURE)
-    CLAUDE_SONNET_4 = _FACTORIES["claude-sonnet-4"](_DEFAULT_TEMPERATURE)
-    CLAUDE_SONNET_45 = _FACTORIES["claude-sonnet-4.5"](_DEFAULT_TEMPERATURE)
-    GEMINI_PRO = _FACTORIES["gemini-pro"](_DEFAULT_TEMPERATURE)
-    NOVA_PRO = _FACTORIES["nova-pro"](_DEFAULT_TEMPERATURE)
-    MISTRAL_LARGE = _FACTORIES["mistral-large"](_DEFAULT_TEMPERATURE)
+    GPT_4O = _FACTORIES["gpt-4o"]()
+    CLAUDE_SONNET_4 = _FACTORIES["claude-sonnet-4"]()
+    CLAUDE_SONNET_45 = _FACTORIES["claude-sonnet-4.5"]()
+    GEMINI_PRO = _FACTORIES["gemini-pro"]()
+    NOVA_PRO = _FACTORIES["nova-pro"]()
+    MISTRAL_LARGE = _FACTORIES["mistral-large"]()
 
     NAMES = list(_FACTORIES.keys())
+    TEMPERATURES = _TEMPERATURES
 
     ALL = [
         GPT_4O,
@@ -80,9 +96,7 @@ class Models:
     ]
 
     @classmethod
-    def create(
-        cls, name: str, temperature: float = _DEFAULT_TEMPERATURE
-    ) -> BaseChatModel:
+    def create(cls, name: str) -> BaseChatModel:
         if name not in _FACTORIES:
             raise ValueError(f"Unknown model '{name}'. Available: {cls.NAMES}")
-        return _FACTORIES[name](temperature)
+        return _FACTORIES[name]()

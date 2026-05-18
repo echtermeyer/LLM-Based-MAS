@@ -7,7 +7,14 @@ from langchain_core.language_models import BaseChatModel
 from src.mas.agent import Agent
 from src.mas.logging import AgentMeta, RoundEntry, RunResult
 from src.mas.round_runner import run_round
-from src.mas.topology import fully_connected
+from src.mas.topology import TOPOLOGY_NAMES, chain, fully_connected, ring, star
+
+_TOPOLOGY_FACTORIES: Dict[str, Callable[[int, int], List[List[int]]]] = {
+    "fc": lambda n, hub: fully_connected(n),
+    "ring": lambda n, hub: ring(n),
+    "chain": lambda n, hub: chain(n),
+    "star": lambda n, hub: star(n, hub),
+}
 
 
 class MultiAgentSystem:
@@ -17,7 +24,7 @@ class MultiAgentSystem:
         t: int,
         llm: BaseChatModel,
         w: Optional[int] = 1,
-        adjacency: Optional[List[List[int]]] = None,
+        topology_name: str = "fc",
         verbose: bool = False,
     ) -> None:
         if n < 1:
@@ -26,15 +33,19 @@ class MultiAgentSystem:
             raise ValueError(f"t must be >= 1, got {t}")
         if w is not None and w < 1:
             raise ValueError(f"w must be >= 1 or None (infinite), got {w}")
+        if topology_name not in _TOPOLOGY_FACTORIES:
+            raise ValueError(
+                f"Unknown topology '{topology_name}'. Available: {TOPOLOGY_NAMES}"
+            )
 
         self._n = n
         self._t = t
         self._w = w
         self._verbose = verbose
         self._llm = llm
-        self._adjacency: List[List[int]] = (
-            adjacency if adjacency is not None else fully_connected(n)
-        )
+        self._topology_name = topology_name
+        hub = random.randint(0, n - 1) if topology_name == "star" else 0
+        self._adjacency = _TOPOLOGY_FACTORIES[topology_name](n, hub)
 
     def run(
         self,
@@ -80,6 +91,7 @@ class MultiAgentSystem:
             N=self._n,
             T=self._t,
             W=self._w,
+            topology_name=self._topology_name,
             topology=self._adjacency,
             agents=agent_metas,
             trajectory=trajectory,

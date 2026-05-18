@@ -42,6 +42,7 @@ class RunResult:
     N: int
     T: int
     W: Optional[int]
+    topology_name: str
     topology: List[List[int]]
     agents: List[AgentMeta]
     trajectory: List[RoundEntry]
@@ -56,6 +57,7 @@ class RunResult:
             "N": self.N,
             "T": self.T,
             "W": self.W,
+            "topology_name": self.topology_name,
             "topology": self.topology,
             "agents": [
                 {"id": a.id, "model": a.model, "persona": a.persona}
