@@ -22,7 +22,7 @@ from gen_ai_hub.proxy.langchain.amazon import (
 )
 from gen_ai_hub.proxy.langchain.google_genai import init_chat_model as _google_genai
 
-_MAX_TOKENS = 128_000
+_MAX_TOKENS = 64_000
 
 _TEMPERATURES: Dict[str, float] = {
     "gpt-4o": 1.0,
@@ -30,7 +30,7 @@ _TEMPERATURES: Dict[str, float] = {
     "claude-sonnet-4.5": 1.0,
     "gemini-pro": 1.0,
     "nova-pro": 1.0,
-    "mistral-large": 0.7,  # See https://huggingface.co/mistralai/Mistral-Medium-3.5-128B
+    "mistral-medium": 0.7,  # See https://huggingface.co/mistralai/Mistral-Medium-3.5-128B
 }
 
 _FACTORIES: Dict[str, Callable[[], BaseChatModel]] = {
@@ -66,9 +66,9 @@ _FACTORIES: Dict[str, Callable[[], BaseChatModel]] = {
         top_p=None,
         temperature=_TEMPERATURES["nova-pro"],
     ),
-    "mistral-large": lambda: init_llm(
+    "mistral-medium": lambda: init_llm(
         "mistralai--mistral-medium-instruct",
-        temperature=_TEMPERATURES["mistral-large"],
+        temperature=_TEMPERATURES["mistral-medium"],
         max_tokens=_MAX_TOKENS,
         model_kwargs={"reasoning_effort": "none"},
     ),
@@ -81,7 +81,7 @@ class Models:
     CLAUDE_SONNET_45 = _FACTORIES["claude-sonnet-4.5"]()
     GEMINI_PRO = _FACTORIES["gemini-pro"]()
     NOVA_PRO = _FACTORIES["nova-pro"]()
-    MISTRAL_LARGE = _FACTORIES["mistral-large"]()
+    MISTRAL_LARGE = _FACTORIES["mistral-medium"]()
 
     NAMES = list(_FACTORIES.keys())
     TEMPERATURES = _TEMPERATURES

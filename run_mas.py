@@ -6,6 +6,8 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tqdm import tqdm
+
 from src.benchmark.benchmarker import _format_prompt
 from src.benchmark.gpqa_loader import GPQALoader, prepare_samples
 from src.benchmark.hiddenbench_loader import HiddenBenchLoader
@@ -20,7 +22,7 @@ parser = argparse.ArgumentParser(
     description="Run synchronous-round MAS debate on a single question."
 )
 parser.add_argument("--dataset", choices=["gpqa", "hiddenbench"], default="gpqa")
-parser.add_argument("--model", choices=Models.NAMES, default="mistral-large")
+parser.add_argument("--model", choices=Models.NAMES, default="mistral-medium")
 parser.add_argument(
     "--n",
     type=int,
@@ -44,7 +46,13 @@ parser.add_argument(
     default=["fc"],
     help="Topology name(s). Multiple values run all combos. fc=fully connected, ring=directed limit-cycle, chain=undirected line, star=hub+leaves (hub randomized per run).",
 )
-parser.add_argument("--index", type=int, nargs="+", default=[56], help="0-based question/task index (multiple values run each in sequence)")
+parser.add_argument(
+    "--index",
+    type=int,
+    nargs="+",
+    default=[56],
+    help="0-based question/task index (multiple values run each in sequence)",
+)
 parser.add_argument(
     "--r", type=int, default=1, help="Number of independent repetitions"
 )
@@ -62,6 +70,9 @@ llm = Models.create(args.model)
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
+total_combos = len(args.index) * len(args.w) * len(args.topology)
+combo_idx = 0
+
 for index in args.index:
     if args.dataset == "hiddenbench":
         loader = HiddenBenchLoader()
@@ -70,18 +81,6 @@ for index in args.index:
         question_prompts, options, correct_option = loader.prepare_task(task, n)
         question = task.description
         question_id = str(index)
-
-        print(f"\n{BOLD}Dataset:{RESET} hiddenbench")
-        print(f"{BOLD}Task index:{RESET} {index}  ({task.name})")
-        desc_preview = task.description[:120].replace("\n", " ")
-        print(f"{BOLD}Scenario:{RESET} {desc_preview}…\n")
-        print(f"{BOLD}Options:{RESET}")
-        for label, text in options.items():
-            if label == correct_option:
-                print(f"  {GREEN}{label}: {text.strip()}{RESET}")
-            else:
-                print(f"  {label}: {text.strip()}")
-        print(f"\n{BOLD}N={n}{RESET} (derived from {n} hidden facts)")
     else:
         n = args.n
         sample = GPQALoader().load_single(index)
@@ -92,36 +91,34 @@ for index in args.index:
         correct_option = shuffled.correct_option
         question_id = str(index)
 
-        print(f"\n{BOLD}Dataset:{RESET} gpqa")
-        print(f"{BOLD}Question index:{RESET} {index}")
-        print(f"{BOLD}Question:{RESET} {shuffled.question}\n")
-        print(f"{BOLD}Options:{RESET}")
-        for label, text in options.items():
-            if label == correct_option:
-                print(f"  {GREEN}{label}: {text.strip()}{RESET}")
-            else:
-                print(f"  {label}: {text.strip()}")
-
     for w in args.w:
         for topo in args.topology:
+            combo_idx += 1
             print(
-                f"\n{BOLD}Running MAS — N={n} agents, T={args.t} rounds, W={w}, "
-                f"topology={topo}, model={args.model}, temperature={temperature}, "
-                f"R={args.r} repetitions{RESET}\n"
+                f"\nConfig {combo_idx}/{total_combos}  "
+                f"q={index} | W={w} | topo={topo} | N={n} T={args.t} R={args.r} | model={args.model}\n"
+                f"  {question[:120].replace(chr(10), ' ')}…"
             )
 
             repetitions = []
             combo_start = time.monotonic()
+            started_at = datetime.now(timezone.utc).isoformat()
 
-            for rep in range(args.r):
-                if args.r > 1:
-                    print(f"{BOLD}--- Repetition {rep + 1}/{args.r} ---{RESET}\n")
+            bar = tqdm(range(args.r), unit="rep", leave=True, disable=args.verbose)
+            for rep in bar:
+                if args.verbose:
+                    print(f"\n{BOLD}--- Repetition {rep + 1}/{args.r} ---{RESET}\n")
 
                 rep_start = time.monotonic()
                 seed = random.getrandbits(32)
                 random.seed(seed)
                 mas = MultiAgentSystem(
-                    n=n, t=args.t, llm=llm, w=w, topology_name=topo, verbose=args.verbose
+                    n=n,
+                    t=args.t,
+                    llm=llm,
+                    w=w,
+                    topology_name=topo,
+                    verbose=args.verbose,
                 )
                 result = mas.run(
                     question=question,
@@ -129,24 +126,31 @@ for index in args.index:
                     question_id=question_id,
                     ground_truth=correct_option,
                     question_prompts=question_prompts,
-                    on_round_complete=lambda r: print_round(
-                        r, correct_option, verbose=args.verbose
+                    on_round_complete=lambda r: (
+                        print_round(r, correct_option, verbose=True)
+                        if args.verbose
+                        else None
                     ),
                 )
 
                 final_round = result.trajectory[-1]
+                init_round = result.trajectory[0]
                 vote_counts = Counter(e.vote for e in final_round.phase_b)
+                init_counts = Counter(e.vote for e in init_round.phase_b)
                 majority_answer, _ = vote_counts.most_common(1)[0]
                 majority_correct = majority_answer == correct_option
-                color = GREEN if majority_correct else RED
-                mark = "✓" if majority_correct else "✗"
+                mark = f"{GREEN}✓{RESET}" if majority_correct else f"{RED}✗{RESET}"
+                votes_str = " ".join(f"{k}:{v}" for k, v in sorted(vote_counts.items()))
+                init_str = " ".join(f"{k}:{v}" for k, v in sorted(init_counts.items()))
 
-                print(
-                    f"{BOLD}Final round (t={final_round.round}) votes:{RESET} {dict(vote_counts)}"
-                )
-                print(
-                    f"{BOLD}Majority vote:{RESET} {color}[{mark}] {majority_answer}{RESET}  (correct: {correct_option})\n"
-                )
+                if args.verbose:
+                    print(
+                        f"\n{BOLD}Majority vote:{RESET} {mark} {majority_answer}  [{votes_str}]  (correct: {correct_option})"
+                    )
+                else:
+                    tqdm.write(
+                        f"  rep {rep + 1:>3}: {mark} {majority_answer}  t0=[{init_str}] → tf=[{votes_str}]"
+                    )
 
                 rep_dict = result.to_dict()
                 rep_dict["repetition"] = rep
@@ -156,12 +160,10 @@ for index in args.index:
                 rep_dict["duration_s"] = round(time.monotonic() - rep_start, 2)
                 repetitions.append(rep_dict)
 
-            if args.r > 1:
-                n_correct = sum(r["correct"] for r in repetitions)
-                print(f"{BOLD}Summary:{RESET} {n_correct}/{args.r} repetitions correct")
+            n_correct = sum(r["correct"] for r in repetitions)
+            print(f"  {n_correct}/{args.r} correct")
 
             first = repetitions[0]
-            started_at = datetime.now(timezone.utc).isoformat()
             output = {
                 "started_at": started_at,
                 "dataset": args.dataset,
@@ -187,4 +189,4 @@ for index in args.index:
             )
             path = RESULTS_DIR / filename
             path.write_text(json.dumps(output, indent=2))
-            print(f"{GRAY}Saved → {path}{RESET}")
+            print(f"  {GRAY}Saved → {path}{RESET}")
