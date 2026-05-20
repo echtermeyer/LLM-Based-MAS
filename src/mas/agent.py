@@ -69,7 +69,7 @@ class PeerRecord:
 
 _PERSONA = """\
 You are {name}, part of a collaborative group working on a multiple-choice problem. \
-Your goal is to reach the correct answer together.
+Your goal is to help the group find the correct answer — agreement should follow from better arguments, not the other way around.
 
 Each round (after round 0) has two phases:
   - Phase A: output three structured fields — defense (a new concrete reason your current \
@@ -243,7 +243,7 @@ def _build_context(
                 line += f" | draft: {rec.draft}"
             parts.append(line)
         for rec in pb_by_round.get(rnd, []):
-            line = f"{rec.name}: vote={rec.vote} | message: {rec.message}"
+            line = f"{rec.name}: message: {rec.message}"
             if rec.draft is not None:
                 line += f" | draft: {rec.draft}"
             parts.append(line)
