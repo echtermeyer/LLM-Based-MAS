@@ -25,6 +25,7 @@ class MultiAgentSystem:
         llm: BaseChatModel,
         w: Optional[int] = 1,
         topology_name: str = "fc",
+        rng: Optional[random.Random] = None,
         verbose: bool = False,
     ) -> None:
         if n < 1:
@@ -44,7 +45,8 @@ class MultiAgentSystem:
         self._verbose = verbose
         self._llm = llm
         self._topology_name = topology_name
-        hub = random.randint(0, n - 1) if topology_name == "star" else 0
+        self._rng = rng if rng is not None else random.Random()
+        hub = self._rng.randint(0, n - 1) if topology_name == "star" else 0
         self._adjacency = _TOPOLOGY_FACTORIES[topology_name](n, hub)
 
     def run(
@@ -57,7 +59,7 @@ class MultiAgentSystem:
         on_round_complete: Optional[Callable[[RoundEntry], None]] = None,
     ) -> RunResult:
         names = [f"Agent{i + 1}" for i in range(self._n)]
-        random.shuffle(names)
+        self._rng.shuffle(names)
         agents = [
             Agent(agent_id=i, name=names[i], llm=self._llm, w=self._w, verbose=self._verbose)
             for i in range(self._n)
@@ -72,6 +74,7 @@ class MultiAgentSystem:
                 round_index=t,
                 trajectory=trajectory,
                 w=self._w,
+                rng=self._rng,
             )
             trajectory.append(round_entry)
             if on_round_complete is not None:

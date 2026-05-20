@@ -14,6 +14,7 @@ def run_round(
     round_index: int,
     trajectory: List[RoundEntry],
     w: Optional[int],
+    rng: random.Random,
 ) -> RoundEntry:
     if round_index == 0:
         phase_b_outputs = _run_parallel(
@@ -27,6 +28,10 @@ def run_round(
             phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs),
         )
 
+    # Pre-generate per-agent rngs before entering threadpool so the rep-level
+    # rng is only ever accessed from the rep's own thread (no shared-state races).
+    phase_a_rngs = {a.id: random.Random(rng.randint(0, 2**32 - 1)) for a in agents}
+
     phase_a_outputs: Dict[int, PhaseAOutput] = _run_parallel(
         agents,
         lambda agent: (
@@ -34,12 +39,15 @@ def run_round(
             agent.phase_a(
                 question_prompts[agent.id],
                 _build_peer_window(
-                    neighbors(adjacency, agent.id), trajectory, round_index, w, agents
+                    neighbors(adjacency, agent.id), trajectory, round_index, w, agents,
+                    phase_a_rngs[agent.id],
                 ),
             ),
         ),
     )
     _flush_verbose(agents)
+
+    phase_b_rngs = {a.id: random.Random(rng.randint(0, 2**32 - 1)) for a in agents}
 
     phase_b_outputs: Dict[int, PhaseBOutput] = _run_parallel(
         agents,
@@ -49,10 +57,12 @@ def run_round(
                 question_prompts[agent.id],
                 _format_phase_a(phase_a_outputs[agent.id]),
                 _build_peer_window(
-                    neighbors(adjacency, agent.id), trajectory, round_index, w, agents
+                    neighbors(adjacency, agent.id), trajectory, round_index, w, agents,
+                    phase_b_rngs[agent.id],
                 ),
                 _shuffled_peer_drafts(
-                    neighbors(adjacency, agent.id), agents, phase_a_outputs
+                    neighbors(adjacency, agent.id), agents, phase_a_outputs,
+                    phase_b_rngs[agent.id],
                 ),
             ),
         ),
@@ -72,6 +82,7 @@ def _build_peer_window(
     round_index: int,
     w: Optional[int],
     agents: List[Agent],
+    rng: random.Random,
 ) -> List[PeerRecord]:
     limit = round_index if w is None else min(round_index, w)
     records = []
@@ -96,7 +107,7 @@ def _build_peer_window(
                     ) if j in pa_by_id else None,
                 )
             )
-        random.shuffle(peers_this_round)
+        rng.shuffle(peers_this_round)
         records.extend(peers_this_round)
     return records
 
@@ -105,9 +116,10 @@ def _shuffled_peer_drafts(
     neighbor_ids: List[int],
     agents: List[Agent],
     phase_a_outputs: Dict[int, PhaseAOutput],
+    rng: random.Random,
 ) -> List[Tuple[str, str]]:
     ns = list(neighbor_ids)
-    random.shuffle(ns)
+    rng.shuffle(ns)
     return [(agents[j].name, _format_phase_a(phase_a_outputs[j])) for j in ns]
 
 

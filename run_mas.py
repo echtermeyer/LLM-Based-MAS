@@ -1,8 +1,10 @@
 import argparse
 import json
 import random
+import threading
 import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -57,6 +59,9 @@ parser.add_argument(
     "--r", type=int, default=1, help="Number of independent repetitions"
 )
 parser.add_argument(
+    "--workers", type=int, default=4, help="Parallel repetitions (1 = sequential)"
+)
+parser.add_argument(
     "--verbose", action="store_true", help="Print full prompts and responses"
 )
 args = parser.parse_args()
@@ -103,22 +108,16 @@ for index in args.index:
             repetitions = []
             combo_start = time.monotonic()
             started_at = datetime.now(timezone.utc).isoformat()
+            seeds = [random.getrandbits(32) for _ in range(args.r)]
+            _print_lock = threading.Lock()
 
-            bar = tqdm(range(args.r), unit="rep", leave=True, disable=args.verbose)
-            for rep in bar:
-                if args.verbose:
-                    print(f"\n{BOLD}--- Repetition {rep + 1}/{args.r} ---{RESET}\n")
-
+            def run_rep(rep: int, verbose: bool = False) -> tuple:
+                seed = seeds[rep]
+                rng = random.Random(seed)
                 rep_start = time.monotonic()
-                seed = random.getrandbits(32)
-                random.seed(seed)
+                on_complete = (lambda r: print_round(r, correct_option, verbose=True)) if verbose else None
                 mas = MultiAgentSystem(
-                    n=n,
-                    t=args.t,
-                    llm=llm,
-                    w=w,
-                    topology_name=topo,
-                    verbose=args.verbose,
+                    n=n, t=args.t, llm=llm, w=w, topology_name=topo, rng=rng, verbose=verbose
                 )
                 result = mas.run(
                     question=question,
@@ -126,13 +125,8 @@ for index in args.index:
                     question_id=question_id,
                     ground_truth=correct_option,
                     question_prompts=question_prompts,
-                    on_round_complete=lambda r: (
-                        print_round(r, correct_option, verbose=True)
-                        if args.verbose
-                        else None
-                    ),
+                    on_round_complete=on_complete,
                 )
-
                 final_round = result.trajectory[-1]
                 init_round = result.trajectory[0]
                 vote_counts = Counter(e.vote for e in final_round.phase_b)
@@ -142,23 +136,40 @@ for index in args.index:
                 mark = f"{GREEN}✓{RESET}" if majority_correct else f"{RED}✗{RESET}"
                 votes_str = " ".join(f"{k}:{v}" for k, v in sorted(vote_counts.items()))
                 init_str = " ".join(f"{k}:{v}" for k, v in sorted(init_counts.items()))
-
-                if args.verbose:
-                    print(
-                        f"\n{BOLD}Majority vote:{RESET} {mark} {majority_answer}  [{votes_str}]  (correct: {correct_option})"
-                    )
-                else:
-                    tqdm.write(
-                        f"  rep {rep + 1:>3}: {mark} {majority_answer}  t0=[{init_str}] → tf=[{votes_str}]"
-                    )
-
                 rep_dict = result.to_dict()
                 rep_dict["repetition"] = rep
                 rep_dict["random_seed"] = seed
                 rep_dict["majority_answer"] = majority_answer
                 rep_dict["correct"] = majority_correct
                 rep_dict["duration_s"] = round(time.monotonic() - rep_start, 2)
-                repetitions.append(rep_dict)
+                line = f"  rep {rep + 1:>3}: {mark} {majority_answer}  t0=[{init_str}] → tf=[{votes_str}]"
+                return rep, rep_dict, line
+
+            if args.verbose:
+                for rep in range(args.r):
+                    print(f"\n{BOLD}--- Repetition {rep + 1}/{args.r} ---{RESET}\n")
+                    _, rep_dict, line = run_rep(rep, verbose=True)
+                    print(line)
+                    repetitions.append(rep_dict)
+            elif min(args.workers, args.r) <= 1:
+                bar = tqdm(range(args.r), unit="rep", leave=True)
+                for rep in bar:
+                    _, rep_dict, line = run_rep(rep)
+                    tqdm.write(line)
+                    repetitions.append(rep_dict)
+            else:
+                workers = min(args.workers, args.r)
+                ordered: dict = {}
+                with ThreadPoolExecutor(max_workers=workers) as executor:
+                    futures = {executor.submit(run_rep, rep): rep for rep in range(args.r)}
+                    with tqdm(total=args.r, unit="rep", leave=True) as bar:
+                        for future in as_completed(futures):
+                            rep_idx, rep_dict, line = future.result()
+                            with _print_lock:
+                                tqdm.write(line)
+                                bar.update(1)
+                            ordered[rep_idx] = rep_dict
+                repetitions = [ordered[i] for i in range(args.r)]
 
             n_correct = sum(r["correct"] for r in repetitions)
             print(f"  {n_correct}/{args.r} correct")
