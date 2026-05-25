@@ -32,7 +32,7 @@ parser.add_argument(
     help="Agents (gpqa only; derived from task for hiddenbench)",
 )
 parser.add_argument(
-    "--t", type=int, default=10, help="Number of rounds (agents run t=0..T)"
+    "--t", type=int, default=15, help="Number of rounds (agents run t=0..T)"
 )
 parser.add_argument(
     "--w",
@@ -64,11 +64,19 @@ parser.add_argument(
 parser.add_argument(
     "--verbose", action="store_true", help="Print full prompts and responses"
 )
+parser.add_argument(
+    "--early-stopping", action="store_true", help="Enable early stopping on unanimity"
+)
+parser.add_argument(
+    "--u", type=int, default=3, help="Consecutive unanimous rounds to trigger early stopping"
+)
 args = parser.parse_args()
 
 for w_val in args.w:
     if w_val < 1:
         parser.error(f"--w values must be >= 1, got {w_val}")
+if args.u != 3 and not args.early_stopping:
+    parser.error("--u has no effect without --early-stopping")
 
 temperature = Models.TEMPERATURES[args.model]
 llm = Models.create(args.model)
@@ -117,7 +125,8 @@ for index in args.index:
                 rep_start = time.monotonic()
                 on_complete = (lambda r: print_round(r, correct_option, verbose=True)) if verbose else None
                 mas = MultiAgentSystem(
-                    n=n, t=args.t, llm=llm, w=w, topology_name=topo, rng=rng, verbose=verbose
+                    n=n, t=args.t, llm=llm, w=w, topology_name=topo, rng=rng, verbose=verbose,
+                    early_stopping_u=args.u if args.early_stopping else None,
                 )
                 result = mas.run(
                     question=question,
@@ -185,6 +194,7 @@ for index in args.index:
                 "N": first["N"],
                 "T": first["T"],
                 "W": w,
+                "early_stopping_u": args.u if args.early_stopping else None,
                 "topology_name": topo,
                 "temperature": temperature,
                 "model": args.model,
@@ -194,9 +204,10 @@ for index in args.index:
             }
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            es_tag = f"_es{args.u}" if args.early_stopping else ""
             filename = (
                 f"{timestamp}_{args.dataset}_{args.model}_N{n}_T{args.t}"
-                f"_W{w}_topo{topo}_temp{temperature}_q{index}_R{args.r}.json"
+                f"_W{w}_topo{topo}_temp{temperature}_q{index}_R{args.r}{es_tag}.json"
             )
             path = RESULTS_DIR / filename
             path.write_text(json.dumps(output, indent=2))

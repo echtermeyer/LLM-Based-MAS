@@ -27,6 +27,7 @@ class MultiAgentSystem:
         topology_name: str = "fc",
         rng: Optional[random.Random] = None,
         verbose: bool = False,
+        early_stopping_u: Optional[int] = None,
     ) -> None:
         if n < 1:
             raise ValueError(f"n must be >= 1, got {n}")
@@ -45,6 +46,7 @@ class MultiAgentSystem:
         self._verbose = verbose
         self._llm = llm
         self._topology_name = topology_name
+        self._early_stopping_u = early_stopping_u
         self._rng = rng if rng is not None else random.Random()
         hub = self._rng.randint(0, n - 1) if topology_name == "star" else 0
         self._adjacency = _TOPOLOGY_FACTORIES[topology_name](n, hub)
@@ -79,6 +81,13 @@ class MultiAgentSystem:
             trajectory.append(round_entry)
             if on_round_complete is not None:
                 on_round_complete(round_entry)
+            if self._early_stopping_u is not None and t >= self._early_stopping_u:
+                last_u = trajectory[-self._early_stopping_u:]
+                if all(
+                    len({e.vote for e in r.phase_b}) == 1
+                    for r in last_u
+                ):
+                    break
 
         model_name = _get_model_name(self._llm)
         agent_metas = [
@@ -98,6 +107,7 @@ class MultiAgentSystem:
             topology=self._adjacency,
             agents=agent_metas,
             trajectory=trajectory,
+            early_stopping_u=self._early_stopping_u,
         )
 
 

@@ -46,6 +46,7 @@ class RunResult:
     topology: List[List[int]]
     agents: List[AgentMeta]
     trajectory: List[RoundEntry]
+    early_stopping_u: Optional[int] = None
 
     def to_dict(self) -> Dict:
         return {
@@ -57,6 +58,7 @@ class RunResult:
             "N": self.N,
             "T": self.T,
             "W": self.W,
+            "early_stopping_u": self.early_stopping_u,
             "topology_name": self.topology_name,
             "topology": self.topology,
             "agents": [
