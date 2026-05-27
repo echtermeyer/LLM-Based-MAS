@@ -56,6 +56,17 @@ parser.add_argument(
     help="0-based question/task index (multiple values run each in sequence)",
 )
 parser.add_argument(
+    "--all",
+    action="store_true",
+    help="Run all questions in the dataset (overrides --index)",
+)
+parser.add_argument(
+    "--subfolder",
+    type=str,
+    default=None,
+    help="Save results in results/mas/<subfolder>/",
+)
+parser.add_argument(
     "--r", type=int, default=1, help="Number of independent repetitions"
 )
 parser.add_argument(
@@ -70,6 +81,21 @@ parser.add_argument(
 parser.add_argument(
     "--u", type=int, default=3, help="Consecutive unanimous rounds to trigger early stopping"
 )
+parser.add_argument(
+    "--skip-existing", action="store_true", help="Skip combos that already have a result file in the output folder"
+)
+parser.add_argument(
+    "--sample-subset",
+    type=int,
+    default=None,
+    help="Randomly sample N tasks from the tier2 subset of the dataset (overrides --index)",
+)
+parser.add_argument(
+    "--run-name",
+    type=str,
+    default=None,
+    help="Named run: saves to results/mas/<run-name>/W{w}_{topo}/ per config",
+)
 args = parser.parse_args()
 
 for w_val in args.w:
@@ -77,6 +103,29 @@ for w_val in args.w:
         parser.error(f"--w values must be >= 1, got {w_val}")
 if args.u != 3 and not args.early_stopping:
     parser.error("--u has no effect without --early-stopping")
+if args.sample_subset is not None and args.all:
+    parser.error("--sample-subset and --all are mutually exclusive")
+
+if args.all:
+    if args.dataset == "gpqa":
+        args.index = list(range(len(GPQALoader()._df)))
+    else:
+        args.index = list(range(len(HiddenBenchLoader())))
+
+if args.sample_subset is not None:
+    subset_path = (
+        Path("dataset/hiddenbench_subset_tier2_n4.json")
+        if args.dataset == "hiddenbench"
+        else Path("dataset/gpqa_subset_tier2.json")
+    )
+    subset_indices = json.loads(subset_path.read_text())
+    args.index = sorted(random.sample(subset_indices, args.sample_subset))
+    print(f"Sampled {args.sample_subset} tasks from tier2 subset: {args.index}")
+
+if args.subfolder:
+    RESULTS_DIR = RESULTS_DIR / args.subfolder
+if args.run_name:
+    RESULTS_DIR = RESULTS_DIR / args.run_name
 
 temperature = Models.TEMPERATURES[args.model]
 llm = Models.create(args.model)
@@ -107,6 +156,17 @@ for index in args.index:
     for w in args.w:
         for topo in args.topology:
             combo_idx += 1
+            es_tag = f"_es{args.u}" if args.early_stopping else ""
+            save_dir = RESULTS_DIR / f"W{w}_{topo}" if args.run_name else RESULTS_DIR
+            save_dir.mkdir(parents=True, exist_ok=True)
+            if args.skip_existing:
+                pattern = (
+                    f"*_{args.dataset}_{args.model}_N{n}_T{args.t}"
+                    f"_W{w}_topo{topo}_temp{temperature}_q{index}_R{args.r}{es_tag}.json"
+                )
+                if any(save_dir.glob(pattern)):
+                    print(f"\nSkipping q={index} W={w} topo={topo} (already exists)")
+                    continue
             print(
                 f"\nConfig {combo_idx}/{total_combos}  "
                 f"q={index} | W={w} | topo={topo} | N={n} T={args.t} R={args.r} | model={args.model}\n"
@@ -204,11 +264,10 @@ for index in args.index:
             }
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            es_tag = f"_es{args.u}" if args.early_stopping else ""
             filename = (
                 f"{timestamp}_{args.dataset}_{args.model}_N{n}_T{args.t}"
                 f"_W{w}_topo{topo}_temp{temperature}_q{index}_R{args.r}{es_tag}.json"
             )
-            path = RESULTS_DIR / filename
+            path = save_dir / filename
             path.write_text(json.dumps(output, indent=2))
             print(f"  {GRAY}Saved → {path}{RESET}")
