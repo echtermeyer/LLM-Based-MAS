@@ -17,6 +17,7 @@ class PhaseBEntry:
     id: int
     vote: str
     reasoning: str
+    confidence: int
     message: str
     prompt_tokens: Optional[int] = None
     completion_tokens: Optional[int] = None
@@ -94,6 +95,7 @@ class RunResult:
                             "id": e.id,
                             "vote": e.vote,
                             "reasoning": e.reasoning,
+                            "confidence": e.confidence,
                             "message": e.message,
                             "prompt_tokens": e.prompt_tokens,
                             "completion_tokens": e.completion_tokens,

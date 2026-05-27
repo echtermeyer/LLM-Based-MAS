@@ -40,6 +40,12 @@ class PhaseAOutput(BaseModel):
 class PhaseBOutput(BaseModel):
     reasoning: str = Field(description="Your private chain-of-thought (never shared)")
     vote: Literal["A", "B", "C", "D"] = Field(description="Your current best answer")
+    confidence: int = Field(
+        description=(
+            "Your private confidence in your current vote as an integer from 0 (completely uncertain) "
+            "to 100 (completely certain). Never shared with peers."
+        )
+    )
     message: str = Field(
         description=(
             "Begin by addressing any questions peers directed at you in this round's Phase A. "
@@ -55,6 +61,7 @@ class PhaseBOutput(BaseModel):
 class OwnRecord:
     round: int
     vote: str
+    confidence: int
     reasoning: str
     message: str
     draft: Optional[str]
@@ -148,6 +155,7 @@ class Agent:
             OwnRecord(
                 round=0,
                 vote=output.vote,
+                confidence=output.confidence,
                 reasoning=output.reasoning,
                 message=output.message,
                 draft=None,
@@ -194,6 +202,7 @@ class Agent:
             OwnRecord(
                 round=len(self._own_history),
                 vote=output.vote,
+                confidence=output.confidence,
                 reasoning=output.reasoning,
                 message=output.message,
                 draft=own_draft,
@@ -262,7 +271,7 @@ def _build_context(
         parts.append(f"--- Round {rnd} ---")
         if rnd in own_by_round:
             rec = own_by_round[rnd]
-            line = f"You: vote={rec.vote} | reasoning: {rec.reasoning} | message: {rec.message}"
+            line = f"You: vote={rec.vote} | confidence={rec.confidence} | reasoning: {rec.reasoning} | message: {rec.message}"
             if rec.draft is not None:
                 line += f" | draft: {rec.draft}"
             parts.append(line)
