@@ -2,8 +2,10 @@ import random
 from dataclasses import dataclass
 from typing import Dict, List, Literal, Optional, Tuple
 
+from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.outputs import LLMResult
 from pydantic import BaseModel, Field
 
 
@@ -95,6 +97,25 @@ _ROUND_0_INST = (
 )
 
 
+class _UsageCapture(BaseCallbackHandler):
+    def __init__(self):
+        self.prompt_tokens: int = 0
+        self.completion_tokens: int = 0
+        self._any = False
+
+    def on_llm_end(self, response: LLMResult, **kwargs):
+        usage = (response.llm_output or {}).get("token_usage", {})
+        if usage:
+            self.prompt_tokens += usage.get("prompt_tokens") or 0
+            self.completion_tokens += usage.get("completion_tokens") or 0
+            self._any = True
+
+    def as_dict(self) -> Dict[str, Optional[int]]:
+        if not self._any:
+            return {"prompt_tokens": None, "completion_tokens": None}
+        return {"prompt_tokens": self.prompt_tokens, "completion_tokens": self.completion_tokens}
+
+
 class Agent:
     def __init__(
         self, agent_id: int, name: str, llm: BaseChatModel, w: Optional[int], verbose: bool = False
@@ -102,8 +123,8 @@ class Agent:
         self.id = agent_id
         self.name = name
         self.persona = _PERSONA.format(name=name)
-        self._llm_a = llm.with_structured_output(PhaseAOutput)
-        self._llm_b = llm.with_structured_output(PhaseBOutput)
+        self._llm_a = llm.bind(model_kwargs={"reasoning_effort": "none"}).with_structured_output(PhaseAOutput)
+        self._llm_b = llm.bind(model_kwargs={"reasoning_effort": "none"}).with_structured_output(PhaseBOutput)
         self._system = SystemMessage(content=self.persona)
         self._w = w
         self._verbose = verbose
@@ -115,10 +136,11 @@ class Agent:
             print(block)
         self._verbose_buffer.clear()
 
-    def init_round(self, question_context: str) -> PhaseBOutput:
+    def init_round(self, question_context: str) -> Tuple[PhaseBOutput, Dict[str, Optional[int]]]:
         content = f"{question_context}\n\n{_ROUND_0_INST}"
+        cb = _UsageCapture()
         output: PhaseBOutput = self._llm_b.invoke(
-            [self._system, HumanMessage(content=content)]
+            [self._system, HumanMessage(content=content)], config={"callbacks": [cb]}
         )
         if self._verbose:
             self._verbose_buffer.append(_print_call(self.name, "Round 0 / Phase B (init)", self.persona, content, output.model_dump()))
@@ -131,20 +153,21 @@ class Agent:
                 draft=None,
             )
         )
-        return output
+        return output, cb.as_dict()
 
     def phase_a(
         self, question_context: str, peer_window: List[PeerRecord]
-    ) -> PhaseAOutput:
+    ) -> Tuple[PhaseAOutput, Dict[str, Optional[int]]]:
         round_index = len(self._own_history)
         content = (
             _build_context(question_context, self._windowed(), peer_window)
             + f"\n\n{_PHASE_A_INST}"
         )
-        output = self._llm_a.invoke([self._system, HumanMessage(content=content)])
+        cb = _UsageCapture()
+        output = self._llm_a.invoke([self._system, HumanMessage(content=content)], config={"callbacks": [cb]})
         if self._verbose:
             self._verbose_buffer.append(_print_call(self.name, f"Round {round_index} / Phase A", self.persona, content, output.model_dump()))
-        return output
+        return output, cb.as_dict()
 
     def phase_b(
         self,
@@ -152,7 +175,7 @@ class Agent:
         own_draft: str,
         peer_window: List[PeerRecord],
         peer_drafts: List[Tuple[str, str]],
-    ) -> PhaseBOutput:
+    ) -> Tuple[PhaseBOutput, Dict[str, Optional[int]]]:
         round_index = len(self._own_history)
         ctx = _build_context(question_context, self._windowed(), peer_window)
         drafts_block = (
@@ -161,8 +184,9 @@ class Agent:
             + "\n".join(f"{name}: {draft}" for name, draft in peer_drafts)
         )
         content = ctx + drafts_block + f"\n\n{_PHASE_B_INST}"
+        cb = _UsageCapture()
         output: PhaseBOutput = self._llm_b.invoke(
-            [self._system, HumanMessage(content=content)]
+            [self._system, HumanMessage(content=content)], config={"callbacks": [cb]}
         )
         if self._verbose:
             self._verbose_buffer.append(_print_call(self.name, f"Round {round_index} / Phase B", self.persona, content, output.model_dump()))
@@ -175,7 +199,7 @@ class Agent:
                 draft=own_draft,
             )
         )
-        return output
+        return output, cb.as_dict()
 
     def _windowed(self) -> List[OwnRecord]:
         if self._w is None:

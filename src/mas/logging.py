@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 
@@ -8,6 +8,8 @@ class PhaseAEntry:
     defense: str
     challenge: str
     question: str
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
 
 
 @dataclass
@@ -16,6 +18,8 @@ class PhaseBEntry:
     vote: str
     reasoning: str
     message: str
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
 
 
 @dataclass
@@ -76,6 +80,8 @@ class RunResult:
                                     "defense": e.defense,
                                     "challenge": e.challenge,
                                     "question": e.question,
+                                    "prompt_tokens": e.prompt_tokens,
+                                    "completion_tokens": e.completion_tokens,
                                 }
                                 for e in r.phase_a
                             ]
@@ -89,6 +95,8 @@ class RunResult:
                             "vote": e.vote,
                             "reasoning": e.reasoning,
                             "message": e.message,
+                            "prompt_tokens": e.prompt_tokens,
+                            "completion_tokens": e.completion_tokens,
                         }
                         for e in r.phase_b
                     ],

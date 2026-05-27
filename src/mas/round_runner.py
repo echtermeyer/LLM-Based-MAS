@@ -17,22 +17,24 @@ def run_round(
     rng: random.Random,
 ) -> RoundEntry:
     if round_index == 0:
-        phase_b_outputs = _run_parallel(
+        phase_b_results = _run_parallel(
             agents,
             lambda agent: (agent.id, agent.init_round(question_prompts[agent.id])),
         )
+        phase_b_outputs = {k: v[0] for k, v in phase_b_results.items()}
+        phase_b_usages = {k: v[1] for k, v in phase_b_results.items()}
         _flush_verbose(agents)
         return RoundEntry(
             round=0,
             phase_a=None,
-            phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs),
+            phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs, phase_b_usages),
         )
 
     # Pre-generate per-agent rngs before entering threadpool so the rep-level
     # rng is only ever accessed from the rep's own thread (no shared-state races).
     phase_a_rngs = {a.id: random.Random(rng.randint(0, 2**32 - 1)) for a in agents}
 
-    phase_a_outputs: Dict[int, PhaseAOutput] = _run_parallel(
+    phase_a_results: Dict[int, object] = _run_parallel(
         agents,
         lambda agent: (
             agent.id,
@@ -45,11 +47,13 @@ def run_round(
             ),
         ),
     )
+    phase_a_outputs = {k: v[0] for k, v in phase_a_results.items()}
+    phase_a_usages = {k: v[1] for k, v in phase_a_results.items()}
     _flush_verbose(agents)
 
     phase_b_rngs = {a.id: random.Random(rng.randint(0, 2**32 - 1)) for a in agents}
 
-    phase_b_outputs: Dict[int, PhaseBOutput] = _run_parallel(
+    phase_b_results: Dict[int, object] = _run_parallel(
         agents,
         lambda agent: (
             agent.id,
@@ -67,12 +71,14 @@ def run_round(
             ),
         ),
     )
+    phase_b_outputs = {k: v[0] for k, v in phase_b_results.items()}
+    phase_b_usages = {k: v[1] for k, v in phase_b_results.items()}
     _flush_verbose(agents)
 
     return RoundEntry(
         round=round_index,
-        phase_a=_to_entries(PhaseAEntry, agents, phase_a_outputs),
-        phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs),
+        phase_a=_to_entries(PhaseAEntry, agents, phase_a_outputs, phase_a_usages),
+        phase_b=_to_entries(PhaseBEntry, agents, phase_b_outputs, phase_b_usages),
     )
 
 
@@ -133,8 +139,8 @@ def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:
     return results
 
 
-def _to_entries(cls, agents: List[Agent], outputs: Dict) -> list:
-    return [cls(id=a.id, **outputs[a.id].model_dump()) for a in agents]
+def _to_entries(cls, agents: List[Agent], outputs: Dict, usages: Dict) -> list:
+    return [cls(id=a.id, **outputs[a.id].model_dump(), **usages[a.id]) for a in agents]
 
 
 def _flush_verbose(agents: List[Agent]) -> None:
