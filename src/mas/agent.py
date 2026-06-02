@@ -41,10 +41,13 @@ class PhaseBOutput(BaseModel):
     reasoning: str = Field(description="Your private chain-of-thought (never shared)")
     vote: Literal["A", "B", "C", "D"] = Field(description="Your current best answer")
     confidence: int = Field(
+        ge=0,
+        le=10,
         description=(
-            "Your private confidence in your current vote as an integer from 0 (completely uncertain) "
-            "to 100 (completely certain). Never shared with peers."
-        )
+            "Your private confidence in your current vote as an integer on the scale 0–10. "
+            "0 = completely uncertain, 5 = leaning but unsure, 8 = moderately confident, "
+            "10 = completely certain. Never shared with peers."
+        ),
     )
     message: str = Field(
         description=(
