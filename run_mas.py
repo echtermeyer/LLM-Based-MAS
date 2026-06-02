@@ -88,7 +88,7 @@ parser.add_argument(
     "--sample-subset",
     type=int,
     default=None,
-    help="Randomly sample N tasks from the tier2 subset of the dataset (overrides --index)",
+    help="Randomly sample N tasks from the tier3 subset of the dataset (overrides --index)",
 )
 parser.add_argument(
     "--run-name",
@@ -114,13 +114,14 @@ if args.all:
 
 if args.sample_subset is not None:
     subset_path = (
-        Path("dataset/hiddenbench_subset_tier2_n4.json")
+        Path("dataset/hiddenbench_tiers.json")
         if args.dataset == "hiddenbench"
-        else Path("dataset/gpqa_subset_tier2.json")
+        else Path("dataset/gpqa_tiers.json")
     )
-    subset_indices = json.loads(subset_path.read_text())
+    tier_map = json.loads(subset_path.read_text())
+    subset_indices = tier_map["3"]
     args.index = sorted(random.sample(subset_indices, args.sample_subset))
-    print(f"Sampled {args.sample_subset} tasks from tier2 subset: {args.index}")
+    print(f"Sampled {args.sample_subset} tasks from tier3 subset: {args.index}")
 
 if args.subfolder:
     RESULTS_DIR = RESULTS_DIR / args.subfolder

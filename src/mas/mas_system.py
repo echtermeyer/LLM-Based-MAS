@@ -81,7 +81,7 @@ class MultiAgentSystem:
             trajectory.append(round_entry)
             if on_round_complete is not None:
                 on_round_complete(round_entry)
-            if self._early_stopping_u is not None and t >= self._early_stopping_u:
+            if self._early_stopping_u is not None and t >= self._early_stopping_u - 1:
                 last_u = trajectory[-self._early_stopping_u:]
                 if all(
                     len({e.vote for e in r.phase_b}) == 1
