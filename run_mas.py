@@ -1,3 +1,7 @@
+import logging
+
+logging.getLogger("mlflow").setLevel(logging.ERROR)
+
 import argparse
 import json
 import random
@@ -79,10 +83,15 @@ parser.add_argument(
     "--early-stopping", action="store_true", help="Enable early stopping on unanimity"
 )
 parser.add_argument(
-    "--u", type=int, default=3, help="Consecutive unanimous rounds to trigger early stopping"
+    "--u",
+    type=int,
+    default=3,
+    help="Consecutive unanimous rounds to trigger early stopping",
 )
 parser.add_argument(
-    "--skip-existing", action="store_true", help="Skip combos that already have a result file in the output folder"
+    "--skip-existing",
+    action="store_true",
+    help="Skip combos that already have a result file in the output folder",
 )
 parser.add_argument(
     "--sample-subset",
@@ -184,9 +193,19 @@ for index in args.index:
                 seed = seeds[rep]
                 rng = random.Random(seed)
                 rep_start = time.monotonic()
-                on_complete = (lambda r: print_round(r, correct_option, verbose=True)) if verbose else None
+                on_complete = (
+                    (lambda r: print_round(r, correct_option, verbose=True))
+                    if verbose
+                    else None
+                )
                 mas = MultiAgentSystem(
-                    n=n, t=args.t, llm=llm, w=w, topology_name=topo, rng=rng, verbose=verbose,
+                    n=n,
+                    t=args.t,
+                    llm=llm,
+                    w=w,
+                    topology_name=topo,
+                    rng=rng,
+                    verbose=verbose,
                     early_stopping_u=args.u if args.early_stopping else None,
                 )
                 result = mas.run(
@@ -231,7 +250,9 @@ for index in args.index:
                 workers = min(args.workers, args.r)
                 ordered: dict = {}
                 with ThreadPoolExecutor(max_workers=workers) as executor:
-                    futures = {executor.submit(run_rep, rep): rep for rep in range(args.r)}
+                    futures = {
+                        executor.submit(run_rep, rep): rep for rep in range(args.r)
+                    }
                     with tqdm(total=args.r, unit="rep", leave=True) as bar:
                         for future in as_completed(futures):
                             rep_idx, rep_dict, line = future.result()
