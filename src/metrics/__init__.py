@@ -3,6 +3,8 @@ from .embedding import embed_repetition, embed_shared
 from .scalars import compute_scalars
 from .persuasiveness import Persuasiveness, PersuasivenessPostFlip
 from .alignment import TFIDFAlignment, BigramJaccardAlignment, build_corpus
+from .self_reinforcement import SystemSelfReinforcement, AgentSelfReinforcement
+from .limit_cycles import detect_limit_cycle
 
 __all__ = [
     "Embedder",
@@ -14,4 +16,7 @@ __all__ = [
     "TFIDFAlignment",
     "BigramJaccardAlignment",
     "build_corpus",
+    "SystemSelfReinforcement",
+    "AgentSelfReinforcement",
+    "detect_limit_cycle",
 ]

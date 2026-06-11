@@ -123,12 +123,11 @@ class BigramJaccardAlignment(AlignmentMetric):
         return _mean_pairwise_jaccard(msgs)
 
 
-def build_corpus(raw: Dict, common_qids: Optional[List] = None) -> List[str]:
-    """Collect all messages from raw data (optionally filtered to common_qids)."""
+def build_corpus(raw: Dict, common_keys: Optional[List] = None) -> List[str]:
     msgs = []
     for w, data in raw.items():
-        for qid, d in data.items():
-            if common_qids is not None and qid not in common_qids:
+        for key, d in data.items():
+            if common_keys is not None and key not in common_keys:
                 continue
             for rep in d['repetitions']:
                 for rnd in rep['trajectory']:

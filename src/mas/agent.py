@@ -6,7 +6,27 @@ from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.outputs import LLMResult
+from openai import APIStatusError
 from pydantic import BaseModel, Field
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
+
+
+def _is_transient(exc: BaseException) -> bool:
+    return isinstance(exc, APIStatusError) and exc.status_code >= 500
+
+
+def _log_retry(retry_state) -> None:
+    exc = retry_state.outcome.exception()
+    print(f"[retry] attempt {retry_state.attempt_number + 1} after {type(exc).__name__} {getattr(exc, 'status_code', '?')}: {exc}")
+
+
+_retry = retry(
+    retry=retry_if_exception(_is_transient),
+    wait=wait_exponential(multiplier=2, min=4, max=60),
+    stop=stop_after_attempt(5),
+    before_sleep=_log_retry,
+    reraise=True,
+)
 
 
 class PhaseAOutput(BaseModel):
@@ -149,7 +169,7 @@ class Agent:
     def init_round(self, question_context: str) -> Tuple[PhaseBOutput, Dict[str, Optional[int]]]:
         content = f"{question_context}\n\n{_ROUND_0_INST}"
         cb = _UsageCapture()
-        output: PhaseBOutput = self._llm_b.invoke(
+        output: PhaseBOutput = _retry(self._llm_b.invoke)(
             [self._system, HumanMessage(content=content)], config={"callbacks": [cb]}
         )
         if self._verbose:
@@ -175,7 +195,7 @@ class Agent:
             + f"\n\n{_PHASE_A_INST}"
         )
         cb = _UsageCapture()
-        output = self._llm_a.invoke([self._system, HumanMessage(content=content)], config={"callbacks": [cb]})
+        output = _retry(self._llm_a.invoke)([self._system, HumanMessage(content=content)], config={"callbacks": [cb]})
         if self._verbose:
             self._verbose_buffer.append(_print_call(self.name, f"Round {round_index} / Phase A", self.persona, content, output.model_dump()))
         return output, cb.as_dict()
@@ -196,7 +216,7 @@ class Agent:
         )
         content = ctx + drafts_block + f"\n\n{_PHASE_B_INST}"
         cb = _UsageCapture()
-        output: PhaseBOutput = self._llm_b.invoke(
+        output: PhaseBOutput = _retry(self._llm_b.invoke)(
             [self._system, HumanMessage(content=content)], config={"callbacks": [cb]}
         )
         if self._verbose:
