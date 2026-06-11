@@ -172,7 +172,8 @@ for index in args.index:
             if args.skip_existing:
                 pattern = (
                     f"*_{args.dataset}_{args.model}_N{n}_T{args.t}"
-                    f"_W{w}_topo{topo}_temp{temperature}_q{index}_R{args.r}{es_tag}.json"
+                    # f"_W{w}_topo{topo}_temp{temperature}_q{index}_R{args.r}{es_tag}.json"
+                    f"_W{w}_topo{topo}_temp{temperature}_q{index}_R*.json"
                 )
                 if any(save_dir.glob(pattern)):
                     print(f"\nSkipping q={index} W={w} topo={topo} (already exists)")
