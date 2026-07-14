@@ -1,6 +1,10 @@
 gen_ai_credential.json
-
+plots/
+scripts/
 results/
+.claude/
+.venv2/
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

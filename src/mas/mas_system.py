@@ -7,12 +7,10 @@ from langchain_core.language_models import BaseChatModel
 from src.mas.agent import Agent
 from src.mas.logging import AgentMeta, RoundEntry, RunResult
 from src.mas.round_runner import run_round
-from src.mas.topology import TOPOLOGY_NAMES, chain, fully_connected, ring, star
+from src.mas.topology import TOPOLOGY_NAMES, fully_connected, star
 
 _TOPOLOGY_FACTORIES: Dict[str, Callable[[int, int], List[List[int]]]] = {
     "fc": lambda n, hub: fully_connected(n),
-    "ring": lambda n, hub: ring(n),
-    "chain": lambda n, hub: chain(n),
     "star": lambda n, hub: star(n, hub),
 }
 
@@ -62,8 +60,9 @@ class MultiAgentSystem:
     ) -> RunResult:
         names = [f"Agent{i + 1}" for i in range(self._n)]
         self._rng.shuffle(names)
+        valid_options = tuple(options.keys())
         agents = [
-            Agent(agent_id=i, name=names[i], llm=self._llm, w=self._w, verbose=self._verbose)
+            Agent(agent_id=i, name=names[i], llm=self._llm, w=self._w, valid_options=valid_options, verbose=self._verbose)
             for i in range(self._n)
         ]
 

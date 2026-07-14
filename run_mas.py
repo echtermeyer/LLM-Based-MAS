@@ -50,7 +50,7 @@ parser.add_argument(
     choices=TOPOLOGY_NAMES,
     nargs="+",
     default=["fc"],
-    help="Topology name(s). Multiple values run all combos. fc=fully connected, ring=directed limit-cycle, chain=undirected line, star=hub+leaves (hub randomized per run).",
+    help="Topology name(s). Multiple values run all combos. fc=fully connected, star=hub+leaves (hub randomized per run).",
 )
 parser.add_argument(
     "--index",
@@ -150,13 +150,17 @@ for index in args.index:
         loader = HiddenBenchLoader()
         task = loader.load_single(index)
         n = len(task.hidden_info)
+        random.seed(index)
         question_prompts, options, correct_option = loader.prepare_task(task, n)
+        random.seed(None)
         question = task.description
         question_id = str(index)
     else:
         n = args.n
         sample = GPQALoader().load_single(index)
+        random.seed(index)
         shuffled = prepare_samples([sample])[0]
+        random.seed(None)
         question_prompts = [_format_prompt(shuffled.question, shuffled.options)] * n
         question = shuffled.question
         options = shuffled.options
@@ -187,7 +191,10 @@ for index in args.index:
             repetitions = []
             combo_start = time.monotonic()
             started_at = datetime.now(timezone.utc).isoformat()
-            seeds = [random.getrandbits(32) for _ in range(args.r)]
+            seeds = [
+                random.Random(f"{index}_{w}_{topo}_{rep}").getrandbits(32)
+                for rep in range(args.r)
+            ]
             _print_lock = threading.Lock()
 
             def run_rep(rep: int, verbose: bool = False) -> tuple:

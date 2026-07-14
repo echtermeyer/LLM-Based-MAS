@@ -2,7 +2,7 @@ import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional, Tuple
 
-from src.mas.agent import Agent, PeerRecord, PhaseAOutput, PhaseBOutput, _format_phase_a
+from src.mas.agent import Agent, PeerRecord, PhaseAOutput, _format_phase_a
 from src.mas.logging import PhaseAEntry, PhaseBEntry, RoundEntry
 from src.mas.topology import neighbors
 
@@ -51,7 +51,11 @@ def run_round(
     phase_a_usages = {k: v[1] for k, v in phase_a_results.items()}
     _flush_verbose(agents)
 
-    phase_b_rngs = {a.id: random.Random(rng.randint(0, 2**32 - 1)) for a in agents}
+    phase_b_pw_rngs = {a.id: random.Random(rng.randint(0, 2**32 - 1)) for a in agents}
+    phase_b_pd_rngs = {a.id: random.Random(rng.randint(0, 2**32 - 1)) for a in agents}
+
+    last_pb = {e.id: e for e in trajectory[-1].phase_b}
+    last_votes = {j: last_pb[j].vote for j in last_pb}
 
     phase_b_results: Dict[int, object] = _run_parallel(
         agents,
@@ -62,11 +66,12 @@ def run_round(
                 _format_phase_a(phase_a_outputs[agent.id]),
                 _build_peer_window(
                     neighbors(adjacency, agent.id), trajectory, round_index, w, agents,
-                    phase_b_rngs[agent.id],
+                    phase_b_pw_rngs[agent.id],
                 ),
                 _shuffled_peer_drafts(
                     neighbors(adjacency, agent.id), agents, phase_a_outputs,
-                    phase_b_rngs[agent.id],
+                    last_votes,
+                    phase_b_pd_rngs[agent.id],
                 ),
             ),
         ),
@@ -122,11 +127,12 @@ def _shuffled_peer_drafts(
     neighbor_ids: List[int],
     agents: List[Agent],
     phase_a_outputs: Dict[int, PhaseAOutput],
+    last_votes: Dict[int, str],
     rng: random.Random,
-) -> List[Tuple[str, str]]:
+) -> List[Tuple[str, str, str]]:
     ns = list(neighbor_ids)
     rng.shuffle(ns)
-    return [(agents[j].name, _format_phase_a(phase_a_outputs[j])) for j in ns]
+    return [(agents[j].name, last_votes[j], _format_phase_a(phase_a_outputs[j])) for j in ns]
 
 
 def _run_parallel(agents: List[Agent], fn) -> Dict[int, object]:
