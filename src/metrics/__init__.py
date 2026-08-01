@@ -7,6 +7,7 @@ from .self_reinforcement import extract_runs, summarise_runs, count_all_runs
 from .limit_cycles import detect_agent_limit_cycles, detect_system_limit_cycles, summarise_lc
 from .bistability import analyse_bistability, summarise_bistability
 from .dominance import score_dominance, analyse_dominance, score_dominance_all, summarise_dominance
+from .linguistic import LocalScorer, DIMENSIONS, collect_prompts, assign_scores, score_repetition
 
 __all__ = [
     "Embedder",
@@ -30,4 +31,9 @@ __all__ = [
     "analyse_dominance",
     "score_dominance_all",
     "summarise_dominance",
+    "LocalScorer",
+    "DIMENSIONS",
+    "collect_prompts",
+    "assign_scores",
+    "score_repetition",
 ]

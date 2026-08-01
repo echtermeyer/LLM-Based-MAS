@@ -16,6 +16,8 @@ MODEL_CHOICES = {
     "gemini-pro": Models.GEMINI_PRO,
     "nova-pro": Models.NOVA_PRO,
     "mistral-large": Models.MISTRAL_LARGE,
+    "mistral-medium": Models.MISTRAL_MEDIUM,
+    "mistral-small": Models.MISTRAL_SMALL,
 }
 
 parser = argparse.ArgumentParser()

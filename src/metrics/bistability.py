@@ -11,12 +11,12 @@ def _composition_seq(traj: List[Dict], options: tuple) -> List[Tuple[int, ...]]:
 
 
 
-def _attractor_label(composition: Tuple[int, ...], options: tuple) -> Any:
+def _unanimous_option(composition: Tuple[int, ...], options: tuple) -> Optional[str]:
     total = sum(composition)
     for cnt, opt in zip(composition, options):
-        if cnt == total:
+        if cnt == total and cnt > 0:
             return opt
-    return composition
+    return None
 
 
 def _trailing_k(seq: list) -> int:
@@ -116,17 +116,27 @@ def analyse_bistability(
     Signature 1 — coexistence: N_eff (inverse Simpson over endpoint attractors).
     Signature 2 — basin selection: Cramér's V + permutation p.
 
+    Eligibility
+    -----------
+    A repetition is converged (eligible) iff it settles (maximal trailing constant
+    run k >= u) AND the locked-in macrostate is unanimous. Reps that never settle,
+    and reps that settle on a non-unanimous split, have no endpoint attractor and
+    are excluded. Attractors are therefore consensus states, so N_eff in [1, M].
+
     Label rule
     ----------
     monostable  : N_eff < 1.5
-    multistable : N_eff >= 1.5  and  p_basin < alpha  and  ci_lo >= 1.5
-    stochastic  : N_eff >= 1.5  and  (p_basin >= alpha  or  ci_lo < 1.5)
+    multistable : N_eff >= 1.5  and  p_basin < alpha
+    stochastic  : N_eff >= 1.5  and  p_basin >= alpha
     insufficient: n_converged < 2
+
+    The 1.5 cutoff is a reporting threshold; the inferential claim rests on p_basin.
+    The bootstrap CI on N_eff is reported as uncertainty, not used to gate the label.
 
     Returns
     -------
     dict with:
-      n_reps, n_converged, n_excluded,
+      n_reps, n_converged, n_settled, n_excluded,
       M            — number of options for this task
       p_hat        — {attractor: fraction}
       n_eff        — inverse Simpson  (nan if insufficient)
@@ -135,7 +145,7 @@ def analyse_bistability(
       p_basin      — permutation p  (nan if insufficient)
       label        — 'monostable' | 'multistable' | 'stochastic' | 'insufficient'
       degree       — 'bistable' | 'tristable' | 'quadstable' | None
-      reps         — list of per-rep records {rep_idx, g0, g0_coarse, attractor, converged}
+      reps         — list of per-rep records {rep_idx, g0, g0_coarse, attractor, settled, converged}
     """
     if options is None:
         options = tuple(repetitions[0]['options'].keys())
@@ -147,17 +157,19 @@ def analyse_bistability(
         traj = rep['trajectory']
         comp_seq = _composition_seq(traj, options)
         k = _trailing_k(comp_seq)
-        converged = k >= u
+        settled = k >= u
+        attractor = _unanimous_option(comp_seq[-1], options) if settled else None
+        converged = settled and attractor is not None
         g0 = comp_seq[0]
-        attractor = _attractor_label(comp_seq[-1], options) if converged else None
-        per_rep.append({'rep_idx': rep_idx, 'g0': g0, 'attractor': attractor, 'converged': converged})
+        per_rep.append({'rep_idx': rep_idx, 'g0': g0, 'attractor': attractor,
+                        'settled': settled, 'converged': converged})
 
     converged_reps = [r for r in per_rep if r['converged']]
     n_c = len(converged_reps)
 
     # Determine dominant endpoint attractor, then coarsen g0 to a scalar:
-    # g0_coarse = #agents initially voting for the dominant option (in {1,2,3,4}).
-    # Falls back to the full tuple when the dominant attractor is itself non-unanimous.
+    # g0_coarse = #agents initially voting for the dominant option (in {0,..,N}).
+    # Attractors are always unanimous options, so dom_att is an option label.
     # Computed for all reps so records stay inspectable; non-converged reps use None.
     if n_c >= 2:
         ep_counter: Dict = {}
@@ -166,10 +178,7 @@ def analyse_bistability(
             ep_counter[e] = ep_counter.get(e, 0) + 1
         dom_att = max(ep_counter, key=ep_counter.__getitem__)
         for r in per_rep:
-            if isinstance(dom_att, str):
-                r['g0_coarse'] = r['g0'][options.index(dom_att)]
-            else:
-                r['g0_coarse'] = r['g0']
+            r['g0_coarse'] = r['g0'][options.index(dom_att)] if r['converged'] else None
     else:
         dom_att = None
         for r in per_rep:
@@ -178,6 +187,7 @@ def analyse_bistability(
     result: Dict = {
         'n_reps': len(repetitions),
         'n_converged': n_c,
+        'n_settled': sum(1 for r in per_rep if r['settled']),
         'n_excluded': len(repetitions) - n_c,
         'M': M,
         'p_hat': {},
@@ -207,7 +217,7 @@ def analyse_bistability(
 
     if n_eff < 1.5:
         label, degree = 'monostable', None
-    elif p_basin < alpha and ci_lo >= 1.5:
+    elif p_basin < alpha:
         label = 'multistable'
         _degree_names = {2: 'bistable', 3: 'tristable', 4: 'quadstable'}
         degree = _degree_names.get(min(round(n_eff), M))

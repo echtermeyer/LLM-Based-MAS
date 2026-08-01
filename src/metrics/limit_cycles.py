@@ -86,7 +86,13 @@ def _composition_seq(traj: List[Dict], options: tuple) -> List[Tuple[int, ...]]:
     result = []
     for t in range(len(traj)):
         votes = [ag['vote'] for ag in traj[t]['phase_b']]
-        result.append(tuple(votes.count(o) for o in options))
+        counts = tuple(votes.count(o) for o in options)
+        if sum(counts) != len(votes):
+            raise ValueError(
+                f"round {t}: {len(votes) - sum(counts)} vote(s) outside option set "
+                f"{options}; votes={votes}"
+            )
+        result.append(counts)
     return result
 
 
