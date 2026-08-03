@@ -9,16 +9,7 @@ from src.utils.console import BOLD, GRAY, RESET, print_results
 
 RESULTS_DIR = Path("results/benchmarking")
 
-MODEL_CHOICES = {
-    "gpt-4o": Models.GPT_4O,
-    "claude-sonnet-4": Models.CLAUDE_SONNET_4,
-    "claude-sonnet-4.5": Models.CLAUDE_SONNET_45,
-    "gemini-pro": Models.GEMINI_PRO,
-    "nova-pro": Models.NOVA_PRO,
-    "mistral-large": Models.MISTRAL_LARGE,
-    "mistral-medium": Models.MISTRAL_MEDIUM,
-    "mistral-small": Models.MISTRAL_SMALL,
-}
+MODEL_CHOICES = {name: Models.create(name) for name in Models.NAMES}
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", choices=MODEL_CHOICES.keys(), default="gpt-4o")

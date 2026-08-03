@@ -48,7 +48,9 @@ def _build_prompt(message: str) -> List:
 
 
 class LocalScorer:
-    def __init__(self, model_name: str = "gemini-3.1-flash-lite", max_workers: int = 10):
+    def __init__(
+        self, model_name: str = "gemini-3.1-flash-lite", max_workers: int = 10
+    ):
         if model_name.startswith("gemini"):
             llm = init_llm(
                 model_name,
@@ -73,16 +75,18 @@ class LocalScorer:
                 result = self._chain.invoke(prompt)
                 return [int(result[d]) for d in DIMENSIONS]
             except Exception:
-                time.sleep(2 ** attempt * 0.5 + random.uniform(0, 1))
+                time.sleep(2**attempt * 0.5 + random.uniform(0, 1))
         raise RuntimeError(f"Failed after {retries} attempts.")
 
     def score_many(self, messages: List[str], pbar=None) -> List[List[int]]:
         indexed = [
-            (i, _build_prompt(msg))
-            for i, msg in enumerate(messages) if msg.strip()
+            (i, _build_prompt(msg)) for i, msg in enumerate(messages) if msg.strip()
         ]
         results: List[List[int]] = [[1, 1, 1] for _ in range(len(messages))]
-        futures = {self._pool.submit(self._invoke_with_retry, prompt): i for i, prompt in indexed}
+        futures = {
+            self._pool.submit(self._invoke_with_retry, prompt): i
+            for i, prompt in indexed
+        }
         for fut in as_completed(futures):
             results[futures[fut]] = fut.result()
             if pbar is not None:
@@ -90,7 +94,9 @@ class LocalScorer:
         return results
 
 
-def collect_prompts(rep: Dict, channel: str = "message") -> Tuple[List[Dict], List[str]]:
+def collect_prompts(
+    rep: Dict, channel: str = "message"
+) -> Tuple[List[Dict], List[str]]:
     traj = _trim_trailing_unanimous(rep["trajectory"])
     N = len(traj[0]["phase_b"])
     rows, messages = [], []
@@ -110,7 +116,9 @@ def assign_scores(rows: List[Dict], vals: List[List[int]]) -> List[Dict]:
     return rows
 
 
-def score_repetition(rep: Dict, scorer: LocalScorer, channel: str = "message") -> List[Dict]:
+def score_repetition(
+    rep: Dict, scorer: LocalScorer, channel: str = "message"
+) -> List[Dict]:
     rows, messages = collect_prompts(rep, channel)
     vals = scorer.score_many(messages)
     return assign_scores(rows, vals)
