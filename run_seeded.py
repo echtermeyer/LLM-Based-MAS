@@ -74,7 +74,7 @@ print(f"Found {len(seed_files)} seed files | conditions={args.condition} | R={ar
 def _build_initial_round(phase_b_dicts: list) -> RoundEntry:
     entries = [
         PhaseBEntry(
-            id=e["id"],
+            id=i,
             vote=e["vote"],
             reasoning=e["reasoning"],
             confidence=e["confidence"],
@@ -82,9 +82,16 @@ def _build_initial_round(phase_b_dicts: list) -> RoundEntry:
             prompt_tokens=e.get("prompt_tokens"),
             completion_tokens=e.get("completion_tokens"),
         )
-        for e in phase_b_dicts
+        for i, e in enumerate(phase_b_dicts)
     ]
     return RoundEntry(round=0, phase_a=None, phase_b=entries)
+
+
+def _sample_init(correct_pool: list, wrong_pool: list, condition: int, rng: random.Random) -> list:
+    chosen = rng.sample(wrong_pool, N - condition) + rng.sample(correct_pool, condition)
+    rng.shuffle(chosen)
+    return chosen
+
 
 
 for CONDITION in args.condition:
@@ -106,14 +113,19 @@ for CONDITION in args.condition:
             print(f"\nSkipping q={index} (already exists)")
             continue
 
-        candidate_rounds = [
-            rep["trajectory"][0]["phase_b"]
+        all_records = [
+            e
             for rep in seed_data["repetitions"]
-            if sum(e["vote"] == gt for e in rep["trajectory"][0]["phase_b"]) == CONDITION
+            for e in rep["trajectory"][0]["phase_b"]
         ]
+        correct_pool = [e for e in all_records if e["vote"] == gt]
+        wrong_pool = [e for e in all_records if e["vote"] != gt]
 
-        if not candidate_rounds:
-            print(f"\nq={index}: no seeds for condition={CONDITION}, skipping")
+        if len(wrong_pool) < N - CONDITION or len(correct_pool) < CONDITION:
+            print(
+                f"\nq={index}: insufficient records for condition={CONDITION} "
+                f"(correct={len(correct_pool)}, wrong={len(wrong_pool)}), skipping"
+            )
             continue
 
         sample = GPQALoader().load_single(index)
@@ -128,12 +140,12 @@ for CONDITION in args.condition:
         rng_seed = random.Random(f"seeded_{CONDITION}_{index}")
         seeds = [rng_seed.getrandbits(32) for _ in range(args.r)]
         sampled_rounds = [
-            candidate_rounds[rng_seed.randrange(len(candidate_rounds))]
+            _sample_init(correct_pool, wrong_pool, CONDITION, rng_seed)
             for _ in range(args.r)
         ]
 
         print(
-            f"\nq={index} | seeds={len(candidate_rounds)} | "
+            f"\nq={index} | pool: correct={len(correct_pool)} wrong={len(wrong_pool)} | "
             f"{question[:100].replace(chr(10), ' ')}…"
         )
 
@@ -235,7 +247,8 @@ for CONDITION in args.condition:
             "model": args.model,
             "R": args.r,
             "seeded_condition": CONDITION,
-            "n_seed_candidates": len(candidate_rounds),
+            "n_correct_pool": len(correct_pool),
+            "n_wrong_pool": len(wrong_pool),
             "total_duration_s": round(time.monotonic() - combo_start, 2),
             "repetitions": repetitions,
         }
