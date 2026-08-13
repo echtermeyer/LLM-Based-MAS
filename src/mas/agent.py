@@ -181,6 +181,11 @@ class Agent:
             print(block)
         self._verbose_buffer.clear()
 
+    def inject_init(self, vote: str, reasoning: str, confidence: int, message: str) -> None:
+        self._own_history.append(
+            OwnRecord(round=0, vote=vote, confidence=confidence, reasoning=reasoning, message=message, draft=None)
+        )
+
     def init_round(self, question_context: str) -> Tuple[BaseModel, Dict[str, Optional[int]]]:
         content = f"{question_context}\n\n{_ROUND_0_INST}"
         cb = _UsageCapture()

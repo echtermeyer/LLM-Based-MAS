@@ -4,6 +4,55 @@
 % moved here to keep the main text reader-friendly.
 % ============================================================
 
+\subsection{System Performance: Full Configuration Table}
+\label{app:perf:configs}
+
+Table~\ref{tab:app:perf:configs} reports accuracy, mean rounds to consensus,
+fraction of repetitions hitting the hard cap $T = 15$, and mean vote flips
+for all 12 (dataset, topology, $W$) configurations
+($R = 50$ repetitions per task, $n = 1{,}750$ repetitions per cell).
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{llccccc}
+\toprule
+Dataset & Config & Accuracy & Mean rounds & $p_{\mathrm{cap}}$ & Mean flips \\
+\midrule
+GPQA & fc / $W=1$ & $39.6\,\%$ & $3.85$ & $0.2\,\%$ & $2.87$ \\
+     & fc / $W=2$ & $42.0\,\%$ & $3.64$ & $0.2\,\%$ & $2.79$ \\
+     & fc / $W=5$ & $40.6\,\%$ & $3.81$ & $0.6\,\%$ & $2.87$ \\
+     & star / $W=1$ & $39.9\,\%$ & $4.22$ & $0.9\,\%$ & $2.98$ \\
+     & star / $W=2$ & $41.1\,\%$ & $4.16$ & $0.8\,\%$ & $3.60$ \\
+     & star / $W=5$ & $41.2\,\%$ & $4.32$ & $1.6\,\%$ & $3.27$ \\
+\addlinespace
+HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
+            & fc / $W=2$ & $32.1\,\%$ & $4.91$ & $1.2\,\%$ & $4.40$ \\
+            & fc / $W=5$ & $29.7\,\%$ & $4.99$ & $2.1\,\%$ & $4.29$ \\
+            & star / $W=1$ & $27.8\,\%$ & $7.56$ & $14.3\,\%$ & $5.33$ \\
+            & star / $W=2$ & $29.4\,\%$ & $6.78$ & $11.9\,\%$ & $5.85$ \\
+            & star / $W=5$ & $28.6\,\%$ & $6.54$ & $11.0\,\%$ & $5.64$ \\
+\bottomrule
+\end{tabular}
+\caption{Full system performance per configuration
+         ($R = 50$, $35$ tasks, $n = 1{,}750$ repetitions per cell).}
+\label{tab:app:perf:configs}
+\end{table}
+
+\subsection{System Performance: Rounds vs.\ Accuracy}
+\label{app:perf:rounds_acc}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{plots/general/fig5_rounds_vs_accuracy.png}
+  \caption{Mean accuracy as a function of rounds to consensus,
+           for GPQA (left) and HiddenBench (right).
+           Points show means over repetitions reaching each round count
+           (minimum $n = 20$).
+           All configurations pooled ($N = 10{,}500$ per dataset).}
+  \label{fig:app:perf:rounds_acc}
+\end{figure}
+
 \subsection{High-Repetition Analysis: Additional Figures}
 \label{app:highrep}
 

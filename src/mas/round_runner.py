@@ -15,8 +15,20 @@ def run_round(
     trajectory: List[RoundEntry],
     w: Optional[int],
     rng: random.Random,
+    initial_round: Optional[RoundEntry] = None,
 ) -> RoundEntry:
     if round_index == 0:
+        if initial_round is not None:
+            pb_by_id = {e.id: e for e in initial_round.phase_b}
+            for agent in agents:
+                e = pb_by_id[agent.id]
+                agent.inject_init(
+                    vote=e.vote,
+                    reasoning=e.reasoning,
+                    confidence=e.confidence,
+                    message=e.message,
+                )
+            return initial_round
         phase_b_results = _run_parallel(
             agents,
             lambda agent: (agent.id, agent.init_round(question_prompts[agent.id])),

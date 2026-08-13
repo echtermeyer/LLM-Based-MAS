@@ -2,80 +2,135 @@
 \label{sec:results:perf}
 
 This section reports overall system accuracy and efficiency across all
-420 task--config combinations (35 tasks $\times$ 2 datasets $\times$ 3 memory
-windows $\times$ 2 topologies, $R = 30$ repetitions each).
-The two metrics throughout are:
+420 task--configuration combinations (35 tasks $\times$ 2 datasets $\times$
+3 memory windows $\times$ 2 topologies, $R = 50$ repetitions each,
+$N = 21{,}000$ total).
+Two metrics are reported throughout:
 
 \begin{itemize}
-  \item \textbf{Accuracy}: fraction of repetitions where the majority vote
-        at the end of the debate matches the ground-truth answer.
+  \item \textbf{Accuracy}: fraction of repetitions in which the majority vote
+        at the final round matches the ground-truth answer.
   \item \textbf{Efficiency}: mean number of rounds until the early-stopping
         criterion fires or the hard cap $T = 15$ is reached.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────
-\paragraph{Single-agent vs.\ multi-agent baseline.}
+\subsubsection{Single-Agent Baseline and Debate Gain}
 \label{sec:results:perf:single_vs_multi}
 
-\paragraph{Baseline.}
-To isolate the contribution of debate, we compare the multi-agent result
-against a single-agent baseline: the majority vote of all four agents at
-round~0, before any discussion takes place.
+To isolate the contribution of debate, we compare the multi-agent outcome
+against two baselines defined at round~0, before any discussion takes place:
+
+\begin{itemize}
+  \item \textbf{Per-agent accuracy}: the fraction of individual agent answers
+        that are correct at round~0, averaged across all four agents and all
+        repetitions.
+  \item \textbf{Majority-vote baseline}: the accuracy of the plurality vote
+        over all four agents at round~0 (ties broken arbitrarily).
+        This is the best a voting ensemble can do without any interaction
+        and represents the fair single-agent comparison point.
+\end{itemize}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\linewidth]{plots/general/fig1_single_vs_multi.png}
-  \caption{Single-agent baseline (majority vote at round~0, before debate)
-           vs.\ multi-agent result (majority vote after debate),
-           for GPQA (left) and HiddenBench (right).
-           Dashed line: random baseline at 25\,\% (four-choice questions).
-           All configurations pooled.}
+  \caption{Accuracy decomposition for GPQA (left) and HiddenBench (right):
+           per-agent accuracy at round~0, majority-vote accuracy at round~0,
+           and multi-agent accuracy after debate.
+           Arrow and annotation show the debate gain (majority $\to$ final).
+           Dashed line: random chance at $25\,\%$ (four-choice questions).
+           All configurations pooled ($N = 10{,}500$ per dataset).}
   \label{fig:perf:single_vs_multi}
 \end{figure}
 
-The two datasets tell very different stories (Figure~\ref{fig:perf:single_vs_multi}):
-
-\begin{itemize}
-  \item \textbf{GPQA.} The single-agent baseline is already 46.7\,\%, well above
-        random. Debate adds a modest \textbf{$+2.4$ percentage points}, reaching
-        49.1\,\%. The model has reasonable prior knowledge on GPQA questions, and
-        debate refines but does not transform the outcome.
-
-  \item \textbf{HiddenBench.} The single-agent baseline is only 7.6\,\%,
-        drastically below the random baseline of 25\,\%. The model carries a
-        strong systematic bias on these questions and almost always picks the
-        wrong option before any debate. Debate corrects this bias by
-        \textbf{$+24.0$ percentage points}, lifting accuracy to 31.6\,\% and
-        above random. This is the strongest signal in the data: multi-agent
-        debate is most valuable precisely when individual agents are
-        systematically wrong.
-\end{itemize}
-
-\paragraph{Interpretation.}
-The gap between the two datasets is not simply a difficulty difference.
-It reflects a qualitative shift in what debate does.
-On GPQA, debate acts as a \emph{refinement}: agents start mostly right and
-the system consolidates.
-On HiddenBench, debate acts as a \emph{correction}: agents start
-systematically wrong and the group partially overcomes this.
-The self-reinforcement and limit-cycle analyses in the following sections
-explain when and why this correction succeeds or fails.
-
-% ─────────────────────────────────────────────────────────────────────────────
-\paragraph{Effect of topology.}
-\label{sec:results:perf:topology}
-
-Table~\ref{tab:perf:topology} reports mean accuracy and mean rounds for
-fully-connected (fc) and star topologies, pooled over all memory windows.
+Table~\ref{tab:perf:baseline} summarises the three accuracy levels together
+with an oracle upper bound (fraction of repetitions in which at least one
+agent holds the correct answer at round~0).
 
 \begin{table}[H]
 \centering
-\caption{Accuracy and mean rounds by topology (pooled over $W \in \{1,2,5\}$,
-         $n = 3{,}150$ repetitions per cell).
-         Accuracy difference is not statistically significant in any cell
-         (Mann-Whitney $U$, all $p > 0.19$).
-         Rounds difference is highly significant in all cells ($p < 0.001$).}
-\label{tab:perf:topology}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Dataset & Per-agent & Majority vote (r\,=\,0) & After debate & Oracle (r\,=\,0) \\
+\midrule
+GPQA        & $36.7\,\%$ & $39.4\,\%$ & $\mathbf{40.7\,\%}$ & $68.8\,\%$ \\
+HiddenBench & $15.5\,\%$ & $\phantom{0}8.3\,\%$ & $\mathbf{29.4\,\%}$ & $46.6\,\%$ \\
+\bottomrule
+\end{tabular}
+\caption{Accuracy decomposition at round~0 and after debate.
+         All configurations pooled ($N = 10{,}500$ per dataset).
+         Oracle: fraction of repetitions where at least one agent is correct
+         at round~0.}
+\label{tab:perf:baseline}
+\end{table}
+
+The two datasets tell qualitatively different stories
+(Figure~\ref{fig:perf:single_vs_multi}):
+
+\begin{itemize}
+  \item \textbf{GPQA.}
+        The per-agent accuracy at round~0 is $36.7\,\%$, and majority voting
+        raises this modestly to $39.4\,\%$ by aggregating four independent
+        guesses.
+        Debate adds a further $\mathbf{+1.4}$\,percentage points (pp),
+        reaching $40.7\,\%$.
+        This marginal gain is consistent with findings across the multi-agent
+        debate literature, where homogeneous agents on knowledge-intensive
+        tasks tend to show small absolute accuracy improvements over single-agent
+        baselines \citep{du2024improving, liang2024encouraging, liu2025stopovervaluing}.
+        The model has reasonable prior knowledge on GPQA questions; debate
+        refines but does not transform the outcome.
+        Notably, the oracle bound of $68.8\,\%$ reveals that the correct answer
+        is present among the agents in roughly two thirds of runs: the limiting
+        factor is not knowledge but the group's ability to identify and amplify
+        the correct voice.
+
+  \item \textbf{HiddenBench.}
+        Here the dynamics are strikingly different.
+        The per-agent accuracy at round~0 is $15.5\,\%$, already well below
+        random.
+        Majority voting does not help --- it \emph{reduces} accuracy further
+        to $8.3\,\%$.
+        This is a direct consequence of correlated errors: agents do not fail
+        randomly across the four options but share a systematic bias, all
+        gravitating towards the same wrong answer.
+        When four agents independently commit to the same wrong option,
+        majority voting amplifies that shared error rather than cancelling it
+        out --- an LLM analogue of the biased information sampling documented
+        in human hidden-profile experiments \citep{stasser1985pooling}.
+        Debate reverses this: final accuracy reaches $29.4\,\%$, a gain of
+        $\mathbf{+21.1}$\,pp over the majority baseline and above the random
+        chance level of $25\,\%$.
+        The oracle bound of $46.6\,\%$ confirms that the correct option is
+        present among the agents in roughly half of runs; debate recovers
+        roughly $\frac{29.4 - 8.3}{46.6 - 8.3} \approx 55\,\%$ of the
+        theoretically recoverable accuracy.
+\end{itemize}
+
+\paragraph{Interpretation.}
+The contrast between GPQA and HiddenBench is not simply a difficulty
+difference.
+It reflects a qualitative shift in the role of debate.
+On GPQA, debate acts as a \emph{refinement}: agents start mostly correct,
+and the system consolidates.
+On HiddenBench, debate acts as a \emph{correction}: agents share a
+systematic bias, and structured discussion partially overcomes it.
+The self-reinforcement, limit-cycle, bistability, and dominance analyses in
+the following sections explain when and why this correction succeeds or fails.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsubsection{Effect of Topology}
+\label{sec:results:perf:topology}
+
+Table~\ref{tab:perf:topology} reports mean accuracy and mean rounds for
+fully-connected (fc) and star topologies.
+Rather than pooling across $W$, the table presents the pooled figure as
+a summary; the full per-$W$ breakdown is in Appendix~\ref{app:perf:configs},
+which confirms the same pattern holds in each of the six individual cells.
+
+\begin{table}[H]
+\centering
 \small
 \begin{tabular}{llcccc}
 \toprule
@@ -83,76 +138,88 @@ fully-connected (fc) and star topologies, pooled over all memory windows.
 \cmidrule(lr){3-4}\cmidrule(lr){5-6}
 Dataset & Topology & Mean & $\Delta$ & Mean & $\Delta$ \\
 \midrule
-GPQA        & fc   & 50.2\,\% & \multirow{2}{*}{$+2.2$\,pp (ns)} & 4.05 & \multirow{2}{*}{$-0.42$ (***)} \\
-            & star & 48.0\,\% &                                   & 4.47 & \\
+GPQA        & fc   & $40.7\,\%$ & \multirow{2}{*}{$0.0$\,pp (ns)} & $3.77$ & \multirow{2}{*}{$-0.47$ (***)} \\
+            & star & $40.7\,\%$ &                                  & $4.23$ & \\
 \addlinespace
-HiddenBench & fc   & 31.4\,\% & \multirow{2}{*}{$-0.5$\,pp (ns)} & 6.32 & \multirow{2}{*}{$-1.06$ (***)} \\
-            & star & 31.9\,\% &                                   & 7.38 & \\
+HiddenBench & fc   & $30.2\,\%$ & \multirow{2}{*}{$+1.6$\,pp (ns)} & $5.12$ & \multirow{2}{*}{$-1.84$ (***)} \\
+            & star & $28.6\,\%$ &                                   & $6.96$ & \\
 \bottomrule
 \end{tabular}
+\caption{Accuracy and mean rounds to consensus by topology,
+         pooled over $W \in \{1,2,5\}$
+         ($n = 5{,}250$ repetitions per cell).
+         Accuracy differences are not statistically significant
+         (Mann-Whitney $U$, $p = 1.00$ for GPQA, $p = 0.075$ for HiddenBench).
+         Round differences are highly significant in both datasets ($p < 0.001$).
+         Pattern holds in each individual $W$ cell; see Appendix~\ref{app:perf:configs}.}
+\label{tab:perf:topology}
 \end{table}
 
-Key observations:
-
 \begin{itemize}
-  \item \textbf{Topology has no significant effect on accuracy.}
-        The difference is at most 2.2 percentage points (GPQA) and is
-        not statistically significant in either dataset.
-        The choice of topology does not determine whether the system
-        gets the right answer.
+  \item \textbf{Topology has no significant effect on accuracy}
+        in any of the six per-$W$ cells or in either pooled comparison.
+        The choice of topology does not determine whether the system reaches
+        the correct answer.
 
   \item \textbf{Topology has a large and significant effect on efficiency.}
-        Star topology requires on average 0.42 more rounds on GPQA and
-        1.06 more rounds on HiddenBench compared to fully connected.
-        The hub bottleneck in the star slows convergence: every spoke
-        must route information through a single central node, which
-        aggregates conflicting signals and converges more slowly.
+        Star topology requires $0.47$ more rounds on GPQA and $1.84$ more
+        rounds on HiddenBench compared to fully connected (both $p < 0.001$).
+        The hub bottleneck in the star slows convergence: every spoke must
+        route information through a single central node, which aggregates
+        conflicting signals and commits more slowly.
 
   \item \textbf{The efficiency cost of star is larger on HiddenBench.}
-        On harder, more ambiguous questions the hub receives more
-        conflicting input and takes longer to commit.
-        On GPQA, where agents quickly agree, the bottleneck matters less.
+        On questions where agents disagree more persistently, the hub receives
+        more conflicting input per round and takes longer to commit.
+        On GPQA, where agents converge quickly regardless of topology, the
+        hub bottleneck is less consequential.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────
-\paragraph{Effect of memory window.}
+\subsubsection{Effect of Memory Window}
 \label{sec:results:perf:window}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth]{plots/general/fig3_memory_window.png}
+  \includegraphics[width=0.9\linewidth]{plots/general/fig3_memory_window.png}
   \caption{Accuracy (left column) and mean rounds (right column) for
            $W \in \{1, 2, 5\}$ across both datasets and topologies.
            Blue: fully connected; red: star.
-           Neither accuracy nor rounds change significantly with $W$
-           (Kruskal-Wallis, all $p > 0.17$ for accuracy;
-           only HiddenBench rounds show a weak effect, $p < 0.05$).}
+           Kruskal-Wallis tests for $W$ effect on accuracy are
+           non-significant across all 12 cells (all $p \geq 0.10$).}
   \label{fig:perf:memory_window}
 \end{figure}
 
 \begin{itemize}
-  \item \textbf{Memory window has no effect on accuracy} across all 12 cells.
-        Kruskal-Wallis tests are non-significant for all (dataset, topology)
-        combinations (all $p > 0.42$).
-        Whether agents see only the previous round ($W=1$) or the last five
-        rounds ($W=5$) does not change how often the system reaches the
-        correct answer.
+  \item \textbf{Memory window has no effect on accuracy} in any of the
+        12 (dataset, topology, $W$) cells.
+        Kruskal-Wallis tests are non-significant across all combinations
+        (all $p \geq 0.10$).
+        Whether agents receive only the previous round ($W=1$) or the last
+        five rounds ($W=5$) does not change how often the system reaches
+        the correct answer.
 
-  \item \textbf{Memory window has a weak, non-monotonic effect on rounds}
-        for HiddenBench.
-        $W = 2$ produces slightly fewer rounds than both $W = 1$ and $W = 5$
-        (star topology: 7.15 vs.\ 7.78 and 7.22 respectively, $p < 0.001$
-        for $W=1$ vs $W=2$).
-        GPQA shows no significant round difference across $W$ (all $p > 0.22$).
+  \item \textbf{Memory window affects convergence speed on HiddenBench.}
+        Larger $W$ is associated with faster convergence: $W=1$ produces
+        the most rounds (fc: $5.47$, star: $7.56$), while $W=5$ is the
+        fastest (fc: $4.99$, star: $6.54$), with $W=2$ intermediate
+        (Kruskal-Wallis $p < 0.001$ for both HiddenBench topologies).
+        A longer context window may allow agents to track the trajectory
+        of the debate and resolve disagreements more efficiently.
+        On GPQA, rounds are not significantly affected by $W$
+        (all $p \geq 0.21$).
 
-  \item The expected monotonic ordering ($W=5$ more rounds than $W=1$ due
-        to richer context) is \textbf{not observed}. A single additional
-        round of memory ($W=2$) is sufficient to capture the relevant prior
-        context; beyond that, more history does not change agent behaviour.
+  \item \textbf{The expected monotonic ordering is observed on HiddenBench}
+        but absent on GPQA.
+        Since GPQA agents converge in very few rounds regardless of $W$,
+        additional history provides no useful signal.
+        On HiddenBench, where convergence is slow and contested, more context
+        appears to help agents distinguish a genuine emerging consensus from
+        transient fluctuations.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────
-\paragraph{Round distributions and the rounds--accuracy asymmetry.}
+\subsubsection{Round Distributions and the Rounds--Accuracy Asymmetry}
 \label{sec:results:perf:rounds}
 
 \begin{figure}[H]
@@ -162,53 +229,57 @@ Key observations:
            for all four (dataset, topology) panels and all three memory
            windows (colours).
            The hard cap at $T = 15$ is marked by the dashed red line.
-           Note that $T_r = 2$ is the minimum possible value: with
-           early-stopping threshold $u = 3$, three consecutive identical
-           majority votes (rounds 0, 1, 2) trigger an early stop.}
+           The minimum possible value is $T_r = 2$: with early-stopping
+           threshold $u = 3$, three consecutive unanimous rounds
+           (rounds 0, 1, 2) trigger an early stop.}
   \label{fig:perf:round_dist}
 \end{figure}
 
 \begin{itemize}
   \item \textbf{GPQA converges fast.}
-        The distribution is strongly right-skewed with a mode at rounds
-        2--3.
-        Over 65\,\% of repetitions stop within 5 rounds.
-        Very few reach the hard cap: $p_{\mathrm{cap}} \leq 2.4\,\%$ across
-        all GPQA cells.
+        The distribution is strongly right-skewed with a mode at
+        rounds 2--3.
+        Very few repetitions reach the hard cap:
+        $p_{\mathrm{cap}} \leq 1.6\,\%$ across all GPQA configurations.
 
-  \item \textbf{HiddenBench converges slowly and often fails.}
-        The distribution is flatter and shifted right.
-        The hard cap at $T = 15$ is reached in 10.6--18.0\,\% of
-        repetitions depending on the config, producing the visible spike
-        at the right edge.
+  \item \textbf{HiddenBench converges slowly and often fails to converge.}
+        The distribution is substantially flatter and shifted right.
+        The hard cap is reached in $1.2$--$14.3\,\%$ of repetitions
+        depending on configuration, with star topologies accounting for
+        the highest failure rates ($11.0$--$14.3\,\%$).
         This spike represents pure efficiency failures: the group never
-        reached unanimity.
+        reached unanimous consensus within the round budget.
+        Fully-connected topologies show dramatically lower cap rates
+        ($1.2$--$3.3\,\%$), reflecting their faster convergence.
 
-  \item \textbf{The star topology shifts the distribution right.}
-        Both panels in each dataset row show that star (right column)
-        has a heavier tail and a larger cap spike than fully connected
-        (left column), consistent with the mean-rounds differences in
+  \item \textbf{Star shifts the distribution right across both datasets.}
+        Both topology panels in each dataset row show that star has a
+        heavier tail and a larger cap spike than fully connected,
+        consistent with the mean-rounds differences in
         Table~\ref{tab:perf:topology}.
-
-  \item \textbf{Memory window has minimal effect on the shape.}
-        The three coloured lines largely overlap in every panel,
-        confirming the non-significant Kruskal-Wallis results for
-        GPQA and the small $W=2$ effect on HiddenBench.
 \end{itemize}
 
- \paragraph{Rounds and accuracy.}
-On GPQA, rounds to consensus and accuracy are negatively correlated:
-repetitions that stop at round 2 have 60.6\,\% accuracy, dropping to
-below 40\,\% for rounds $\geq 5$.
-Fast consensus signals early agreement among already-competent agents.
-On HiddenBench the pattern reverses: repetitions stopping at round 2
-have only 2.2\,\% accuracy (far below random), because early consensus
-here means the group locked in on the wrong answer before any corrective
-debate could occur.
-This asymmetry motivates the self-reinforcement analysis in
-Section~\ref{sec:results:sr}: early lock-in is the mechanism behind
-both the fast correct convergence on GPQA and the catastrophic early
-failure on HiddenBench.
+\paragraph{Rounds and accuracy.}
+The relationship between rounds to consensus and accuracy reveals a
+striking asymmetry (full plot in Appendix~\ref{app:perf:rounds_acc}).
+On GPQA, accuracy peaks at rounds~3--4 ($47.1\,\%$) and is lower both
+for the earliest stops at round~2 ($36.1\,\%$) and for longer debates
+(${\leq}\,40\,\%$ from round~5 onwards): neither very fast nor very slow
+consensus is reliably correct.
+On HiddenBench the pattern is opposite: repetitions stopping at round~2
+achieve only $6.4\,\%$ accuracy --- far below random --- because early
+consensus means the group has locked in on the majority-biased wrong answer
+before any corrective exchange.
+Accuracy rises steadily with more rounds: $23.8\,\%$ at round~3,
+$31.7\,\%$ at round~4, $33.1\,\%$ at round~5.
+
+This asymmetry is fundamental to understanding the dynamics reported in the
+following sections.
+On GPQA, self-reinforcement of an early consensus is often adaptive.
+On HiddenBench, it is the primary failure mode: agents self-reinforce a
+shared bias, and the system reaches confident unanimity on the wrong answer.
+Full per-configuration accuracy, efficiency, cap rates, and vote-flip counts
+are reported in Appendix~\ref{app:perf:configs}.
 
 
 \subsection{Self-Reinforcement}

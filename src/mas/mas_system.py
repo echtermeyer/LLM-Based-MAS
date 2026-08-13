@@ -57,6 +57,7 @@ class MultiAgentSystem:
         ground_truth: str,
         question_prompts: List[str],
         on_round_complete: Optional[Callable[[RoundEntry], None]] = None,
+        initial_round: Optional[RoundEntry] = None,
     ) -> RunResult:
         names = [f"Agent{i + 1}" for i in range(self._n)]
         self._rng.shuffle(names)
@@ -76,6 +77,7 @@ class MultiAgentSystem:
                 trajectory=trajectory,
                 w=self._w,
                 rng=self._rng,
+                initial_round=initial_round if t == 0 else None,
             )
             trajectory.append(round_entry)
             if on_round_complete is not None:
