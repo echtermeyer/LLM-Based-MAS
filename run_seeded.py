@@ -20,7 +20,6 @@ from src.mas import MultiAgentSystem, PhaseBEntry, RoundEntry
 from src.models.llms import Models
 from src.utils.console import BOLD, GRAY, GREEN, RED, RESET, print_round
 
-SEED_DIR = Path("results/mas/final_dataset_new_system/W2_fc")
 RESULTS_DIR = Path("results/mas")
 
 W = 2
@@ -29,6 +28,18 @@ N = 4
 
 parser = argparse.ArgumentParser(
     description="Run seeded-init MAS debate: inject round-0 from existing data, debate from round 1."
+)
+parser.add_argument(
+    "--seed-dir",
+    type=Path,
+    default=Path("data/seeds"),
+    help="Directory containing seed JSON files (default: data/seeds)",
+)
+parser.add_argument(
+    "--results-dir",
+    type=Path,
+    default=Path("results/mas"),
+    help="Root output directory (default: results/mas)",
 )
 parser.add_argument(
     "--condition",
@@ -51,7 +62,7 @@ args = parser.parse_args()
 temperature = Models.TEMPERATURES[args.model]
 llm = Models.create(args.model)
 
-seed_files = sorted(SEED_DIR.glob("*gpqa*.json"))
+seed_files = sorted(args.seed_dir.glob("*gpqa*.json"))
 print(f"Found {len(seed_files)} seed files | conditions={args.condition} | R={args.r}")
 
 
@@ -72,7 +83,7 @@ def _build_initial_round(phase_b_dicts: list) -> RoundEntry:
 
 
 for CONDITION in args.condition:
-    output_dir = RESULTS_DIR / f"seeded_init_{CONDITION}"
+    output_dir = args.results_dir / f"seeded_init_{CONDITION}"
     output_dir.mkdir(parents=True, exist_ok=True)
     print(f"\n=== Condition {CONDITION} ===")
 
