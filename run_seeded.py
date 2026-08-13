@@ -20,6 +20,9 @@ from src.mas import MultiAgentSystem, PhaseBEntry, RoundEntry
 from src.models.llms import Models
 from src.utils.console import BOLD, GRAY, GREEN, RED, RESET, print_round
 
+import inspect as _inspect
+_REPO_ROOT = Path(_inspect.currentframe().f_code.co_filename).parent
+
 RESULTS_DIR = Path("results/mas")
 
 W = 2
@@ -32,13 +35,13 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "--seed-dir",
     type=Path,
-    default=Path("data/seeds"),
+    default=_REPO_ROOT / "data/seeds",
     help="Directory containing seed JSON files",
 )
 parser.add_argument(
     "--results-dir",
     type=Path,
-    default=Path("results/mas"),
+    default=_REPO_ROOT / "results/mas",
     help="Root output directory",
 )
 parser.add_argument(
