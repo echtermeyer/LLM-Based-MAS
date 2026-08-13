@@ -29,17 +29,19 @@ N = 4
 parser = argparse.ArgumentParser(
     description="Run seeded-init MAS debate: inject round-0 from existing data, debate from round 1."
 )
+_SCRIPT_DIR = Path(__file__).parent
+
 parser.add_argument(
     "--seed-dir",
     type=Path,
-    default=Path("data/seeds"),
-    help="Directory containing seed JSON files (default: data/seeds)",
+    default=_SCRIPT_DIR / "data/seeds",
+    help="Directory containing seed JSON files",
 )
 parser.add_argument(
     "--results-dir",
     type=Path,
-    default=Path("results/mas"),
-    help="Root output directory (default: results/mas)",
+    default=_SCRIPT_DIR / "results/mas",
+    help="Root output directory",
 )
 parser.add_argument(
     "--condition",
