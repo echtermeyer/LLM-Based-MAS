@@ -29,7 +29,7 @@ N = 4
 parser = argparse.ArgumentParser(
     description="Run seeded-init MAS debate: inject round-0 from existing data, debate from round 1."
 )
-_SCRIPT_DIR = Path(__file__).parent
+_SCRIPT_DIR = Path(globals().get("__file__", __import__("os").getcwd()))
 
 parser.add_argument(
     "--seed-dir",

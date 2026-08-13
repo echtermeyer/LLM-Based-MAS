@@ -22,7 +22,7 @@ from src.models.llms import Models
 from src.mas.topology import TOPOLOGY_NAMES
 from src.utils.console import BOLD, GRAY, GREEN, RED, RESET, print_round
 
-RESULTS_DIR = Path(__file__).parent / "results/mas"
+RESULTS_DIR = Path(globals().get("__file__", __import__("os").getcwd())).parent / "results/mas"
 
 parser = argparse.ArgumentParser(
     description="Run synchronous-round MAS debate on a single question."
