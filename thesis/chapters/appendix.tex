@@ -1,0 +1,268 @@
+% ============================================================
+% APPENDIX
+% Overflow from Chapters 4 and 5, preserved in substance but
+% moved here to keep the main text reader-friendly.
+% ============================================================
+
+\subsection{High-Repetition Analysis: Additional Figures}
+\label{app:highrep}
+
+This appendix provides the full feature-by-outcome breakdown and correlation
+matrix for the high-repetition experiment described in
+Section~\ref{sec:results:highrep} ($R = 1{,}000$, three GPQA tasks,
+$W = 2$, fully-connected topology, $N = 4$ agents).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/figA_full_feature_breakdown.png}
+  \caption{Full breakdown of accuracy (top row) and efficiency (bottom row, where
+           applicable) as a function of six run-level features.
+           (a) Accuracy by initial plurality size.
+           (b) Accuracy by vote-flip count (binned, Wilson 95\,\% CI, $n \geq 10$).
+           (c) Accuracy by mean initial confidence.
+           (d) Efficiency by initial plurality size.
+           (e) Accuracy by mean final confidence.
+           (f) Accuracy by confidence change (final minus initial);
+               dotted line at zero.
+           $R=1{,}000$ per task, $W=2$, fully-connected.}
+  \label{fig:app:highrep:features}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{plots/highrep/figA_correlation_heatmap.png}
+  \caption{Feature-outcome correlation matrix for the high-repetition experiment.
+           Left: point-biserial correlation $r$ between each feature and binary
+           accuracy (correct/incorrect).
+           Right: Pearson $r$ between each feature and rounds to consensus.
+           Significance: *** $p < 0.001$, ** $p < 0.01$, * $p < 0.05$.}
+  \label{fig:app:highrep:heatmap}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/figA_distributions_by_outcome.png}
+  \caption{Feature distributions split by outcome (correct: colour; incorrect: grey)
+           for three GPQA tasks, $R=1{,}000$ each, $W=2$, fully-connected.
+           Rows: q84, q125, q144.
+           Columns: vote flips, mean initial confidence, mean final confidence,
+           confidence change (final minus initial), rounds to consensus.
+           Histograms show empirical density; curves are kernel density estimates.
+           Confidence change distributions for correct and incorrect runs overlap
+           almost perfectly in all three tasks, indicating that agents gain
+           confidence at the same rate regardless of whether the system reaches the
+           correct answer.
+           Vote flip and round distributions separate in task-dependent directions
+           (see Section~\ref{sec:results:highrep}).}
+  \label{fig:app:highrep:distributions}
+\end{figure}
+
+\subsection{Motifs Beyond the Present Selection}
+\label{app:future_motifs}
+
+\autoref{sec:method:vocab} restricts the study to four motifs. The same
+structural/dynamical lens admits several others that we leave to future work. On
+the structural side, in the emergent influence graph:
+\begin{itemize}
+  \item \textbf{Mutual-reinforcement dyad} (a two-node positive loop): two agents
+        that repeatedly push each other the same way.
+  \item \textbf{Influence feed-forward loop}: $A$ sways $B$, $B$ sways $C$, and $A$
+        also sways $C$ directly, predicting delayed or robust lock-in.
+  \item \textbf{Cascade / chain}: sequential adoption $A \to B \to C$, the
+        structural signature of herding.
+\end{itemize}
+On the dynamical side, further regimes of the joint trajectory:
+\begin{itemize}
+  \item \textbf{Consensus / fixed point}: the baseline regime (a point attractor)
+        against which the others are defined.
+  \item \textbf{Polarisation / stable split}: persistent within-run disagreement
+        into stable subgroups, distinct from across-run bistability.
+  \item \textbf{Negative autoregulation / self-correction}: the sign-flipped twin
+        of self-reinforcement, an agent that damps its own confidence.
+\end{itemize}
+These span a coherent picture of the regimes a small interacting system can fall
+into; a study must start somewhere, so we treat them as directions for future
+investigation.
+
+
+\subsection{Benchmark Survey}
+\label{app:benchmarks}
+
+This appendix records the full survey of candidate benchmarks considered for
+motif detection and the reason each was retained or rejected against the four
+selection criteria of \autoref{sec:setup:datasets} (discrete shared decision
+variable, verifiable ground truth, calibrated difficulty, sufficient initial
+disagreement).
+
+\subsubsection{Native Multi-Agent Benchmarks}
+
+These were designed to evaluate multi-agent systems but are mostly structurally
+incompatible with motif detection. They fall into three families.
+
+\paragraph{Family 1: Task-decomposed / role-specialised.}
+Agents are bound to specific sub-tasks rather than deliberating over a shared
+decision, so there is no shared position space across agents.
+\begin{itemize}
+  \item \textbf{REALM-Bench}~\citep{geng2025realmbench}: planning/scheduling
+        problems; agents bound to specific machines, ``communication'' is
+        notification cascades rather than deliberation.
+  \item \textbf{MultiAgentBench / MARBLE}~\citep{zhu2025multiagentbench}:
+        role-specialised agents (e.g.\ five database agents each diagnosing a
+        different root cause). Its Bargaining and Werewolf sub-environments
+        \emph{do} have shared decision variables and could serve as secondary
+        datasets.
+  \item \textbf{PARTNR}~\citep{chang2024partnr}: embodied household tasks with
+        hard-coded heterogeneous capabilities; dyadic by design, ruling out
+        group-level motifs.
+  \item \textbf{Collab-Overcooked}: chef and assistant operate in distinct
+        action spaces.
+\end{itemize}
+
+\paragraph{Family 2: Competition / cooperation without a shared decision.}
+Agents have positions in physical or tactical space rather than a shared decision
+space, so position metrics cannot be defined directly.
+\begin{itemize}
+  \item \textbf{BattleAgentBench}~\citep{wang2024battleagentbench}: tank combat;
+        each agent's state is a continuous physical configuration
+        $(x, y, \theta, h)$, with no shared categorical variable.
+  \item \textbf{SPIN-Bench}~\citep{yao2025spinbench}: planning and board/strategy
+        games. Only Diplomacy is close to deliberation, but its ``position'' is a
+        spatial supply-centre configuration, and the authors report that
+        coordination quality degrades sharply beyond two to three agents.
+\end{itemize}
+
+\paragraph{Family 3: Social / deliberative interaction.}
+Closer in spirit to our goal, with a mixed picture.
+\begin{itemize}
+  \item \textbf{SOTOPIA}~\citep{zhou2024sotopia}: social scenarios with holistic
+        multi-dimensional scoring, but $N = 2$ by design, which is structurally
+        fatal here: dominance and mutual inhibition require $N \geq 3$, and
+        bistability requires multiple factions.
+  \item \textbf{LLM-Deliberation}~\citep{abdelnabi2024cooperation}: a genuinely
+        multi-agent ($N = 6$) negotiation environment with public scratchpads and
+        native adversarial variants. Its deal space is too sparse for
+        equality-based agreement metrics and it has no per-agent correctness
+        signal, so it is the strongest candidate for a \emph{future} mixed-motive
+        extension rather than a correctness benchmark here.
+  \item \textbf{HiddenBench}~\citep{li2026hiddenbench}: the hidden-profile
+        paradigm \citep{stasser1985pooling, schulzhardt2012synergy} formalised as
+        a benchmark, with validity criteria guaranteeing that information pooling
+        is required. Adopted as our secondary substrate (\autoref{sec:setup:datasets:hiddenbench}).
+\end{itemize}
+
+\paragraph{Conceptually adjacent (frameworks and reference corpora).}
+Cited but not used as substrates: \textbf{AgentVerse}~\citep{chen2024agentverse},
+a framework rather than a benchmark; and the \textbf{DEBATE
+corpus}~\citep{chuang2025debate}, a human public/private opinion-dynamics corpus
+used as a reference point rather than an LLM task environment.
+
+\subsubsection{Single-Agent Reasoning Benchmarks Adopted by MAD}
+
+The foundational MAD work \citep{du2024improving} established the methodology on
+GSM8K~\citep{cobbe2021gsm8k}, MMLU~\citep{hendrycks2021mmlu}, and similar sets,
+later extended to MATH~\citep{hendrycks2021math} and
+StrategyQA~\citep{geva2021strategyqa}. These are operationally attractive
+(discrete answers, clean ground truth, cheap, well-precedented) but fail our use
+case through \textbf{saturation}: GSM8K and MMLU are effectively solved by
+frontier models \citep{achiam2023gpt4}, so the typical trajectory is immediate
+unanimous agreement with no dynamical signal. Critical reassessments confirm that
+on saturated benchmarks debate frequently fails to beat single-agent
+baselines \citep{liu2025stopovervaluing, zhang2025debateorvote}. MATH retains
+higher difficulty but requires non-trivial answer normalisation and has long
+solutions that inflate token cost, making it worse on operational tractability.
+GPQA-Diamond \citep{rein2024gpqa} is the current frontier instance of the same
+lineage that still leaves headroom, which is why we adopt it as primary
+(\autoref{sec:setup:datasets:gpqa}).
+
+
+\subsection{Per-Knob Justification}
+\label{app:knobs}
+
+This appendix expands the classification of tunable components summarised in
+\autoref{tab:knob-summary}, giving the full rationale for each scan, fix, or
+defer decision.
+
+\paragraph{Memory window and contents (scan).}
+\citet{marandi2026protocols} systematically compare within-round, cross-round,
+and rank-adaptive protocols and find a real tradeoff between convergence speed,
+peer-referencing, and argument diversity. \citet{tian2025madm2} establish that
+MAD performance depends heavily on memory quality and that erroneous memories can
+propagate. The convergence-time control of \citet{du2024improving} is functionally
+memory-driven. We scan $W \in \{1, 2, 5\}$ with $W = 1$ as the near-Markov
+baseline.
+
+\paragraph{Communication topology (scan).}
+Topology is the canonical lever for network-motif analysis and an established
+first-class design choice in MAD \citep{li2024sparsetopology}.
+\citet{liu2025problemsolving} report that hub placement in network topologies
+substantially shifts performance, and \citet{chen2023consensus} observe emergent
+leader-follower structure in directed graphs, a dominance motif under another
+name. We scan $\{\textsc{fc}, \textsc{star}\}$.
+
+\paragraph{Number of agents (fix at $N = 4$).}
+\citet{du2024improving} use $N = 3$ as the canonical baseline;
+\citet{liang2024encouraging} report only modest degradation up to $N = 4$. The
+joint answer-profile state space grows as $M^N$, so $N = 4$ is the smallest value
+at which the two canonical topologies are structurally distinct while the state
+space stays tractable for trajectory statistics.
+
+\paragraph{Number of rounds (fix at $T = 15$).}
+$T$ behaves as an observation budget rather than a structural perturbation, since
+trajectories can be cropped post hoc but not extended. Accuracy-level convergence
+is reported within a few rounds \citep{li2024sparsetopology}, but motif detection
+needs longer windows, since limit cycles in particular require $T \geq 2 \cdot
+\text{period}$ and the period is unknown a priori. We fix $T = 15$ as a hard cap
+with early stopping $u = 3$ to recover efficiency.
+
+\paragraph{Output structure (fix, full Phase A/B).}
+The structured output is the measurement apparatus, not engineering taste.
+Private reasoning and confidence versus the public message enable the
+public/private dissociation; the Phase-A \texttt{question} field yields the
+directed influence graph for dominance detection; \texttt{challenge} quoting peer
+claims provides attribution; and the vote-stability rule separates argumentation
+from belief update so they can be measured independently. Structured outputs are
+the norm in serious MAD work \citep{liang2024encouraging, he2025dimo}.
+
+\paragraph{Cooperativeness (fix, cooperative).}
+\citet{liang2024encouraging} identify the operational sweet spot: a modest level
+of tit-for-tat is required, with pure cooperation collapsing into
+Degeneration-of-Thought and pure adversarial framing preventing convergence. Our
+defense/challenge/question scaffold implements modest tit-for-tat while Phase-B
+belief update leaves room for convergence.
+
+\paragraph{Synchrony (fix, parallel-synchronous).}
+\citet{du2024improving} establish synchronous simultaneous-talk as the canonical
+MAD protocol, also adopted by \citet{liu2024groupdebate}. Synchronous execution
+with randomised peer-message order also removes agent-order position effects that
+would otherwise confound dominance detection.
+
+\paragraph{Model selection (fix, homogeneous mid-tier).}
+We fix a single homogeneous model, \texttt{mistral-medium}, to isolate topology
+and memory effects from capability-asymmetry effects: \citet{wynn2025talk} document
+that models shift from correct to incorrect answers under peer pressure, producing
+dominance-like dynamics attributable to conformity. A homogeneous baseline ensures
+any observed dominance is structural rather than capability-driven; heterogeneous
+setups are reserved as an ablation.
+
+\paragraph{Sampling temperature (fix at $0.7$, reasoning disabled).}
+Deterministic decoding collapses MAD into voting among identical samples, and
+\citet{zhu2026demystifying} show the homogeneous deterministic case cannot improve
+over a single agent. We use temperature $0.7$ with reasoning disabled to obtain
+diverse yet focused outputs without chain-of-thought token overhead.
+
+\paragraph{Tool access (defer).}
+For GPQA-Diamond, tools would push single-agent accuracy toward the ceiling and
+remove dynamical headroom, introduce non-reproducibility through web search, and
+violate the Google-proof design rationale of \citet{rein2024gpqa}.
+
+\paragraph{Compute budget.}
+Reliable motif detection requires $R = 30$--$50$ repetitions per configuration:
+bistability needs enough samples to surface both attractor basins, limit cycles
+enough trajectories to confirm period-$\geq 2$ structure, and dominance
+estimators statistical power. At $\approx 25$\,s per repetition, the naive cost of
+the full grid on all 198 GPQA-Diamond tasks would be $198 \times 6 \times R \times
+25$\,s, i.e.\ $\approx 248$\,h ($\approx 10.3$ days) at $R = 30$ and $\approx 413$\,h
+($\approx 17.2$ days) at $R = 50$. The two-phase difficulty-based procedure of
+\autoref{sec:setup:design} reduces this to $\approx 29$\,h by running the full
+grid only on promoted Tier-3 tasks, while the screening pass still yields
+prevalence estimates across the broader task set.

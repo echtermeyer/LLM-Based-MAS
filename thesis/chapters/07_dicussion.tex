@@ -1,0 +1,97 @@
+% ============================================================
+% 7.1 INTERPRETATION OF FINDINGS
+% ------------------------------------------------------------
+% Synthesize the four motifs into a coherent story:
+%
+%   SR as amplifier of initial conditions (not a universally
+%   beneficial mechanism): present and universal on both datasets
+%   and all configs; positively correlated with accuracy on GPQA
+%   (where initial conditions are reliable) but inert on
+%   HiddenBench (where they are not). SR accelerates whatever
+%   the initial distribution favors -- correct or wrong.
+%
+%   Topology as the primary design lever: the star/fc contrast
+%   drives the limit cycle finding (only star produces genuine
+%   cycles), efficiency differences (star ~0.4-1.1 rounds slower),
+%   and dominance concentration (star D ~3-4x fc). Memory window
+%   W has weaker, inconsistent effects on most metrics.
+%
+%   Two dynamical regimes -- GPQA vs HiddenBench: GPQA is a
+%   refinement regime (agents mostly right, debate consolidates);
+%   HiddenBench is a correction regime (agents systematically
+%   wrong, debate partially overcomes). Motif signatures differ
+%   accordingly: stronger bistability on HiddenBench, SR inert
+%   on accuracy, limit cycles predominantly HiddenBench.
+%
+%   Null results as findings: near-absent limit cycles in fc,
+%   monostable domination in bistability, weak W effects -- these
+%   are informative, not failures. Document them honestly.
+% ============================================================
+\subsection{Interpretation of Findings}
+
+% [TO WRITE: ~2 pages synthesizing the above into prose]
+
+
+% ============================================================
+% 7.2 ROBUSTNESS AND LIMITATIONS
+% ------------------------------------------------------------
+% Robustness:
+%   - New critical system prompt experiment (NB 029): anti-
+%     conformity instruction yields faster fc convergence
+%     (-1 to -1.5 rounds, Holm-sig in 3/6 configs) but no
+%     accuracy change and no bistability reduction. Gains are
+%     dynamical not epistemic. SR flat (0/6 Holm-sig).
+%     Interpretation: the prompt change modulates speed of
+%     entrenchment but not the underlying motif structure.
+%
+% Limitations:
+%   - Phenomenological, not causal: all four motif detectors
+%     detect signatures, not certified attractors/causes.
+%     Perturbation experiments needed for causal claims.
+%   - Single model (Mistral-Medium), two benchmarks, N=4:
+%     generalizability to other models, larger N, other tasks
+%     is not guaranteed.
+%   - SR null model survivorship bias: downward confidence
+%     drift censoring may inflate p_SR above 0.5 baseline.
+%     Results conservative but not bias-free.
+%   - SR-to-rounds mediation: partial tautology concern
+%     (longer runs have more opportunity for slope to develop).
+%   - Linguistic scorer not independent (same model as agents).
+%   - Multiple comparisons: corrections applied per-test but
+%     exploratory nature of the study means some false positives
+%     are expected across the full analysis.
+%   - Bistability N_eff > M bug: split attractors inflate N_eff
+%     in a small number of cells.
+% ============================================================
+\subsection{Robustness and Limitations}
+
+% [TO WRITE: ~1.5 pages]
+
+
+% ============================================================
+% 7.3 DESIGN IMPLICATIONS
+% ------------------------------------------------------------
+% Practical takeaways for practitioners building MAD systems:
+%
+%   - Use star topology if worst-case efficiency is a concern
+%     (no genuine limit cycles in fc; star can trap debates).
+%   - fc produces stronger SR and faster convergence -- prefer
+%     when speed matters and initial conditions are reliable.
+%   - A hard round cap is necessary with star topology; reaching
+%     T should be treated as an explicit unresolved-output signal.
+%   - Memory window W is not a reliable tuning knob for accuracy
+%     or SR; its effect on dominance (W entrenches hub in star)
+%     is the clearest actionable signal.
+%   - Promoting initial vote diversity (seeded initialization)
+%     is the largest lever for slowing SR and extending debate.
+%   - Linguistically heterogeneous agent styles (diverse anchoring
+%     and dialogic behavior) correlate with faster resolution --
+%     consider prompt diversity as a design axis.
+%   - On HiddenBench-type tasks (systematic pre-debate bias),
+%     debate provides large accuracy gains (+24 pp) but motifs
+%     (especially SR) do not additionally explain accuracy --
+%     the correction is structural, not motif-mediated.
+% ============================================================
+\subsection{Design Implications}
+
+% [TO WRITE: ~1 page]

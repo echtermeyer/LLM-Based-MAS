@@ -1,0 +1,270 @@
+\documentclass[12pt]{article}
+
+\usepackage[]{graphicx}
+\usepackage[]{color}
+\usepackage{alltt}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{acronym}
+\usepackage{multirow} 
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit, calc, backgrounds}
+\usepackage{pifont} % For checkmark symbol
+
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp}
+
+% \acrodef{VAE}{Variational Autoencoder}
+% \acrodef{ELBO}{Evidence Lower Bound}
+% \acrodef{KL}{Kullback-Leibler}
+% \acrodef{IWAE}{Importance Weighted Autoencoder}
+% \acrodef{AIS}{Annealed Importance Sampling}
+% \acrodef{FFG}{Fully-Factorized Gaussian}
+% \acrodef{AF}{Auxiliary Flow}
+% \acrodef{HMC}{Hamiltonian Monte Carlo}
+% \acrodef{BDMC}{Bidirectional Monte Carlo}
+% \acrodef{SA-VAE}{Semi-Amortized Variational Autoencoders}
+% \acrodef{VLAE}{Variational Laplace Autoencoders}
+
+\newcommand{\mytitle}{Self-Organization Patterns in LLM-based MAS}
+\newcommand{\myname}{Eric Echtermeyer}
+\newcommand{\mysupervisor}{Prof. Dr. Hinrich Schütze, Ali Modarressi}
+
+\usepackage[a4paper, width = 160mm, top = 35mm, bottom = 30mm, 
+bindingoffset = 0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+\usepackage[round, comma]{natbib}
+\usepackage{fancyhdr}
+\newcommand{\changefont}{%
+    \fontsize{8}{11}\selectfont
+}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor = black,
+  urlcolor = black,
+  citecolor = black}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[R]{\changefont{\mytitle}}
+\fancyfoot{}
+\fancyfoot[R]{\thepage}
+\setlength{\headheight}{14.5pt}
+\setlength{\parindent}{0pt}
+\interfootnotelinepenalty = 10000
+
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Subsection}
+
+% ------------------------------------------------------------------------------
+% MAIN -------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+
+\begin{document}
+
+% FRONT PAGE -------------------------------------------------------------------
+
+\pagenumbering{Roman}
+
+\begin{titlepage}
+\begin{center}
+    
+\LARGE
+Master Thesis
+    
+\vspace{0.5cm}
+      
+\rule{\textwidth}{1.5pt}
+\LARGE
+\textbf{\mytitle}
+\rule{\textwidth}{1.5pt}
+   
+\vspace{0.5cm}
+      
+\large
+Department of Statistics \\
+Ludwig-Maximilians-Universität München 
+
+\vfill
+
+\Large
+\textbf{\myname}
+
+\vfill
+
+\large
+Munich, September 31\textsuperscript{st}, 2026
+      
+\vfill
+
+\includegraphics[width = 0.4\textwidth]{sigillum.png}
+
+\vfill
+
+\normalsize
+
+Supervised by \mysupervisor
+
+\end{center}
+\end{titlepage}
+
+% CONTENTS ---------------------------------------------------------------------
+
+\newpage
+
+\begin{abstract}
+
+Hier wird mein Abstract sein!
+
+\end{abstract}
+
+\newpage
+\tableofcontents
+
+%%%% if you would want to include material overview
+%%%% use one of the following in addition
+% \newpage
+% \listoffigures
+% \newpage
+% \listoftables
+\newpage
+
+% CHAPTERS ---------------------------------------------------------------------
+
+\pagenumbering{arabic}
+    
+\section{Introduction}
+\label{sec:introduction}
+\input{chapters/01_introduction}
+\newpage
+
+\section{Background}
+\label{sec:infsub}
+\input{chapters/02_background}
+\newpage
+
+\section{Related Work}
+\label{sec:related}
+\input{chapters/03_related_work}
+\newpage
+
+\section{System and Experimental Setup}
+\label{sec:exp}
+\input{chapters/04_system_design}
+\newpage
+
+\section{Detection Methodology}
+\label{sec:method}
+\input{chapters/05_detection}
+\newpage
+
+\section{Results}
+\label{sec:results}
+\input{chapters/06_results}
+\newpage
+
+\section{Discussion}
+\label{sec:discussion}
+\input{chapters/07_dicussion}
+\newpage
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{chapters/08_conclusion}
+
+\newpage
+
+% ------------------------------------------------------------------------------
+% APPENDIX ---------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+    
+\pagenumbering{Roman}
+
+\setcounter{page}{5} % CHANGE
+
+\appendix
+
+\section{Appendix}
+\label{app}
+\input{chapters/appendix}
+\newpage
+
+\section{Electronic appendix}
+\label{el_app}
+The complete source code, including all scripts required to reproduce the figures and results, is publicly available in the following GitHub repository: 
+
+\url{https://github.com/echtermeyer/Inference-Suboptimality-Seminar}
+
+\newpage
+    
+% ------------------------------------------------------------------------------
+% BIBLIOGRAPHY -----------------------------------------------------------------
+% ------------------------------------------------------------------------------
+
+\RaggedRight
+\bibliography{bibliography}
+\bibliographystyle{dcu}
+\newpage
+
+% ------------------------------------------------------------------------------
+% DECLARATION OF AUTHORSHIP-----------------------------------------------------
+% ------------------------------------------------------------------------------
+
+\Large
+\noindent
+\textbf{Declaration of authorship} 
+\vspace{0.3cm}
+\noindent
+\normalsize
+
+I hereby declare that the report submitted is my own unaided work. All direct 
+or indirect sources used are acknowledged as references. I am aware that the 
+Thesis in digital form can be examined for the use of unauthorized aid and in 
+order to determine whether the report as a whole or parts incorporated in it may 
+be deemed as plagiarism. For the comparison of my work with existing sources I 
+agree that it shall be entered in a database where it shall also remain after 
+examination, to enable comparison with future Theses submitted. Further rights 
+of reproduction and usage, however, are not granted here. This paper was not 
+previously presented to another examination board and has not been published.
+
+\vspace{0.7cm}
+\Large
+\noindent
+\textbf{AI Tools}
+\vspace{0.3cm}
+\noindent
+\normalsize
+
+I hereby confirm that I have written all parts of this work myself. The following AI tools were used during the creation of this thesis and the presentations. All AI-generated suggestions and outputs were critically reviewed, tested where applicable, and independently revised by me. No AI tool was used for the main analysis or interpretation of experimental results.
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item \textbf{Anthropic Claude Sonnet 4.5} (AI as Tutor): Used initially to explore and understand core \ac{VAE} concepts and the inference suboptimality framework.
+    \item \textbf{GitHub Copilot} (Inline Completion): Used for inline code completion suggestions during development. All outputs were reviewed and modified as appropriate.
+    \item \textbf{Anthropic Claude Opus 4.5} (Performance and Resource Optimization): Used to parallelize the evaluation pipeline for the experiments in \autoref{sec:exp}. The generated code was reviewed and tested carefully.
+    \item \textbf{Anthropic Claude Opus 4.5} (Code Documentation): Used to generate a first draft of the project's README.md file in the electronic appendix. 
+    \item \textbf{Anthropic Claude Opus 4.6} (Peer Review Simulation): Used for proofreading, including identification of inconsistencies, typo errors, and grammar errors.
+    \item \textbf{Google Gemini 3} (Improve Writing Style, Paraphrasing and Reformulation): Used for linguistic refinement and paraphrasing. Suggestions were not adopted verbatim but were manually reviewed, adapted, and reformulated.
+\end{itemize}
+
+All AI outputs and suggestions were independently evaluated and selectively adopted after critical review.
+
+\vspace{0.8cm}
+\textcolor{orange}{München, 06.02.2026} \\
+
+\vspace{1cm}
+
+\noindent\rule{0.5\textwidth}{0.4pt} \\
+
+\textcolor{orange}{Name}
+
+% ------------------------------------------------------------------------------
+
+\end{document}

@@ -1,0 +1,584 @@
+% ============================================================
+% CHAPTER 4: SYSTEM AND EXPERIMENTAL SETUP
+%
+% Structure (matches ToC):
+%   4.1  Notation and System Model
+%   4.2  Debate Protocol
+%        4.2.1  Agent State and Two-Phase Rounds
+%        4.2.2  Memory Window and Stopping Criteria
+%   4.3  Datasets
+%        4.3.1  GPQA-Diamond
+%        4.3.2  HiddenBench
+%   4.4  Experimental Design
+%
+% Notation convention (consistent with Chapter 5):
+%   t  = round index (0..T);  r = repetition index;  R = #repetitions
+%   N  = #agents (=4);  M = #answer options (3 or 4)
+%   v_i^t = vote;  c_i^t = confidence;  s_t = macrostate (vote composition)
+%   \mathcal{H} = history/memory window (avoids clash with M = option count)
+% Overflow (full benchmark survey, per-knob justifications) moved to Appendix.
+% ============================================================
+
+
+% ------------------------------------------------------------
+% 4.1 NOTATION AND SYSTEM MODEL
+% ------------------------------------------------------------
+\subsection{Notation and System Model}
+\label{sec:setup:notation}
+
+We study a fixed group of $N$ language-model agents that repeatedly answer the
+same multiple-choice question over a sequence of discrete rounds. All agents are
+instances of a single frozen model $f_\theta$; they differ only in the private
+context each one has seen. Because the same symbols recur throughout the
+detection methodology of \autoref{sec:method}, we fix the notation here and use
+it consistently thereafter. \autoref{tab:notation} summarises it.
+
+Three units of analysis must be kept apart, since they nest inside one another
+and are easy to confuse. A \emph{round} is a single synchronous time step $t$
+within one debate, at which every agent (re)casts its vote; a debate runs for up
+to $T$ rounds. A \emph{repetition} (indexed by $r$) is one complete debate on a
+given task from round $0$ to termination; because sampling is stochastic, the
+same task run twice yields different repetitions. A \emph{task--config cell} is a
+single question paired with one configuration (a topology and a memory window),
+and we execute $R$ repetitions of each cell. In short: many rounds make up one
+repetition, and many repetitions make up one task--config cell. Throughout, ``run''
+is used informally as a synonym for repetition.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Notation used throughout this thesis. Rounds are indexed by $t$ and
+repetitions by $r$; the two must not be confused.}
+\label{tab:notation}
+\begin{tabular}{ll}
+\toprule
+Symbol & Meaning \\
+\midrule
+$N$ & number of agents ($N = 4$ throughout) \\
+$i, j$ & agent indices, $i \in \{1, \ldots, N\}$ \\
+$t$ & round index, $t \in \{0, 1, \ldots, T\}$ \\
+$T$ & hard cap on the number of rounds \\
+$r$ & repetition index (an independent re-run of a task--config cell) \\
+$R$ & number of repetitions per task--config cell \\
+$M$ & number of answer options a task presents, $M \in \{3, 4\}$ \\
+$v_i^{t}$ & vote of agent $i$ at round $t$, one of the $M$ options \\
+$c_i^{t}$ & private confidence of agent $i$ at round $t$, $c_i^t \in \{1,\ldots,10\}$ \\
+$\text{priv}_i^{t}$ & private reasoning of agent $i$ (never transmitted) \\
+$\text{pub}_i^{t}$ & public message of agent $i$ (broadcast to neighbours) \\
+$\text{draft}_i^{t}$ & Phase-A draft of agent $i$ (defense, challenge, question) \\
+$\mathbf{A}$ & adjacency matrix of the communication topology, $A_{ii}=0$ \\
+$\mathcal{N}(i)$ & neighbourhood of agent $i$, $\{j \mid A_{ij}=1\}$ \\
+$W$ & memory window (rounds of history each agent may see) \\
+$u$ & early-stopping threshold (consecutive unanimous rounds) \\
+$s_t$ & system macrostate at round $t$ (the vote composition, see below) \\
+$f_\theta$ & the shared frozen LLM used as the update function \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Communication topology.}
+The interaction structure is a binary adjacency matrix
+$\mathbf{A} \in \{0,1\}^{N \times N}$, where $A_{ij}=1$ means agent $i$ receives
+agent $j$'s messages. Self-loops are excluded ($A_{ii}=0$), so no agent is fed
+its own output as a neighbour signal, and the neighbourhood of agent $i$ is
+$\mathcal{N}(i) = \{j \mid A_{ij}=1\}$. Any topology can be instantiated by
+supplying a different matrix without changing the agent or round logic. We use
+two topologies:
+\begin{itemize}
+  \item \textbf{Fully connected (fc):} $A_{ij} = 1 - \delta_{ij}$, so every agent
+        observes all others each round. This maximises information flow and
+        serves as the baseline.
+  \item \textbf{Star:} one hub agent is connected to all $N-1$ spokes, and the
+        spokes are connected only to the hub. The hub is drawn uniformly at
+        random per repetition, independently of agent indices, so that any
+        observed hub effect is structural rather than an artefact of indexing.
+\end{itemize}
+
+\paragraph{System macrostate.}
+Individual agents are exchangeable: only how many of them hold each option
+matters for the system-level analyses, not which agent holds which. We therefore
+summarise the group at round $t$ by its \emph{vote composition}, the count of
+agents on each option,
+\begin{equation}
+  s_t = (n_1^{t}, n_2^{t}, \ldots, n_M^{t}),
+  \qquad \sum_{k=1}^{M} n_k^{t} = N,
+  \label{eq:macrostate}
+\end{equation}
+where $n_k^{t}$ is the number of agents voting for option $k$ at round $t$. The
+number of agents $N$ and the number of options $M$ are independent: $N = 4$
+always, whereas $M$ varies by task. The composition retains the information a
+plain set of options would discard, since a $3$--$1$ split and a $2$--$2$ split
+are distinct macrostates. This macrostate is the object on which the
+system-level motif detectors of \autoref{sec:method} operate.
+
+
+% ------------------------------------------------------------
+% 4.2 DEBATE PROTOCOL
+% ------------------------------------------------------------
+\subsection{Debate Protocol}
+\label{sec:setup:protocol}
+
+The protocol specifies three things: the persistent state each agent carries
+across rounds, the within-round message passing that produces a new state, and
+the memory window controlling how much past history each agent may see. We follow
+the multi-agent debate paradigm of \citet{du2024improving}, in which agents
+independently answer and then revise over several rounds, but instrument it so
+that the interaction log exposes exactly the quantities the motif detectors
+require.
+
+\subsubsection{Agent State and Two-Phase Rounds}
+\label{sec:setup:protocol:state}
+
+\paragraph{Per-agent state.}
+At each round $t$, agent $i$ produces four fields:
+\begin{itemize}
+  \item $v_i^{t}$: the discrete \textbf{vote}, one of the task's $M$ options;
+  \item $c_i^{t} \in \{1,\ldots,10\}$: a private \textbf{confidence}, never transmitted;
+  \item $\text{priv}_i^{t}$: private chain-of-thought \textbf{reasoning}, never transmitted;
+  \item $\text{pub}_i^{t}$: a \textbf{public message}, broadcast to neighbours.
+\end{itemize}
+The separation of the public message from the private reasoning and confidence is
+deliberate: it lets us measure whether agents say what they privately hold. The
+discrete-vote / continuous-confidence split follows the continuous-opinion,
+discrete-action template of \citet{martins2008coda}, and the public/private
+channel separation follows the DEBATE design of \citet{chuang2025debate}.
+
+\paragraph{Phase-A draft.}
+For rounds $t \geq 1$ each agent also emits an ephemeral \emph{draft} before
+committing to a belief:
+\begin{equation}
+  \text{draft}_i^{t} = \big(\text{def}_i^{t},\ \text{chal}_i^{t},\ \text{ques}_i^{t}\big),
+\end{equation}
+consisting of a \textbf{defense} (one concrete reason the current vote is
+correct), a \textbf{challenge} (a dispute of a specific peer claim, or a
+concession), and a \textbf{question} (a targeted query to a named peer). The
+draft is visible to neighbours at the start of Phase~B but does not itself change
+any vote. The three structured fields are the measurement apparatus for the
+influence-based detectors of \autoref{sec:method}: the \texttt{question} field
+yields the directed influence graph, and the \texttt{challenge} field provides
+attribution for who is disputing whom.
+
+\paragraph{Round structure.}
+Each round consists of two phases executed in parallel across all agents;
+Phase~A completes before Phase~B begins. Round $0$ is asymmetric, as no
+communication has yet occurred.
+
+\begin{itemize}
+  \item \textbf{Round $0$ (initialisation, Phase~B only).} Each agent receives
+        the question and options and produces an initial belief with no peer
+        input:
+        \[
+          (v_i^{0},\ c_i^{0},\ \text{priv}_i^{0},\ \text{pub}_i^{0})
+          = f_\theta\big(\text{question, options}\big).
+        \]
+
+  \item \textbf{Round $t \geq 1$, Phase~A (drafting).} Agent $i$ reads its self
+        and peer history windows (defined in \autoref{sec:setup:protocol:memory})
+        and emits a draft. Votes are \emph{not} updated in this phase:
+        \[
+          \text{draft}_i^{t}
+          = f_\theta\big(q,\ \mathcal{H}^{\text{self}}_i(t,W),\ \mathcal{H}^{\text{peer}}_i(t,W)\big).
+        \]
+
+  \item \textbf{Round $t \geq 1$, Phase~B (belief update).} Agent $i$ additionally
+        reads its own and its neighbours' current-round drafts, then updates its
+        full state; if it changes its vote it is instructed to cite the specific
+        argument that caused the change:
+        \[
+          (v_i^{t},\ c_i^{t},\ \text{priv}_i^{t},\ \text{pub}_i^{t})
+          = f_\theta\big(q,\ \mathcal{H}^{\text{self}}_i(t,W),\ \mathcal{H}^{\text{peer}}_i(t,W),\
+          \text{draft}_i^{t},\ \{\text{draft}_j^{t}\}_{j \in \mathcal{N}(i)}\big).
+        \]
+\end{itemize}
+
+The two-phase structure compresses a question--answer exchange into a single
+round; a one-phase synchronous protocol could not achieve this without a
+two-round lag. For the dynamical analysis, only the committed Phase-B state is
+treated as the system state at round $t$; the drafts function as message memory,
+not as a separate time step. Peers' private reasoning and confidence are never
+transmitted, and neither judge agents nor any consensus-pressure framing is used,
+as such framing would reweight the very motif distributions we aim to detect.
+\autoref{fig:protocol} illustrates the full message flow for two agents over the
+first three rounds.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  phB/.style={draw, rounded corners=3pt, fill=blue!8, align=left,
+              inner sep=5pt, text width=4.5cm},
+  phA/.style={draw, rounded corners=3pt, fill=orange!12, align=left,
+              inner sep=5pt, text width=4.5cm},
+  parr/.style={-Stealth, thick, gray!65},
+  darr/.style={-Stealth, thick, orange!80},
+  >=Stealth
+]
+
+\coordinate (Lsep) at (-3.4, 0);
+\coordinate (Rsep) at (10.4, 0);
+
+% Question box
+\node[draw, rounded corners=3pt, fill=gray!10, align=center,
+      inner sep=5pt, text width=9.6cm] (Q) at (3.7, 2.6) {
+  \textbf{Question $q$ + Options ($M$ choices)}
+};
+
+% r=0 --- Phase B only
+\node[phB] (B0i1) at (0, 0) {
+  \textbf{Agent $1$ \textbullet\ Phase~B}\\[3pt]
+  $v_1^{0}$: vote\\[1pt]
+  {\color{gray}$c_1^{0}$: confidence \textit{(private)}}\\[1pt]
+  {\color{gray}$\text{priv}_1^{0}$: reasoning \textit{(private)}}\\[1pt]
+  $\text{pub}_1^{0}$: public message
+};
+\node[phB] (B0i2) at (7.4, 0) {
+  \textbf{Agent $2$ \textbullet\ Phase~B}\\[3pt]
+  $v_2^{0}$: vote\\[1pt]
+  {\color{gray}$c_2^{0}$: confidence \textit{(private)}}\\[1pt]
+  {\color{gray}$\text{priv}_2^{0}$: reasoning \textit{(private)}}\\[1pt]
+  $\text{pub}_2^{0}$: public message
+};
+\node[font=\bfseries\small, left=0.5cm of B0i1] {$t{=}0$};
+\draw[-Stealth, thick, gray!45] (Q.south) -- (B0i1.north);
+\draw[-Stealth, thick, gray!45] (Q.south) -- (B0i2.north);
+
+\path (B0i1.south) +(0,-0.35) coordinate (sep01);
+\draw[dashed, gray!45, thin] (Lsep |- sep01) -- (Rsep |- sep01);
+
+% r=1 --- Phase A
+\node[phA, below=0.7cm of B0i1] (Ar1i1) {
+  \textbf{Agent $1$ \textbullet\ Phase~A}\\[3pt]
+  $\text{draft}_1^{1}$: defense, challenge, question
+};
+\node[phA, below=0.7cm of B0i2] (Ar1i2) {
+  \textbf{Agent $2$ \textbullet\ Phase~A}\\[3pt]
+  $\text{draft}_2^{1}$: defense, challenge, question
+};
+\node[font=\bfseries\small, left=0.5cm of Ar1i1] {$t{=}1$};
+\draw[parr] (B0i1.south) -- (Ar1i2.north);
+\draw[parr] (B0i2.south) -- (Ar1i1.north);
+
+% r=1 --- Phase B
+\node[phB, below=0.5cm of Ar1i1] (Br1i1) {
+  \textbf{Agent $1$ \textbullet\ Phase~B}\\[3pt]
+  $v_1^{1},\ c_1^{1},\ \text{priv}_1^{1},\ \text{pub}_1^{1}$
+};
+\node[phB, below=0.5cm of Ar1i2] (Br1i2) {
+  \textbf{Agent $2$ \textbullet\ Phase~B}\\[3pt]
+  $v_2^{1},\ c_2^{1},\ \text{priv}_2^{1},\ \text{pub}_2^{1}$
+};
+\draw[darr] (Ar1i1.south) -- (Br1i2.north);
+\draw[darr] (Ar1i2.south) -- (Br1i1.north);
+
+\path (Br1i1.south) +(0,-0.35) coordinate (sep12);
+\draw[dashed, gray!45, thin] (Lsep |- sep12) -- (Rsep |- sep12);
+
+% r=2 --- Phase A
+\node[phA, below=0.7cm of Br1i1] (Ar2i1) {
+  \textbf{Agent $1$ \textbullet\ Phase~A}\\[3pt]
+  $\text{draft}_1^{2}$: defense, challenge, question
+};
+\node[phA, below=0.7cm of Br1i2] (Ar2i2) {
+  \textbf{Agent $2$ \textbullet\ Phase~A}\\[3pt]
+  $\text{draft}_2^{2}$: defense, challenge, question
+};
+\node[font=\bfseries\small, left=0.5cm of Ar2i1] {$t{=}2$};
+\draw[parr] (Br1i1.south) -- (Ar2i2.north);
+\draw[parr] (Br1i2.south) -- (Ar2i1.north);
+
+% r=2 --- Phase B
+\node[phB, below=0.5cm of Ar2i1] (Br2i1) {
+  \textbf{Agent $1$ \textbullet\ Phase~B}\\[3pt]
+  $v_1^{2},\ c_1^{2},\ \text{priv}_1^{2},\ \text{pub}_1^{2}$
+};
+\node[phB, below=0.5cm of Ar2i2] (Br2i2) {
+  \textbf{Agent $2$ \textbullet\ Phase~B}\\[3pt]
+  $v_2^{2},\ c_2^{2},\ \text{priv}_2^{2},\ \text{pub}_2^{2}$
+};
+\draw[darr] (Ar2i1.south) -- (Br2i2.north);
+\draw[darr] (Ar2i2.south) -- (Br2i1.north);
+
+% Legend
+\coordinate (legX) at (3.7, 0);
+\path (Br2i1.south) +(0,-1.15) coordinate (legY);
+\node[draw, rounded corners=3pt, fill=gray!5, align=left, inner sep=6pt]
+  at (legX |- legY) {%
+  {\color{gray!65}$\longrightarrow$}~$\text{pub}$: public message, sent to each
+    neighbour's Phase~A the \emph{next} round\\[3pt]
+  {\color{orange!80}$\longrightarrow$}~$\text{draft}$: Phase~A output, sent to
+    each neighbour's Phase~B the \emph{same} round\\[3pt]
+  {\color{gray}$c$, $\text{priv}$}: confidence and reasoning, produced every
+    Phase~B but \textbf{never transmitted}%
+};
+
+\end{tikzpicture}
+\caption{Two-phase synchronous protocol for two agents over rounds
+$t{=}0,1,2$ (the full system uses $N{=}4$). Round~$0$ has no Phase~A: agents read
+the question directly. Each Phase~B commits the four state fields
+$(v,c,\text{priv},\text{pub})$; the confidence $c$ and reasoning $\text{priv}$
+stay private (grey). A public message reaches neighbours in the \emph{next}
+round's Phase~A; a Phase~A draft reaches neighbours in the \emph{same} round's
+Phase~B, which is what lets one round carry a full question--answer exchange.}
+\label{fig:protocol}
+\end{figure}
+
+\subsubsection{Memory Window and Stopping Criteria}
+\label{sec:setup:protocol:memory}
+
+\paragraph{Memory window.}
+The memory window $W \in \mathbb{Z}_{\geq 1}$ controls how many past rounds each
+agent may condition on. At round $t$, agent $i$ sees a \emph{self} window of its
+own recent states and drafts, and a \emph{peer} window of its neighbours' recent
+votes, public messages, and drafts (peer private reasoning and confidence are
+excluded):
+\begin{align}
+  \mathcal{H}^{\text{self}}_i(t, W)
+    &= \big\{\big(v_i^{t-k},\, c_i^{t-k},\, \text{pub}_i^{t-k},\, \text{draft}_i^{t-k}\big)\big\}_{k=1}^{\min(t,\,W)}, \\
+  \mathcal{H}^{\text{peer}}_i(t, W)
+    &= \big\{\big(v_j^{t-k},\, \text{pub}_j^{t-k},\, \text{draft}_j^{t-k}\big)\big\}_{j \in \mathcal{N}(i),\ k=1..\min(t,\,W)}.
+\end{align}
+Peer entries are presented in randomised order at each call to mitigate position
+bias, and round-$0$ entries omit the draft field, which does not exist. A larger
+$W$ exposes more history but also interacts with documented long-context
+degradation \citep{liu2024lostmiddle}, which is why we treat $W$ as an explicit
+perturbation axis rather than fixing it implicitly. $W = 1$ is the near-Markov
+baseline in which each agent sees only the immediately preceding round.
+
+\paragraph{Early repetition stopping.}
+Running every repetition for the full $T$ rounds is wasteful once agents have
+converged: pilot transition matrices show a self-loop probability of $0.97$--$1.00$
+for the unanimous states, so escaping consensus after reaching it is effectively
+impossible. We therefore stop a repetition as soon as $u$ consecutive rounds are
+unanimously agreed. The threshold $u$ trades efficiency against reliability: too
+small and a transient consensus may be cut short; too large and the savings
+shrink. Analysing pilot runs (\autoref{fig:time_savings}), we find that the
+harmful case, in which stopping would have prevented a later recovery to the
+correct answer, stays negligible while coverage remains high, and we set $u = 3$
+with a hard cap of $T = 15$. Terminating debate at consensus is standard practice
+in the MAD literature \citep{yin2023eot, yang2025revisiting, kaesberg2025voting}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/time_savings.png}
+    \caption{Mean fraction of runtime saved by early stopping as a function of
+    the threshold $u$. Solid line: all repetitions. Dashed line: only
+    repetitions that triggered stopping. At $u = 3$ the saving is roughly
+    $50\%$ per repetition.}
+    \label{fig:time_savings}
+\end{figure}
+
+% ------------------------------------------------------------
+% Early task stopping: no longer used in the final experiment.
+% Commented out but retained in case it is needed later.
+% ------------------------------------------------------------
+% \paragraph{Early task stopping.}
+% Not every question is worth its full repetition budget. For some, all agents are
+% already unanimous at $t = 0$, so the outcome is fixed by the model's prior rather
+% than by deliberation. Using a small pilot batch of $R_{\text{pilot}} = 5$
+% repetitions, we skip the remainder of a task if the mean per-agent accuracy at
+% $t = 0$ and the mean system accuracy at the final round agree at an extreme:
+% \begin{equation}
+%   \big(\bar{a}_0 \geq \theta_{\text{high}} \ \text{and}\ \bar{a}_T \geq \theta_{\text{high}}\big)
+%   \quad\text{or}\quad
+%   \big(\bar{a}_0 \leq \theta_{\text{low}} \ \text{and}\ \bar{a}_T \leq \theta_{\text{low}}\big),
+% \end{equation}
+% with $\theta_{\text{high}} = 0.95$ (trivially easy) and $\theta_{\text{low}} = 0.05$
+% (effectively unsolvable). Requiring agreement between $t = 0$ and the final round
+% prevents false positives, since a question whose accuracy moves between the two
+% cannot satisfy either condition. The unanimously-correct case is safe to filter
+% unconditionally (a correct consensus at $t = 0$ is stable under the dynamics);
+% the unanimously-wrong case is in principle riskier, but recovery from it was
+% observed in only one of twenty pilot questions.
+
+
+% ------------------------------------------------------------
+% 4.3 DATASETS
+% ------------------------------------------------------------
+\subsection{Datasets}
+\label{sec:setup:datasets}
+
+Because this work studies motif emergence rather than task-completion
+performance, our benchmark selection criteria differ from those usual in the MAD
+literature. A benchmark suitable for motif detection must provide (i) a
+\textbf{discrete shared decision variable}, so that all agents commit to a
+position in the same finite set each round; (ii) \textbf{verifiable ground truth},
+so dynamics can be related to correctness; (iii) \textbf{calibrated difficulty},
+since saturated tasks remove the disagreement that drives deliberation; and (iv)
+\textbf{sufficient initial disagreement}, without which no motif can be
+distinguished from trivial consensus.
+
+Applying these criteria rules out most existing benchmarks. Saturated reasoning
+sets such as GSM8K and MMLU leave no headroom for deliberation dynamics; native
+multi-agent benchmarks are largely incompatible, being either role-specialised
+(no shared decision variable) or defined over spatial rather than categorical
+positions. A full survey of the candidates we considered and the reason each was
+rejected is given in \autoref{app:benchmarks}. Two benchmarks satisfy all four
+criteria and are complementary, so we adopt one as primary and one as a
+generality check.
+
+\subsubsection{GPQA-Diamond}
+\label{sec:setup:datasets:gpqa}
+
+GPQA-Diamond \citep{rein2024gpqa} is a graduate-level science
+question-answering benchmark of 198 questions in biology, physics, and
+chemistry, written by domain experts and validated through a ``Google-proof''
+protocol that resists retrieval-based shortcuts. It satisfies our criteria
+directly:
+\begin{itemize}
+  \item \textbf{Discrete decision variable:} four-option multiple choice
+        ($M = 4$), on which vote composition, agreement, and flip rate are
+        immediately defined.
+  \item \textbf{Verifiable ground truth:} expert-validated and unambiguous.
+  \item \textbf{Calibrated difficulty:} frontier single-model accuracy sits in
+        the $70$--$85\%$ range \citep{rein2024gpqa, becker2025orchestration},
+        leaving genuine headroom for debate.
+  \item \textbf{Initial disagreement:} agents genuinely disagree at round one,
+        as documented in multi-agent studies on this benchmark
+        \citep{becker2025orchestration}.
+\end{itemize}
+GPQA-Diamond also has direct multi-agent precedent
+\citep{becker2025orchestration, kenton2024debate, he2025dimo, wang2025mars}. We
+adopt it as the \textbf{primary} substrate. The main caveat is that it accrued
+less cumulative MAD literature than MMLU or GSM8K, simply because it is more
+recent; the migration is driven by benchmark saturation, not a methodological
+pivot.
+
+\subsubsection{HiddenBench}
+\label{sec:setup:datasets:hiddenbench}
+
+We use HiddenBench \citep{li2026hiddenbench} as a structurally complementary
+\textbf{secondary} substrate for generality testing. It formalises the
+hidden-profile paradigm from social psychology
+\citep{stasser1985pooling, schulzhardt2012synergy}: the evidence needed for the
+correct answer is split across agents, so that no single agent can solve the task
+alone and success requires genuine information pooling. Its value here is as a
+control for a specific confound. Motifs seen only on GPQA-Diamond might be
+artefacts of cooperative reasoning over a reliable individual signal, in which
+RLHF-induced truth-seeking \citep{ouyang2022instructgpt} amplifies convergence.
+Under the hidden-profile condition, by contrast, pre-discussion accuracy is very
+low by construction \citep{li2026hiddenbench}, so any post-discussion improvement
+must come from social information transfer rather than from individual competence.
+Motifs that appear on both substrates are therefore robust to this confound,
+while motifs that appear on only one are themselves informative.
+
+Two structural details of HiddenBench matter for the analysis. First, the
+benchmark is calibrated for a group of $N = 4$ agents: each task distributes its
+clues across four information-holders, which is one reason we fix $N = 4$ (a
+choice that also suits GPQA-Diamond and keeps the two benchmarks comparable).
+Second, unlike GPQA-Diamond, which is uniformly four-option, HiddenBench tasks
+present either three or four candidate answers, so the number of \emph{options}
+is task-dependent, $M \in \{3, 4\}$. The agent count $N$ and the option count $M$
+are therefore independent quantities and should not be conflated: $N = 4$ is
+fixed everywhere, while $M$ varies only on HiddenBench. This is why every
+option-indexed quantity in \autoref{sec:method} is defined over the task's actual
+$M$ options. Extension to mixed-motive negotiation settings is left to future
+work.
+
+
+% ------------------------------------------------------------
+% 4.4 EXPERIMENTAL DESIGN
+% ------------------------------------------------------------
+\subsection{Experimental Design}
+\label{sec:setup:design}
+
+The system exposes many tunable components. We classify each as \textbf{scan} (a
+primary perturbation axis), \textbf{fix} (held constant), or \textbf{defer} (out
+of scope). \autoref{tab:knob-summary} summarises the classification and the
+literature supporting it; the detailed per-knob justification is deferred to
+\autoref{app:knobs}.
+
+\paragraph{Scan axes.}
+Two structural axes are varied, chosen because they are the canonical levers for
+network-motif analysis:
+\begin{itemize}
+  \item \textbf{Memory window} $W \in \{1, 2, 5\}$, with $W = 1$ the near-Markov
+        baseline. Memory content is an established driver of debate behaviour
+        \citep{du2024improving, li2024sparsetopology}.
+  \item \textbf{Topology} $\in \{\textsc{fc}, \textsc{star}\}$. Fully-connected
+        probes the symmetric baseline; the star probes hub-induced dominance,
+        following evidence that centralised structures concentrate influence
+        \citep{li2024sparsetopology, chen2023consensus, liu2025problemsolving}.
+\end{itemize}
+Their product gives $3 \times 2 = 6$ configurations per task.
+
+\paragraph{Fixed choices.}
+The remaining components are held constant to isolate the effect of the two scan
+axes:
+\begin{itemize}
+  \item \textbf{Agents} $N = 4$: the smallest group size at which the two
+        topologies are structurally distinct and the macrostate space stays
+        tractable, while still admitting multi-way splits; it also matches the
+        four-way information split for which HiddenBench is calibrated.
+  \item \textbf{Rounds} $T = 15$ (hard cap) with early stopping $u = 3$: $T$ is
+        an observation budget rather than a structural knob, since trajectories
+        can be cropped post hoc but not extended.
+  \item \textbf{Model} \texttt{mistral-medium} (homogeneous): a single mid-tier
+        model isolates topology and memory effects from capability-asymmetry
+        effects \citep{wynn2025talk}.
+  \item \textbf{Sampling} temperature $0.7$, reasoning disabled: diverse yet
+        focused outputs, avoiding the degenerate identical-sample case
+        \citep{zhu2026demystifying}.
+  \item \textbf{Framing} cooperative, with the full Phase-A/Phase-B structured
+        output as the measurement instrument, and synchronous execution to
+        remove agent-order confounds.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{3.0cm}lp{4.4cm}p{4.8cm}}
+\toprule
+\textbf{Knob} & \textbf{Verdict} & \textbf{Value} & \textbf{Key references} \\
+\midrule
+Memory $W$ & scan & $\{1, 2, 5\}$ & \citep{du2024improving, li2024sparsetopology} \\
+Topology & scan & fc, star & \citep{li2024sparsetopology, chen2023consensus, liu2025problemsolving} \\
+Agents $N$ & fix & $4$ (matches HiddenBench information split) & \citep{du2024improving, li2026hiddenbench} \\
+Rounds $T$ & fix & $15$ (cap), $u=3$ & \citep{kaesberg2025voting, yang2025revisiting} \\
+Output structure & fix & full Phase A/B & \citep{liang2024encouraging, he2025dimo} \\
+Framing & fix & cooperative & \citep{liang2024encouraging, du2024improving} \\
+Synchrony & fix & parallel-synchronous & \citep{du2024improving, liu2024groupdebate} \\
+Model & fix & \texttt{mistral-medium} & \citep{liu2025stopovervaluing, wynn2025talk} \\
+Temperature & fix & $0.7$, no reasoning & \citep{zhu2026demystifying} \\
+Information cond. & scan (dataset) & GPQA ($M{=}4$), HiddenBench ($M{\in}\{3,4\}$) & \citep{li2026hiddenbench, stasser1985pooling} \\
+Tool access & defer & none & \citep{rein2024gpqa} \\
+\bottomrule
+\end{tabular}
+\caption{Classification of tunable components. Full justification per knob is
+given in \autoref{app:knobs}.}
+\label{tab:knob-summary}
+\end{table}
+
+\paragraph{Difficulty-based task selection.}
+Motifs are per-task properties, and running the full grid at high $R$ on every
+question is infeasible: at roughly $25$\,s per repetition, the full GPQA-Diamond
+set across six configurations would take on the order of ten days at $R = 30$
+alone. We therefore use a two-phase procedure. A shallow \emph{screening} pass
+runs every task once at a single baseline configuration (fc, $W = 1$, $R = 3$)
+and assigns each task a difficulty tier from its observed dynamics:
+\begin{itemize}
+  \item \textbf{Tier 0 (trivial):} unanimous at $t = 0$ with no flips; excluded.
+  \item \textbf{Tier 1 (easy):} converges almost immediately (mean trajectory
+        $\leq 4$ rounds).
+  \item \textbf{Tier 2 (moderate):} debate occurs but always converges to the
+        same answer (no outcome variance across repetitions).
+  \item \textbf{Tier 3 (hard):} debate occurs \emph{and} the final answer varies
+        across repetitions, so the dynamics, not the model prior, decide the
+        outcome.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/task_difficulty_4tiers.png}
+    \caption{Distribution of tasks across difficulty tiers for GPQA-Diamond and
+    HiddenBench, from the screening pass.}
+    \label{fig:difficulty_tiers}
+\end{figure}
+
+Tier~3 tasks are precisely those where self-organization dynamics can be observed
+at all, so they are promoted to a deep \emph{characterization} pass on the full
+six-configuration grid. This yields the final dataset used throughout
+\autoref{sec:results}: \textbf{35 tasks for each of the two benchmarks, six
+configurations each, $R = 30$ repetitions}, for a total of
+$35 \times 2 \times 6 \times 30 = 12{,}600$ repetitions. Because $R = 3$ in the
+screening pass introduces some noise, tier assignments near a boundary are
+mildly unstable, which we accept as a screening cost rather than a final claim.

@@ -1,0 +1,177 @@
+% ============================================================
+% CHAPTER 3: RELATED WORK
+% All citations in this chapter were verified against the primary
+% sources during the literature review. Bibliography entries for
+% liu2025stopovervaluing, zhang2025debateorvote, wynn2025talk,
+% liu2025problemsolving, chen2023consensus, liu2024groupdebate
+% were corrected, and cho2025herd, choi2025groupconformity,
+% zhang2024socialpsych were added, based on that verification.
+% ============================================================
+
+\subsection{Multi-Agent Debate: Design and Failure Modes}
+\label{sec:related:mad}
+
+The multi-agent debate (MAD) paradigm was introduced by
+\citet{du2024improving}, who let several instances of a language model
+independently propose answers and then critique and revise them over multiple
+rounds before committing to a joint response. This ``society of minds'' setup
+was reported to improve factual accuracy and mathematical reasoning while
+reducing hallucination, using an identical procedure across tasks and treating
+the underlying model as a black box. The core intuition, that partially
+independent agents make partially independent errors which deliberation can
+surface and correct, has since motivated a broad family of systems.
+
+Subsequent work has varied the debate design along several axes.
+\citet{liang2024encouraging} frame MAD as a remedy for the
+\emph{Degeneration-of-Thought} problem, in which a single reflecting model
+cannot escape a confident but incorrect initial position; they introduce a
+``tit-for-tat'' exchange moderated by a judge agent and report that both an
+adequate level of disagreement between agents and a well-chosen debate
+termination rule are necessary for gains. \citet{chen2024reconcile} propose
+ReConcile, a round-table procedure in which \emph{heterogeneous} models exchange
+explanations and confidence-weighted votes, arguing that the diversity arising
+from different model families is critical to the improvement. Beyond reasoning,
+\citet{chan2024chateval} apply multi-agent debate to text evaluation, using a
+panel of models to produce more reliable judgements than a single evaluator.
+
+A second line of work studies the structural parameters of debate.
+\citet{li2024sparsetopology} show that restricting who communicates with whom, a
+sparse communication topology, can match or exceed fully-connected debate while
+substantially reducing token cost. \citet{liu2025problemsolving} extend this to
+arbitrary network topologies and report that random networks perform comparably
+to fully-connected ones at far lower cost, that hub placement matters (a
+correctly-biased hub node boosts performance), and that strong group consensus
+tends to coincide with correct answers. \citet{kaesberg2025voting} isolate the
+decision protocol itself, finding that voting protocols help reasoning tasks
+while consensus protocols help knowledge tasks, that adding agents improves
+performance but adding discussion rounds can degrade it. Efficiency-oriented
+designs such as GroupDebate \citep{liu2024groupdebate} organise agents into
+discussion groups that debate internally and exchange summaries, reducing tokens
+while retaining accuracy.
+
+Against this largely optimistic backdrop, a critical literature has emerged that
+questions whether debate delivers what it promises. \citet{liu2025stopovervaluing}
+evaluate MAD across nine benchmarks and four base models and find that it
+frequently fails to outperform simple single-agent baselines such as
+chain-of-thought and self-consistency, despite consuming substantially more
+inference-time compute; they argue that model heterogeneity, rather than debate
+per se, is what reliably helps. \citet{zhang2025debateorvote} decompose MAD into
+its constituent mechanisms and show that majority voting alone accounts for most
+of the gains usually attributed to debate; they further prove that, under their
+formalisation, debate induces a martingale over agents' belief trajectories and
+therefore does not improve expected correctness on its own. \citet{yang2025revisiting}
+reframe MAD as a form of test-time scaling and find its value to be conditional,
+offering limited advantage over single-agent scaling except when problems are
+hard and the base model is weak. What unifies both the affirmative and the
+critical strands is that they evaluate debate almost exclusively by its
+\emph{final outcome}. The deliberative process that produces that outcome, and
+whether two systems reaching the same accuracy do so through genuinely different
+dynamics, remains largely outside the scope of these evaluations.
+
+
+\subsection{Dynamics and Emergence in LLM Collectives}
+\label{sec:related:dynamics}
+
+A distinct and more recent line of work looks inside the debate at the
+\emph{dynamics} of how agents' positions evolve and influence one another. Much
+of it documents systematic pathologies rather than aggregate accuracy.
+\citet{prasad2025certain} stage repeated adversarial debates between LLMs and
+find pervasive miscalibration: models begin overconfident, grow \emph{more}
+confident that they are winning as the debate proceeds even when no new
+supporting evidence is introduced, and frequently both claim a high probability
+of victory simultaneously, a logical impossibility. This upward, anti-Bayesian
+confidence drift is precisely the kind of positive-feedback signature that
+motivates a dynamical treatment.
+
+Several studies document conformity and herding. \citet{wynn2025talk} show that
+when agents differ in capability, debate can \emph{decrease} accuracy over time
+even when stronger models outnumber weaker ones, because models frequently shift
+from correct to incorrect answers in response to peer reasoning, favouring
+agreement over challenging flawed arguments; they attribute this to sycophancy
+and social conformity and warn that debate needs safeguards against persuasive
+but incorrect reasoning. \citet{cho2025herd} characterise this herd behaviour
+quantitatively, finding that the gap between an agent's self-confidence and its
+perceived confidence in peers governs how likely it is to conform, and that the
+format in which peer information is presented modulates the effect.
+\citet{choi2025groupconformity}, across more than two thousand simulated
+debates, report that agents tend to align with the numerically dominant group or
+with more capable agents, reducing opinion diversity in a manner that mirrors
+human group conformity. Earlier, \citet{zhang2024socialpsych} had already shown
+that LLM collectives exhibit human-like social behaviours such as conformity and
+consensus reaching, drawing an explicit connection to social-psychology theory.
+
+These behaviours are increasingly understood as \emph{emergent} properties of
+the collective rather than of any single agent. \citet{chen2024agentverse}
+observe emergent social behaviours in multi-agent collaboration and discuss
+leveraging the beneficial ones while mitigating the harmful ones.
+\citet{chen2023consensus} study consensus seeking directly and find that, absent
+explicit instruction, LLM agents default to an averaging strategy, with the
+number of agents, assigned personalities, and network structure all shaping the
+negotiation. \citet{chuang2025debate} construct a benchmark of human opinion
+dynamics with paired public messages and private beliefs and report that
+role-playing LLM groups converge far more strongly and rapidly than human groups
+do, indicating a systematic bias toward premature agreement. A structurally
+sharper version of this failure is captured by HiddenBench
+\citep{li2026hiddenbench}, which adapts the hidden-profile paradigm from social
+psychology \citep{stasser1985pooling, schulzhardt2012synergy}: when the evidence
+needed for the correct answer is distributed across agents, collective accuracy
+collapses from 80.7\% (a single agent with complete information) to 30.1\%,
+because agents lock onto shared information and fail to pool their private
+knowledge.
+
+The vocabulary needed to name these phenomena precisely comes from
+complex-systems theory. Recurring interaction structures are studied as
+\emph{network motifs}, small subgraphs that appear more often than in a
+randomised network and that generate characteristic behaviour
+\citep{milo2002network, alon2007network}; the complementary notion of a
+\emph{dynamical motif}, a recurring pattern in the system's trajectory such as an
+attractor or an oscillation, has recently been formalised for recurrent networks
+\citep{driscoll2024dynamical}. The individual regimes are classical: positive
+feedback and lock-in \citep{arthur1989competing}, and limit cycles, fixed points,
+and multistability in nonlinear dynamics \citep{strogatz2015nonlinear}. On the
+influence side, opinion-dynamics models formalise how agreement and social power
+propagate through a network and when influence concentrates on a single node
+\citep{degroot1974consensus, jia2015opinion}, and the continuous-opinion,
+discrete-action framework \citep{martins2008coda} matches the setting of agents
+that hold latent confidence but cast discrete votes. At the level of principle,
+\citet{miehling2025agentic} argue that agentic AI must be analysed through a
+systems-theoretic lens precisely because group-level behaviour cannot be
+predicted from individual agent properties, but their contribution is conceptual
+and supplies no empirical instrument for detecting such behaviour.
+
+
+\subsection{Research Gap}
+\label{sec:related:gap}
+
+Three observations follow from the literature above. First, the mainstream
+evaluation of multi-agent debate is outcome-centric: both its proponents and its
+critics measure final accuracy and largely leave the deliberative trajectory
+unexamined \citep{du2024improving, liu2025stopovervaluing, zhang2025debateorvote}.
+Second, the emerging work on interaction dynamics does examine the trajectory,
+but it typically documents a single pathology at a time, overconfidence, herding,
+or premature consensus, in descriptive terms
+\citep{prasad2025certain, wynn2025talk, cho2025herd, choi2025groupconformity},
+without connecting them to the formal dynamical regimes they resemble. Third, the
+complex-systems vocabulary that would unify these observations, self-reinforcement,
+limit cycles, bistability, and dominance, is at most invoked informally: the
+motif and opinion-dynamics frameworks that could make the phenomena measurable
+\citep{milo2002network, driscoll2024dynamical, jia2015opinion} have not been
+applied to LLM-based debate, and the call for a systems-theoretic treatment
+\citep{miehling2025agentic} has not been operationalised.
+
+The gap this thesis addresses is therefore the absence of an \emph{empirical,
+literature-grounded detection} of self-organization motifs in LLM-based
+multi-agent debate. We treat the debate not as a black box to be scored by its
+output, but as a dynamical system whose trajectory carries measurable structure.
+Concretely, we (i) define detectors for self-reinforcement, limit cycles,
+bistability, and dominance, each grounded in the corresponding complex-systems or
+opinion-dynamics literature and equipped with a principled null model, rather than
+in ad hoc thresholds; (ii) characterise how these motifs appear or vanish under
+controlled variation of the two canonical structural axes of multi-agent design,
+communication topology and memory window; and (iii) relate motif presence to
+task outcomes across two deliberately contrasting regimes, a truth-verifiable
+benchmark where agents start with reasonable priors (GPQA-Diamond) and a
+hidden-profile benchmark where they start systematically wrong
+(HiddenBench), so that the role of a reliable individual signal can be isolated.
+In doing so we also treat the \emph{absence} of a motif as an informative
+finding, a stance the outcome-centric literature has no natural place for.
