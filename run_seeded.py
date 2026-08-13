@@ -63,6 +63,8 @@ temperature = Models.TEMPERATURES[args.model]
 llm = Models.create(args.model)
 
 seed_files = sorted(args.seed_dir.glob("*gpqa*.json"))
+print(f"Seed dir: {args.seed_dir.resolve()}")
+print(f"Seed dir exists: {args.seed_dir.exists()}")
 print(f"Found {len(seed_files)} seed files | conditions={args.condition} | R={args.r}")
 
 
