@@ -16,21 +16,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage{textcomp}
 
-% \acrodef{VAE}{Variational Autoencoder}
-% \acrodef{ELBO}{Evidence Lower Bound}
-% \acrodef{KL}{Kullback-Leibler}
-% \acrodef{IWAE}{Importance Weighted Autoencoder}
-% \acrodef{AIS}{Annealed Importance Sampling}
-% \acrodef{FFG}{Fully-Factorized Gaussian}
-% \acrodef{AF}{Auxiliary Flow}
-% \acrodef{HMC}{Hamiltonian Monte Carlo}
-% \acrodef{BDMC}{Bidirectional Monte Carlo}
-% \acrodef{SA-VAE}{Semi-Amortized Variational Autoencoders}
-% \acrodef{VLAE}{Variational Laplace Autoencoders}
-
 \newcommand{\mytitle}{Self-Organization Patterns in LLM-based MAS}
 \newcommand{\myname}{Eric Echtermeyer}
 \newcommand{\mysupervisor}{Prof. Dr. Hinrich Schütze, Ali Modarressi}
+\newcommand{\suitename}{\textit{SOMA}}
 
 \usepackage[a4paper, width = 160mm, top = 35mm, bottom = 30mm, 
 bindingoffset = 0mm]{geometry}
@@ -55,10 +44,17 @@ bindingoffset = 0mm]{geometry}
 \fancyfoot[R]{\thepage}
 \setlength{\headheight}{14.5pt}
 \setlength{\parindent}{0pt}
+\setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
 \interfootnotelinepenalty = 10000
 
 \renewcommand{\sectionautorefname}{Section}
-\renewcommand{\subsectionautorefname}{Subsection}
+\renewcommand{\subsectionautorefname}{Section}
+\renewcommand{\subsubsectionautorefname}{Section}
+
+% Custom float for verbatim prompt templates, to populate a List of Prompts
+\newfloat{prompt}{H}{lop}
+\floatname{prompt}{Prompt}
+\newcommand{\promptautorefname}{Prompt}
 
 % ------------------------------------------------------------------------------
 % MAIN -------------------------------------------------------------------------
@@ -99,7 +95,7 @@ Ludwig-Maximilians-Universität München
 \vfill
 
 \large
-Munich, September 31\textsuperscript{st}, 2026
+Munich, September 30\textsuperscript{th}, 2026
       
 \vfill
 
@@ -120,19 +116,43 @@ Supervised by \mysupervisor
 
 \begin{abstract}
 
-Hier wird mein Abstract sein!
+Multi-agent debate is promoted as a way to make language models reason better
+together, but it is evaluated almost entirely by final accuracy, which reveals
+nothing about how a group arrives at its answer or whether it is deliberating
+soundly. We study cooperative LLM debate as a dynamical system and define
+\suitename{} (Self-Organization Motif Analysis), a suite of detectors for four
+self-organization motifs, self-reinforcement, limit cycles,
+bistability, and dominance, each measured from interaction logs against a
+principled null and applied to 21{,}000 debates across two benchmarks. Their
+prevalence varies sharply: self-reinforcement is universal, bistability common,
+dominance behaviourally present, and genuine limit cycles rare and confined to one
+topology, an informative pattern in itself.
+
+Our central result is that the four motifs are faces of one mechanism: the debate
+predominantly amplifies the vote distribution it starts with rather than reasoning
+a new answer into existence. Self-reinforcement is universal and drives
+convergence, yet is blind to correctness, strengthening whichever option leads at
+the outset. A causal seeding experiment on GPQA confirms the amplifier reading:
+inserting a single correct agent into an otherwise-wrong opening raises accuracy
+roughly thirteen-fold, while the system almost never recovers a correct answer that
+no agent initially held. The structural design choices we varied, communication topology and
+memory window, change convergence speed, worst-case runtime, and influence
+concentration, but not accuracy, which is largely fixed before deliberation begins.
+The internal signals a user might trust are misleading: confidence rises regardless
+of correctness, and early unanimity on biased tasks predicts wrong answers.
+
+Beyond detecting the motifs, we show that each detector, computed from ordinary
+logs, can serve as a diagnostic of deliberative health, and we distil the findings
+into design principles graded by evidential strength, as groundwork for a diagnostic
+suite. All claims are bounded to the tested setting, a homogeneous, cooperative,
+four-agent debate on one model family, and the absence of a motif is treated as an
+informative result throughout.
 
 \end{abstract}
 
 \newpage
 \tableofcontents
 
-%%%% if you would want to include material overview
-%%%% use one of the following in addition
-% \newpage
-% \listoffigures
-% \newpage
-% \listoftables
 \newpage
 
 % CHAPTERS ---------------------------------------------------------------------
@@ -169,9 +189,14 @@ Hier wird mein Abstract sein!
 \input{chapters/06_results}
 \newpage
 
-\section{Discussion}
+\section{Discussion: From Dynamics to Diagnostics}
 \label{sec:discussion}
 \input{chapters/07_dicussion}
+\newpage
+
+\section{Limitations and Future Work}
+\label{sec:limitations}
+\input{chapters/08_limitations}
 \newpage
 
 \section{Conclusion}
@@ -199,8 +224,24 @@ Hier wird mein Abstract sein!
 \label{el_app}
 The complete source code, including all scripts required to reproduce the figures and results, is publicly available in the following GitHub repository: 
 
-\url{https://github.com/echtermeyer/Inference-Suboptimality-Seminar}
+\url{https://github.com/echtermeyer/LLM-Based-MAS}
 
+\newpage
+
+% ------------------------------------------------------------------------------
+% BACK-MATTER LISTS (figures, tables, prompts) ---------------------------------
+% ------------------------------------------------------------------------------
+\phantomsection
+\addcontentsline{toc}{section}{List of Figures}
+\listoffigures
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{List of Tables}
+\listoftables
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{List of Prompts}
+\listof{prompt}{List of Prompts}
 \newpage
     
 % ------------------------------------------------------------------------------
@@ -246,9 +287,9 @@ I hereby confirm that I have written all parts of this work myself. The followin
 \vspace{0.3cm}
 
 \begin{itemize}
-    \item \textbf{Anthropic Claude Sonnet 4.5} (AI as Tutor): Used initially to explore and understand core \ac{VAE} concepts and the inference suboptimality framework.
+    \item \textbf{Anthropic Claude Sonnet 4.5} (AI as Tutor): Used initially to explore and understand core concepts in complex-systems theory and multi-agent debate.
     \item \textbf{GitHub Copilot} (Inline Completion): Used for inline code completion suggestions during development. All outputs were reviewed and modified as appropriate.
-    \item \textbf{Anthropic Claude Opus 4.5} (Performance and Resource Optimization): Used to parallelize the evaluation pipeline for the experiments in \autoref{sec:exp}. The generated code was reviewed and tested carefully.
+    \item \textbf{Anthropic Claude Opus 4.5} (Performance and Resource Optimization): Used to parallelize the evaluation pipeline for the experiments described in \autoref{sec:exp} and reported in \autoref{sec:results}. The generated code was reviewed and tested carefully.
     \item \textbf{Anthropic Claude Opus 4.5} (Code Documentation): Used to generate a first draft of the project's README.md file in the electronic appendix. 
     \item \textbf{Anthropic Claude Opus 4.6} (Peer Review Simulation): Used for proofreading, including identification of inconsistencies, typo errors, and grammar errors.
     \item \textbf{Google Gemini 3} (Improve Writing Style, Paraphrasing and Reformulation): Used for linguistic refinement and paraphrasing. Suggestions were not adopted verbatim but were manually reviewed, adapted, and reformulated.
@@ -264,6 +305,8 @@ All AI outputs and suggestions were independently evaluated and selectively adop
 \noindent\rule{0.5\textwidth}{0.4pt} \\
 
 \textcolor{orange}{Name}
+\normalsize
+\myname
 
 % ------------------------------------------------------------------------------
 

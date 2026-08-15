@@ -1,0 +1,129 @@
+% ============================================================
+% CHAPTER: LIMITATIONS AND FUTURE WORK
+% Content moved here from the Discussion (limitations) and the
+% Conclusion (future work) so that the scope of the claims and the
+% research agenda are visible in the table of contents rather than
+% buried as subsections. Labels are preserved so cross-references
+% elsewhere continue to resolve.
+% ============================================================
+
+The claims in this thesis are bounded, and stating those bounds precisely is
+essential to not overstating them. This chapter groups the limitations into those
+of \emph{scope} (what was varied) and those of \emph{method} (how the motifs were
+measured), and then maps them onto a prioritised research agenda.
+
+\subsection{Limitations}
+\label{sec:discussion:limitations}
+
+\paragraph{Scope: what we did and did not vary.}
+The experimental grid varies communication topology, memory window, task
+difficulty, and benchmark, and the seeded experiment additionally varies the
+opening vote composition causally. It does \emph{not} vary the base model (a
+single model family throughout), the number of agents ($N = 4$), agent
+heterogeneity (all agents share priors and competence), or the interaction
+framing (cooperative, synchronous, two-phase). Every quantitative claim should be
+read as conditional on these fixed choices. This matters most for the results that
+already differ between our two benchmarks: if a single model on two datasets
+produces opposite signs for the value of dominance and of stylistic diversity,
+then the effect of changing the model, or introducing capability asymmetry, is
+likely to be at least as large. The heterogeneity axis is especially consequential
+because the critical literature identifies model heterogeneity, not debate per se,
+as the reliable source of gains \citep{liu2025stopovervaluing, chen2024reconcile},
+and capability asymmetry is what drives the accuracy-decreasing herding reported by
+\citet{wynn2025talk}. Our homogeneous design isolates the dynamics of a uniform
+collective by construction, but it cannot speak to heterogeneous ones.
+
+\paragraph{The causal evidence is GPQA-only.}
+The seeded-initialisation experiment, our only intervention and the strongest
+support for the amplifier claim, was run exclusively on GPQA
+(\autoref{sec:results:seeded}). This is a real restriction on the causal claim,
+and in one respect the less favourable case is the one left untested: on
+HiddenBench, where agents begin systematically wrong, amplification of the opening
+distribution should if anything be more consequential (and more often harmful),
+so the mechanism is plausibly at least as strong there. But that remains an
+expectation, not a measurement. The causal statement should therefore be read as
+established for GPQA and as a well-supported but observational hypothesis for
+HiddenBench; a seeded HiddenBench arm is the most valuable single extension of this
+work.
+
+\paragraph{Method: signatures, not certified mechanisms.}
+All four \suitename{} detectors identify \emph{signatures}, not certified dynamical
+objects. The self-reinforcement slope is a phenomenological positive trend, not a
+proof of a positive-feedback loop; the RQA test flags periodic recurrence, not a
+mathematically certified limit cycle; $N_{\mathrm{eff}}$ measures endpoint
+coexistence, not a certified multistable attractor landscape; and the dominance
+index measures conversion concentration, not certified causal influence. With the
+single exception of the seeded-initialisation experiment, which is a genuine
+intervention, every association reported here is observational. Establishing that,
+say, hub identity \emph{causes} the outcome, rather than co-varying with a
+question-specific expertise signal, would require perturbation experiments we did
+not run.
+
+\paragraph{Specific measurement caveats.}
+Four narrower caveats bound specific results. (i) The self-reinforcement null may
+be subject to survivorship bias: agents whose confidence drifts downward are more
+likely to flip their vote and terminate a vote-stable run, which can censor
+negative slopes and inflate $p_{\mathrm{SR}}$ above the $0.5$ baseline; the
+prevalence result is therefore conservative in direction but not bias-free in
+magnitude. (ii) The diversity$\to$SR$\to$rounds mediation is partly mechanical,
+since longer runs afford more rounds over which a slope can accumulate; we report
+it as a decomposition, not as evidence that SR temporally precedes convergence.
+(iii) The bistability $N_{\mathrm{eff}}$ measure can in principle exceed the option
+count when split (non-unanimous) endpoints are admitted; because we restrict
+attractors to unanimous endpoints (a $2.1\,\%$ loss of repetitions),
+$N_{\mathrm{eff}}$ is bounded by the option count by construction, and we verified
+$N_{\mathrm{eff}} \leq M$ in all $420$ cells.
+(iv) The linguistic scorer is an instance of the same model family as the agents,
+so it is not an independent rater; we use its scores only for relative, rank-based
+comparisons and never as ground-truth argument quality.
+
+\paragraph{Statistical multiplicity.}
+This is an exploratory study reporting many tests across twelve configuration
+cells and several motifs. Inference is conducted at the task level (the unit of
+analysis, $n \approx 35$; \autoref{sec:method}), and we apply corrections within
+families of tests where appropriate (Benjamini--Hochberg false-discovery-rate
+control across configuration cells and outcome variables, permutation and
+surrogate nulls per detector), but we do not impose a single study-wide
+correction, and some false positives are expected across the full battery. We have
+tried to lean on effect sizes and on consistency across cells rather than on
+isolated $p$-values, and the central claims (universality of SR, the amplifier
+effect, the topology/accuracy dissociation) rest on effects that are large and
+repeated across many cells rather than on any single borderline test.
+
+
+\subsection{Future Work}
+\label{sec:conclusion:future}
+
+The limitations above map directly onto a prioritised research agenda.
+
+\begin{enumerate}
+  \item \textbf{From signatures to causes.} With the exception of the seeded
+        experiment, our findings are observational. Targeted perturbation
+        experiments, seeding basins to certify the bistability landscape,
+        perturbing the hub to test whether dominance is causal or an expertise
+        proxy, and an asynchronous protocol variant to isolate synchrony-induced
+        cycles, would upgrade the remaining associations toward causal claims.
+
+  \item \textbf{Heterogeneity and scale.} The most consequential untested axes are
+        model heterogeneity and group size. The critical literature identifies
+        heterogeneity as the reliable source of debate gains
+        \citep{liu2025stopovervaluing, chen2024reconcile} and capability asymmetry
+        as a driver of harmful herding \citep{wynn2025talk}; testing whether the
+        amplifier characterisation survives heterogeneous agents and larger $N$ is
+        the natural next step, and one our homogeneous design cannot address.
+
+  \item \textbf{Correcting the self-reinforcement null.} The survivorship bias in
+        the SR prevalence null (downward-drifting confidence censored by vote
+        flips) should be addressed with a matched null that models the flip hazard,
+        to establish how much of the above-baseline $p_{\mathrm{SR}}$ is genuine.
+
+  \item \textbf{An independent linguistic scorer.} Replacing the same-family judge
+        with an independent model would remove the shared-prior confound and test
+        whether the stylistic-diversity-to-convergence association survives.
+
+  \item \textbf{Toward the diagnostic suite.} Finally, the \suitename{} instruments
+        in \autoref{tab:design:instruments} could be packaged into an online monitor
+        and the Tier-2 recommendations validated across models, group sizes, and
+        task domains beyond the two studied here. This is the step that would turn
+        the groundwork of this thesis into the practical tool it points toward.
+\end{enumerate}

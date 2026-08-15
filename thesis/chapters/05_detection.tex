@@ -22,6 +22,25 @@
 % ============================================================
 
 
+Each of the four motifs introduced in \autoref{sec:bg:complex} is a hypothesis
+about the debate dynamics: if the system self-organizes in the way a
+complex-systems reading predicts, then confidence should reinforce within a held
+position, the vote sequence should occasionally oscillate, repeated runs should
+settle into a small number of initial-condition-selected attractors, and influence
+should concentrate on particular agents. This chapter turns each hypothesis into a
+\emph{detector}: a statistic computed from the interaction log together with a
+principled null model against which it is tested, so that a positive result
+reflects genuine structure rather than the chance regularities of a small, discrete
+state space. Together the four detectors form \suitename{} (Self-Organization
+Motif Analysis), the detector suite this thesis contributes. Two properties are common to all four and are worth stating up front.
+Each detector reads only from ordinary interaction logs, the vote and confidence
+channels defined in \autoref{sec:exp}, which is what later lets us propose the
+same detectors as diagnostic instruments (\autoref{sec:discussion:design}). And
+each detects a \emph{signature}, not a certified dynamical object; every
+``Limitations'' paragraph below makes explicit what the corresponding statistic can
+and cannot claim, a distinction we carry into the interpretation of every result.
+
+
 % ------------------------------------------------------------
 % 5.1 SYSTEM MACROSTATE AND MOTIF VOCABULARY
 % ------------------------------------------------------------
@@ -100,6 +119,26 @@ config and dataset}: GPQA and HiddenBench are analysed separately and never pool
 and the memory-window comparison is always made within a fixed topology and
 dataset. Each detector below only states its own \emph{measurement primitive}, the
 lowest-level object it scores.
+
+\paragraph{Statistical conventions.}
+Three conventions govern every inferential test in \autoref{sec:results}, chosen
+to be simple and transparent rather than maximally powerful. (i)~\emph{The task
+is the unit of analysis for comparisons across tasks or configurations.} Because
+the $R$ repetitions of a cell are re-runs of the \emph{same} question, they are
+not independent across tasks; wherever we test whether a quantity differs between
+configurations or covaries with accuracy, we first aggregate each task to a single
+value (its mean or proportion over repetitions) and test across the $\approx 35$
+tasks with a paired Wilcoxon signed-rank test, a Spearman correlation, a
+task-blocked Friedman test, or a sign test, or else resample whole tasks in a
+cluster bootstrap. Repetition-level counts are reported descriptively only.
+(ii)~\emph{Multiplicity is controlled per family.} Where a motif is tested across
+the twelve configuration cells or several outcome variables, we control the
+false-discovery rate with the Benjamini--Hochberg procedure within each
+pre-defined family and report which results survive. (iii)~\emph{Negative claims
+are stated as bounded effects, not equivalence.} For the design axes that do not
+move accuracy we report the effect size with a task-level confidence interval and
+conclude only that it is small and contains zero, i.e.\ that we find no evidence
+of a meaningful effect, rather than asserting strict statistical equivalence.
 
 A final property is shared by all four detectors and stated once here: each claim
 is \textbf{phenomenological, not causal}. We detect a trajectory or influence
@@ -208,7 +247,7 @@ $0$ for slope differences across $W$).
 Consider a single agent that holds option $A$ for five consecutive rounds with
 confidences $c = (5, 6, 6, 8, 9)$ at $t = 0,\ldots,4$. This is one vote-stable run
 of length $L = 5 \geq 3$. Regressing confidence on the round index gives a slope of
-$\beta_{\mathrm{run}} = +0.9$ confidence points per round, a positive (upward) run
+$\beta_{\mathrm{run}} = +1.0$ confidence points per round, a positive (upward) run
 that counts toward $\hat{p}_{\mathrm{SR}}$. Had the same agent instead drifted
 $c = (7, 7, 6, 6, 5)$, the slope would be $\beta_{\mathrm{run}} = -0.5$, a downward
 run counting against it. A run that never moved, $c = (6,6,6,6,6)$, has
@@ -341,10 +380,12 @@ of length $4$ and the offset-4 diagonal a line of length $2$, so
 $DET = (4 + 2)/(4 + 2) = 1.0$. For the null, the multiset $\{3A, 3B\}$ has
 $\binom{6}{3} = 20$ arrangements, of which only the two perfectly alternating ones
 reach $DET = 1$, giving $p = 2/20 = 0.10$, which does \emph{not} clear $0.05$: at
-$L = 6$ even a perfect period-2 cycle lacks the power to be called significant. The
-same pattern over a full-length candidate ($L \approx 16$) has
-$p \approx 2/\binom{16}{8} \approx 2 \times 10^{-4}$ and is flagged decisively,
-which is exactly why only the non-converged, full-length runs are informative. By
+$L = 6$ even a perfect period-2 cycle lacks the power to be called significant. The same pattern over a full-length candidate ($L \approx 16$) has an exact
+combinatorial null probability of $\approx 2/\binom{16}{8} \approx 2 \times
+10^{-4}$; with $B = 1000$ shuffle surrogates the add-one $p$-value saturates at
+its floor $1/(B{+}1) \approx 10^{-3}$, so such a case is flagged decisively at
+that floor, which is exactly why only the non-converged, full-length runs are
+informative. By
 contrast $(A,B,A,B,B,B,B)$ has $k \geq 3$, is a fixed point, and is excluded; and
 the near-constant $(A,B,B,B,B,B,B)$ attains high $DET$ but $\hat{P} = 1$ and is
 rejected by the period guard as persistence, not oscillation.
@@ -499,8 +540,8 @@ Take a cell with $n_c = 30$ converged repetitions and dominant attractor $A$; th
 coexistence reading depends only on the endpoint distribution.
 \begin{itemize}
   \item \textbf{Monostable.} Endpoints $28 \times A$, $2 \times B$ give
-        $\hat{P} \approx (0.93, 0.07)$ and
-        $N_{\mathrm{eff}} = 1/(0.93^2 + 0.07^2) \approx 1.16 < 1.5$: one valley.
+        $\hat{P} = (0.933, 0.067)$ and
+        $N_{\mathrm{eff}} = 1/(0.933^2 + 0.067^2) \approx 1.14 < 1.5$: one valley.
   \item \textbf{Bistable.} Endpoints $15 \times A$, $15 \times B$ give
         $N_{\mathrm{eff}} = 2.0$. If repetitions starting with more agents on $A$
         (high $g(s_0)$) end on $A$ and those starting with few end on $B$, then
@@ -606,7 +647,13 @@ converting agent, round, weight, and number of sources but randomises the source
 \emph{identity} uniformly among $\mathcal{N}(j)$. In \textbf{fc} the null is
 symmetric, so any concentration is emergent; in \textbf{star} the null already
 concentrates on the centre by wiring alone, so only the \emph{excess} over it is
-behaviourally meaningful. For $B = 1000$ surrogates the add-one one-sided
+behaviourally meaningful. In the star this excess is moreover often undefined: for
+a leaf, the only neighbour is the centre, so a leaf conversion has a single
+possible source and the shuffle cannot randomise it. As a result the star null is
+degenerate for a large majority of star repetitions (73--87\,\%, reported in
+\autoref{sec:results:dominance}), and the emergent-excess test is effectively
+identified only for the fully-connected topology; raw $D$ is still reported for
+both. For $B = 1000$ surrogates the add-one one-sided
 $p = \tfrac{1 + \#\{b : D^{(b)} \geq D\}}{1 + B}$ flags a repetition when
 $p < 0.05$. Because raw $D$ is mechanically larger in the star, we never compare it
 across topologies: across topologies we report the standardised
@@ -634,7 +681,7 @@ gives three conversions: $0 \to 1$ gains $6$ ($m = 1$); $0 \to 2, 1 \to 2$ each
 $2.5$ ($m = 2$); $0 \to 3, 1 \to 3, 2 \to 3$ each $\tfrac{5}{3}$ ($m = 3$). Then
 $\sigma = (\tfrac{61}{6}, \tfrac{25}{6}, \tfrac{5}{3}, 0)$,
 $p \approx (0.635, 0.260, 0.104, 0)$, and $D = (0.482 - 0.25)/0.75 \approx 0.31$.
-Agent $0$ is a clear hub ($64\%$ of influence), yet $D$ is far from $1$: the
+Agent $0$ is a clear hub ($64\,\%$ of influence), yet $D$ is far from $1$: the
 $1/m_j^t$ split makes each early adopter a co-source for later conversions, so
 staggered convergence never yields a pure hub. $D = 1$ needs all credit on one node
 (a single conversion, or a simultaneous mass flip onto a sole prior holder); a lone
@@ -666,13 +713,13 @@ orthogonal linguistic dimensions and later correlate them with the motif measure
 Each public message is scored on three dimensions, each a bipolar ordinal scale
 from $1$ to $5$:
 \begin{itemize}
-  \item \textbf{Conviction} --- how certain the message sounds, from $1$ (very
+  \item \textbf{Conviction}, how certain the message sounds, from $1$ (very
         hedged and uncertain) to $5$ (completely categorical). This is the
         linguistic counterpart of the numeric confidence and is defined at every
         round, including round $0$.
-  \item \textbf{Anchoring} --- the stated \emph{source} of the belief, from $1$
+  \item \textbf{Anchoring}, the stated \emph{source} of the belief, from $1$
         (purely the agent's own reasoning) to $5$ (purely deference to peers).
-  \item \textbf{Dialogic orientation} --- the degree of \emph{engagement} with a
+  \item \textbf{Dialogic orientation}, the degree of \emph{engagement} with a
         named peer, from $1$ (no reference to any other agent) to $5$ (directly
         quoting or paraphrasing a specific agent).
 \end{itemize}

@@ -19,6 +19,23 @@
 % Overflow (full benchmark survey, per-knob justifications) moved to Appendix.
 % ============================================================
 
+The premise of this thesis is that a multi-agent debate is a dynamical system
+whose trajectory carries measurable structure (\autoref{sec:related:lenses}).
+Turning that premise into empirical claims requires a system built as a
+\emph{measurement instrument}, not merely as a high-performing debate pipeline.
+Two design commitments follow. First, the protocol must expose the quantities the
+motif detectors need, a discrete vote and a latent confidence, per agent and
+per round, with private belief cleanly separated from public message, so that
+the interaction log is a faithful record of the dynamics rather than only of the
+final answer (\autoref{sec:setup:protocol}). Second, the two structural axes most
+often cited as design levers in the debate literature, communication topology and
+memory window (\autoref{sec:related:mad}), must be exposed as \emph{controlled
+perturbation axes} so that we can ask which dynamics they cause rather than merely
+observe. This chapter specifies that instrument: the system model and notation
+(\autoref{sec:setup:notation}), the two-phase protocol and stopping rule, the two
+deliberately contrasting benchmarks, and the experimental grid that the results of
+\autoref{sec:results} are computed over.
+
 
 % ------------------------------------------------------------
 % 4.1 NOTATION AND SYSTEM MODEL
@@ -47,9 +64,6 @@ is used informally as a synonym for repetition.
 \begin{table}[H]
 \centering
 \small
-\caption{Notation used throughout this thesis. Rounds are indexed by $t$ and
-repetitions by $r$; the two must not be confused.}
-\label{tab:notation}
 \begin{tabular}{ll}
 \toprule
 Symbol & Meaning \\
@@ -74,6 +88,9 @@ $s_t$ & system macrostate at round $t$ (the vote composition, see below) \\
 $f_\theta$ & the shared frozen LLM used as the update function \\
 \bottomrule
 \end{tabular}
+\caption[Notation used throughout the thesis]{Notation used throughout this thesis. Rounds are indexed by $t$ and
+repetitions by $r$; the two must not be confused.}
+\label{tab:notation}
 \end{table}
 
 \paragraph{Communication topology.}
@@ -312,7 +329,7 @@ first three rounds.
 };
 
 \end{tikzpicture}
-\caption{Two-phase synchronous protocol for two agents over rounds
+\caption[Two-phase synchronous debate protocol]{Two-phase synchronous protocol for two agents over rounds
 $t{=}0,1,2$ (the full system uses $N{=}4$). Round~$0$ has no Phase~A: agents read
 the question directly. Each Phase~B commits the four state fields
 $(v,c,\text{priv},\text{pub})$; the confidence $c$ and reasoning $\text{priv}$
@@ -359,11 +376,11 @@ in the MAD literature \citep{yin2023eot, yang2025revisiting, kaesberg2025voting}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/time_savings.png}
-    \caption{Mean fraction of runtime saved by early stopping as a function of
+    \includegraphics[width=0.85\linewidth]{figures/time_savings.png}
+    \caption[Runtime saved by early stopping threshold]{Mean fraction of runtime saved by early stopping as a function of
     the threshold $u$. Solid line: all repetitions. Dashed line: only
     repetitions that triggered stopping. At $u = 3$ the saving is roughly
-    $50\%$ per repetition.}
+    $50\,\%$ per repetition.}
     \label{fig:time_savings}
 \end{figure}
 
@@ -430,7 +447,7 @@ directly:
         immediately defined.
   \item \textbf{Verifiable ground truth:} expert-validated and unambiguous.
   \item \textbf{Calibrated difficulty:} frontier single-model accuracy sits in
-        the $70$--$85\%$ range \citep{rein2024gpqa, becker2025orchestration},
+        the $70$--$85\,\%$ range \citep{rein2024gpqa, becker2025orchestration},
         leaving genuine headroom for debate.
   \item \textbf{Initial disagreement:} agents genuinely disagree at round one,
         as documented in multi-agent studies on this benchmark
@@ -442,6 +459,13 @@ adopt it as the \textbf{primary} substrate. The main caveat is that it accrued
 less cumulative MAD literature than MMLU or GSM8K, simply because it is more
 recent; the migration is driven by benchmark saturation, not a methodological
 pivot.
+A second caveat concerns comparability of the accuracy numbers: the frontier
+$70$--$85\,\%$ figures refer to strong models on the full benchmark, whereas we use
+a mid-tier model (\texttt{mistral-medium}) on the promoted Tier-3 subset only.
+The accuracies reported in \autoref{sec:results} (per-agent $36.7\,\%$, final
+$40.7\,\%$) are therefore not comparable to published frontier GPQA-Diamond
+numbers, and are not intended to be; the Tier-3 selection deliberately keeps the
+hardest, most dynamically contested tasks, where accuracy is low by design.
 
 \subsubsection{HiddenBench}
 \label{sec:setup:datasets:hiddenbench}
@@ -543,7 +567,7 @@ Information cond. & scan (dataset) & GPQA ($M{=}4$), HiddenBench ($M{\in}\{3,4\}
 Tool access & defer & none & \citep{rein2024gpqa} \\
 \bottomrule
 \end{tabular}
-\caption{Classification of tunable components. Full justification per knob is
+\caption[Classification of tunable components]{Classification of tunable components. Full justification per knob is
 given in \autoref{app:knobs}.}
 \label{tab:knob-summary}
 \end{table}
@@ -568,8 +592,8 @@ and assigns each task a difficulty tier from its observed dynamics:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/task_difficulty_4tiers.png}
-    \caption{Distribution of tasks across difficulty tiers for GPQA-Diamond and
+    \includegraphics[width=0.85\linewidth]{figures/task_difficulty_4tiers.png}
+    \caption[Task distribution across difficulty tiers]{Distribution of tasks across difficulty tiers for GPQA-Diamond and
     HiddenBench, from the screening pass.}
     \label{fig:difficulty_tiers}
 \end{figure}
@@ -578,7 +602,23 @@ Tier~3 tasks are precisely those where self-organization dynamics can be observe
 at all, so they are promoted to a deep \emph{characterization} pass on the full
 six-configuration grid. This yields the final dataset used throughout
 \autoref{sec:results}: \textbf{35 tasks for each of the two benchmarks, six
-configurations each, $R = 30$ repetitions}, for a total of
-$35 \times 2 \times 6 \times 30 = 12{,}600$ repetitions. Because $R = 3$ in the
+configurations each, $R = 50$ repetitions}, for a total of
+$35 \times 2 \times 6 \times 50 = 21{,}000$ repetitions.
+GPQA-Diamond yields more than $35$ Tier-3 tasks in the screening pass, so we
+retain $35$ of them to match the number of eligible HiddenBench tasks, giving a
+balanced design with equal task counts per benchmark; the $35$ are drawn
+uniformly at random from the eligible Tier-3 GPQA tasks, so that no further
+selection is made on any outcome-derived quantity within the tier. Because $R = 3$ in the
 screening pass introduces some noise, tier assignments near a boundary are
 mildly unstable, which we accept as a screening cost rather than a final claim.
+
+One consequence of this design should be made explicit for the interpretation of
+RQ2. Because the deep pass runs only Tier-3 tasks, raw task difficulty is held
+roughly constant by construction: it is a \emph{selection criterion} for the study
+rather than a factor we vary within it. The ``difficulty regime'' contrast that
+RQ2 refers to is therefore operationalised at the benchmark level, GPQA (a
+refinement regime, agents mostly start correct) versus HiddenBench (a correction
+regime, agents start systematically wrong), and, within GPQA, through the
+single-agent-accuracy strata examined in the seeded analysis
+(\autoref{sec:results:seeded}); it is not a within-study manipulation of per-task
+difficulty.

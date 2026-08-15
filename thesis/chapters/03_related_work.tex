@@ -115,7 +115,7 @@ sharper version of this failure is captured by HiddenBench
 \citep{li2026hiddenbench}, which adapts the hidden-profile paradigm from social
 psychology \citep{stasser1985pooling, schulzhardt2012synergy}: when the evidence
 needed for the correct answer is distributed across agents, collective accuracy
-collapses from 80.7\% (a single agent with complete information) to 30.1\%,
+collapses from 80.7\,\% (a single agent with complete information) to 30.1\,\%,
 because agents lock onto shared information and fail to pool their private
 knowledge.
 
@@ -138,6 +138,63 @@ that hold latent confidence but cast discrete votes. At the level of principle,
 systems-theoretic lens precisely because group-level behaviour cannot be
 predicted from individual agent properties, but their contribution is conceptual
 and supplies no empirical instrument for detecting such behaviour.
+
+
+\subsection{Ways of Analysing Multi-Agent Systems}
+\label{sec:related:lenses}
+
+Before stating the gap, it is worth making explicit \emph{why} a
+complex-systems treatment is the appropriate instrument, by situating it against
+the alternative ways one might analyse an LLM collective. Each lens answers a
+different question and carries different costs.
+
+\paragraph{Outcome and benchmark evaluation.}
+The dominant approach scores a system by its final task performance on a
+benchmark \citep{du2024improving, liu2025stopovervaluing, zhang2025debateorvote}.
+Its strengths are decisive: it is objective, comparable across systems, and
+directly measures the quantity practitioners ultimately care about. Its weakness
+is equally decisive for our purposes. An outcome is a scalar summary of a
+trajectory, and two systems that reach the same accuracy through entirely
+different dynamics, one by genuine error correction, the other by a confident
+slide into a shared mistake, are indistinguishable under it. It can say
+\emph{whether} a configuration worked but not \emph{why}, and it provides no
+vocabulary for a run's failure mode.
+
+\paragraph{Mechanistic interpretability.}
+A second approach would open the models themselves, analysing weights, activations,
+or attention to explain behaviour. This operates at the wrong level of abstraction
+for our question: the phenomena of interest, consensus, oscillation, influence
+concentration, are properties of the \emph{group} trajectory, not of any single
+forward pass, and emerge from interaction rather than from internal computation
+\citep{miehling2025agentic, chen2024agentverse}. It is also infeasible for the
+closed, API-served models typical of applied multi-agent systems, whose internals
+are inaccessible.
+
+\paragraph{Qualitative transcript analysis.}
+A third approach reads the debate transcripts directly, characterising the content
+of arguments and the rhetoric of persuasion. This is rich and interpretable, and
+we draw on it informally when reading the mechanism behind the flagged
+limit-cycle cases (\autoref{sec:results:lc}). But on its own it is subjective, does not scale to tens
+of thousands of runs, and yields no falsifiable structure that can be tested
+against a null. It complements a quantitative lens rather than replacing it.
+
+\paragraph{The complex-systems / dynamical lens.}
+The approach taken here treats the debate as a dynamical system and measures
+recurring patterns in its state trajectory \citep{strogatz2015nonlinear,
+driscoll2024dynamical}. Its advantages match the gaps above: it operates at the
+group level where the interesting behaviour lives, it is quantitative and scales to
+the full dataset, it requires only interaction logs (not model internals), and each
+motif has a falsifiable signature that can be tested against a principled null. Its
+disadvantages must be stated as plainly. The transfer of motif concepts from
+physical and biological systems to an LLM collective is a modelling choice, not a
+law; the detection thresholds are partly conventional; a four-agent group is small
+for some of these measures; and, absent intervention, the detectors identify
+\emph{signatures} and \emph{associations}, not certified attractors or causes. We
+adopt this lens because it is the only one of the four that can name and measure
+the dynamical pathologies the previous subsection documented, while remaining
+applicable to the black-box models of practical interest, but we carry its
+limitations forward explicitly into the interpretation of every result
+(\autoref{sec:discussion:limitations}).
 
 
 \subsection{Research Gap}

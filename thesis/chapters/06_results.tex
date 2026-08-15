@@ -14,7 +14,7 @@ Two metrics are reported throughout:
         criterion fires or the hard cap $T = 15$ is reached.
 \end{itemize}
 
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
 \subsubsection{Single-Agent Baseline and Debate Gain}
 \label{sec:results:perf:single_vs_multi}
 
@@ -34,16 +34,18 @@ against two baselines defined at round~0, before any discussion takes place:
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\linewidth]{plots/general/fig1_single_vs_multi.png}
-  \caption{Accuracy decomposition for GPQA (left) and HiddenBench (right):
+  \caption[Accuracy decomposition: per-agent, majority, debate]{Accuracy decomposition for GPQA (left) and HiddenBench (right):
            per-agent accuracy at round~0, majority-vote accuracy at round~0,
            and multi-agent accuracy after debate.
            Arrow and annotation show the debate gain (majority $\to$ final).
-           Dashed line: random chance at $25\,\%$ (four-choice questions).
+           Dashed line: random chance at $25\,\%$ for four-option questions;
+           note that most HiddenBench tasks have three options, where the chance
+           level is $33\,\%$ (see text).
            All configurations pooled ($N = 10{,}500$ per dataset).}
   \label{fig:perf:single_vs_multi}
 \end{figure}
 
-Table~\ref{tab:perf:baseline} summarises the three accuracy levels together
+\autoref{tab:perf:baseline} summarises the three accuracy levels together
 with an oracle upper bound (fraction of repetitions in which at least one
 agent holds the correct answer at round~0).
 
@@ -58,7 +60,7 @@ GPQA        & $36.7\,\%$ & $39.4\,\%$ & $\mathbf{40.7\,\%}$ & $68.8\,\%$ \\
 HiddenBench & $15.5\,\%$ & $\phantom{0}8.3\,\%$ & $\mathbf{29.4\,\%}$ & $46.6\,\%$ \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy decomposition at round~0 and after debate.
+\caption[Baseline and debate accuracy by dataset]{Accuracy decomposition at round~0 and after debate.
          All configurations pooled ($N = 10{,}500$ per dataset).
          Oracle: fraction of repetitions where at least one agent is correct
          at round~0.}
@@ -66,14 +68,14 @@ HiddenBench & $15.5\,\%$ & $\phantom{0}8.3\,\%$ & $\mathbf{29.4\,\%}$ & $46.6\,\
 \end{table}
 
 The two datasets tell qualitatively different stories
-(Figure~\ref{fig:perf:single_vs_multi}):
+(\autoref{fig:perf:single_vs_multi}):
 
 \begin{itemize}
   \item \textbf{GPQA.}
         The per-agent accuracy at round~0 is $36.7\,\%$, and majority voting
         raises this modestly to $39.4\,\%$ by aggregating four independent
         guesses.
-        Debate adds a further $\mathbf{+1.4}$\,percentage points (pp),
+        Debate adds a further $\mathbf{+1.3}$\,percentage points (pp),
         reaching $40.7\,\%$.
         This marginal gain is consistent with findings across the multi-agent
         debate literature, where homogeneous agents on knowledge-intensive
@@ -90,23 +92,54 @@ The two datasets tell qualitatively different stories
         Here the dynamics are strikingly different.
         The per-agent accuracy at round~0 is $15.5\,\%$, already well below
         random.
-        Majority voting does not help --- it \emph{reduces} accuracy further
+        Majority voting does not help, it \emph{reduces} accuracy further
         to $8.3\,\%$.
         This is a direct consequence of correlated errors: agents do not fail
-        randomly across the four options but share a systematic bias, all
+        randomly across the options but share a systematic bias, all
         gravitating towards the same wrong answer.
         When four agents independently commit to the same wrong option,
         majority voting amplifies that shared error rather than cancelling it
-        out --- an LLM analogue of the biased information sampling documented
+        out, an LLM analogue of the biased information sampling documented
         in human hidden-profile experiments \citep{stasser1985pooling}.
-        Debate reverses this: final accuracy reaches $29.4\,\%$, a gain of
-        $\mathbf{+21.1}$\,pp over the majority baseline and above the random
-        chance level of $25\,\%$.
+        Debate reverses this partial collapse: final accuracy reaches
+        $29.4\,\%$, a gain of $\mathbf{+21.1}$\,pp over the majority baseline.
+        This gain is the substantive effect; in absolute terms $29.4\,\%$ is
+        still \emph{at or slightly below} the chance level, because most
+        HiddenBench tasks have three options rather than four (31 of 35 tasks,
+        $M = 3$, so the repetition-weighted chance level is $\approx 32\,\%$
+        rather than $25\,\%$; see below).
         The oracle bound of $46.6\,\%$ confirms that the correct option is
         present among the agents in roughly half of runs; debate recovers
         roughly $\frac{29.4 - 8.3}{46.6 - 8.3} \approx 55\,\%$ of the
-        theoretically recoverable accuracy.
+        accuracy that is in principle recoverable from the majority baseline.
 \end{itemize}
+
+Because the chance level differs by option count, we report HiddenBench accuracy
+split by $M$.
+The $31$ three-option tasks reach $30.3\,\%$ (chance $33.3\,\%$) and the $4$
+four-option tasks reach $22.7\,\%$ (chance $25\,\%$); both sit just below their
+respective chance lines.
+The correct reading is therefore not that debate lifts HiddenBench above chance,
+but that it recovers most of the ground lost by the majority-biased starting
+point: the starting majority vote is far below chance ($8.3\,\%$), and debate
+returns the group roughly to the chance line.
+
+\paragraph{Correlated errors, two ways.}
+The oracle bounds make the difference between the two benchmarks precise.
+If the four agents erred independently, the probability that at least one holds
+the correct answer at round~0 would be $1 - (1 - p_{\mathrm{agent}})^4$, where
+$p_{\mathrm{agent}}$ is per-agent accuracy.
+For GPQA this predicts $1 - (1 - 0.367)^4 = 83.9\,\%$, well above the observed
+oracle of $68.8\,\%$: GPQA agents' errors are \emph{positively correlated} in the
+``is anyone right'' sense, they tend to be wrong on the same questions.
+For HiddenBench the independence prediction is $1 - (1 - 0.155)^4 = 49.0\,\%$,
+almost exactly the observed oracle of $46.6\,\%$: at the level of ``is the correct
+option present,'' HiddenBench agents are close to independent.
+The HiddenBench collapse is therefore not a failure to cover the correct answer
+but a correlation in \emph{which wrong option} the agents choose, which is what
+drives the majority vote down to $8.3\,\%$ while the oracle stays near the
+independence prediction.
+This is the sharper statement of the ``systematic bias'' described above.
 
 \paragraph{Interpretation.}
 The contrast between GPQA and HiddenBench is not simply a difficulty
@@ -114,16 +147,18 @@ difference.
 It reflects a qualitative shift in the role of debate.
 On GPQA, debate acts as a \emph{refinement}: agents start mostly correct,
 and the system consolidates.
-On HiddenBench, debate acts as a \emph{correction}: agents share a
-systematic bias, and structured discussion partially overcomes it.
+On HiddenBench, debate acts as a partial \emph{correction}: agents share a
+systematic bias that drives the majority vote well below chance, and structured
+discussion recovers most of that deficit without pushing the group clearly above
+chance.
 The self-reinforcement, limit-cycle, bistability, and dominance analyses in
 the following sections explain when and why this correction succeeds or fails.
 
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
 \subsubsection{Effect of Topology}
 \label{sec:results:perf:topology}
 
-Table~\ref{tab:perf:topology} reports mean accuracy and mean rounds for
+\autoref{tab:perf:topology} reports mean accuracy and mean rounds for
 fully-connected (fc) and star topologies.
 Rather than pooling across $W$, the table presents the pooled figure as
 a summary; the full per-$W$ breakdown is in Appendix~\ref{app:perf:configs},
@@ -145,21 +180,28 @@ HiddenBench & fc   & $30.2\,\%$ & \multirow{2}{*}{$+1.6$\,pp (ns)} & $5.12$ & \m
             & star & $28.6\,\%$ &                                   & $6.96$ & \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy and mean rounds to consensus by topology,
+\caption[Accuracy and rounds by topology]{Accuracy and mean rounds to consensus by topology,
          pooled over $W \in \{1,2,5\}$
          ($n = 5{,}250$ repetitions per cell).
-         Accuracy differences are not statistically significant
-         (Mann-Whitney $U$, $p = 1.00$ for GPQA, $p = 0.075$ for HiddenBench).
-         Round differences are highly significant in both datasets ($p < 0.001$).
+         Accuracy differences are not significant at the task level
+         (task-paired Wilcoxon over $n = 35$ tasks, $p = 0.96$ for GPQA,
+         $p = 0.16$ for HiddenBench; the bootstrap $95\,\%$ CI for the accuracy
+         gap is $[-0.14, +0.15]$ on GPQA and $[-0.07, +0.11]$ on HiddenBench,
+         both containing zero).
+         Round differences are large and highly significant in both datasets
+         (task-paired Wilcoxon, $p < 0.001$).
          Pattern holds in each individual $W$ cell; see Appendix~\ref{app:perf:configs}.}
 \label{tab:perf:topology}
 \end{table}
 
 \begin{itemize}
-  \item \textbf{Topology has no significant effect on accuracy}
-        in any of the six per-$W$ cells or in either pooled comparison.
-        The choice of topology does not determine whether the system reaches
-        the correct answer.
+  \item \textbf{Topology has no detectable effect on accuracy.}
+        Aggregating each task to its mean accuracy and pairing fully connected
+        against star across the $35$ tasks, the difference is negligible and its
+        $95\,\%$ confidence interval contains zero for both datasets
+        (GPQA $\Delta \approx 0.0$\,pp, $p = 0.96$; HiddenBench
+        $\Delta = +1.6$\,pp, $p = 0.16$). We find no evidence that the choice of
+        topology determines whether the system reaches the correct answer.
 
   \item \textbf{Topology has a large and significant effect on efficiency.}
         Star topology requires $0.47$ more rounds on GPQA and $1.84$ more
@@ -175,39 +217,46 @@ HiddenBench & fc   & $30.2\,\%$ & \multirow{2}{*}{$+1.6$\,pp (ns)} & $5.12$ & \m
         hub bottleneck is less consequential.
 \end{itemize}
 
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
 \subsubsection{Effect of Memory Window}
 \label{sec:results:perf:window}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/general/fig3_memory_window.png}
-  \caption{Accuracy (left column) and mean rounds (right column) for
+  \caption[Accuracy and rounds by memory window]{Accuracy (left column) and mean rounds (right column) for
            $W \in \{1, 2, 5\}$ across both datasets and topologies.
            Blue: fully connected; red: star.
-           Kruskal-Wallis tests for $W$ effect on accuracy are
-           non-significant across all 12 cells (all $p \geq 0.10$).}
+           At the task level (task-blocked Friedman over $n = 35$ tasks), the
+           memory window has no effect on accuracy in three of the four
+           dataset/topology cells; HiddenBench/fc is nominally significant
+           ($p = 0.019$) but does not survive Benjamini--Hochberg correction
+           across the four cells ($q = 0.076$).}
   \label{fig:perf:memory_window}
 \end{figure}
 
 \begin{itemize}
-  \item \textbf{Memory window has no effect on accuracy} in any of the
-        12 (dataset, topology, $W$) cells.
-        Kruskal-Wallis tests are non-significant across all combinations
-        (all $p \geq 0.10$).
-        Whether agents receive only the previous round ($W=1$) or the last
-        five rounds ($W=5$) does not change how often the system reaches
-        the correct answer.
+  \item \textbf{Memory window has essentially no effect on accuracy.}
+        Task-blocked Friedman tests (unit $=$ task, $n = 35$) are
+        non-significant for GPQA/fc ($p = 0.17$), GPQA/star ($p = 0.28$) and
+        HiddenBench/star ($p = 0.68$). The one exception, HiddenBench/fc
+        ($p = 0.019$, with $W{=}2$ peaking at $32.1\,\%$), does not survive
+        Benjamini--Hochberg correction across the four cells ($q = 0.076$), so
+        we treat it as at most a weak, isolated signal rather than a general
+        memory effect. Whether agents receive only the previous round ($W=1$)
+        or the last five rounds ($W=5$) does not systematically change how
+        often the system reaches the correct answer.
 
   \item \textbf{Memory window affects convergence speed on HiddenBench.}
         Larger $W$ is associated with faster convergence: $W=1$ produces
         the most rounds (fc: $5.47$, star: $7.56$), while $W=5$ is the
         fastest (fc: $4.99$, star: $6.54$), with $W=2$ intermediate
-        (Kruskal-Wallis $p < 0.001$ for both HiddenBench topologies).
+        (task-blocked Friedman $p < 0.001$ for both HiddenBench topologies).
         A longer context window may allow agents to track the trajectory
         of the debate and resolve disagreements more efficiently.
-        On GPQA, rounds are not significantly affected by $W$
-        (all $p \geq 0.21$).
+        On GPQA the window effect on rounds is at most small: GPQA/fc shows a
+        modest, non-monotonic variation (Friedman $p = 0.013$, range
+        $3.64$--$3.85$ rounds) while GPQA/star is not significant ($p = 0.68$).
 
   \item \textbf{The expected monotonic ordering is observed on HiddenBench}
         but absent on GPQA.
@@ -218,14 +267,14 @@ HiddenBench & fc   & $30.2\,\%$ & \multirow{2}{*}{$+1.6$\,pp (ns)} & $5.12$ & \m
         transient fluctuations.
 \end{itemize}
 
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
 \subsubsection{Round Distributions and the Rounds--Accuracy Asymmetry}
 \label{sec:results:perf:rounds}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{plots/general/fig4_round_distribution.png}
-  \caption{Fraction of repetitions stopping at each round count,
+  \caption[Round-count distributions by configuration]{Fraction of repetitions stopping at each round count,
            for all four (dataset, topology) panels and all three memory
            windows (colours).
            The hard cap at $T = 15$ is marked by the dashed red line.
@@ -256,7 +305,7 @@ HiddenBench & fc   & $30.2\,\%$ & \multirow{2}{*}{$+1.6$\,pp (ns)} & $5.12$ & \m
         Both topology panels in each dataset row show that star has a
         heavier tail and a larger cap spike than fully connected,
         consistent with the mean-rounds differences in
-        Table~\ref{tab:perf:topology}.
+        \autoref{tab:perf:topology}.
 \end{itemize}
 
 \paragraph{Rounds and accuracy.}
@@ -264,10 +313,11 @@ The relationship between rounds to consensus and accuracy reveals a
 striking asymmetry (full plot in Appendix~\ref{app:perf:rounds_acc}).
 On GPQA, accuracy peaks at rounds~3--4 ($47.1\,\%$) and is lower both
 for the earliest stops at round~2 ($36.1\,\%$) and for longer debates
-(${\leq}\,40\,\%$ from round~5 onwards): neither very fast nor very slow
+(around $40\,\%$ or below at most later stopping points, though the
+individual late-round buckets are sparse): neither very fast nor very slow
 consensus is reliably correct.
 On HiddenBench the pattern is opposite: repetitions stopping at round~2
-achieve only $6.4\,\%$ accuracy --- far below random --- because early
+achieve only $6.4\,\%$ accuracy, far below random, because early
 consensus means the group has locked in on the majority-biased wrong answer
 before any corrective exchange.
 Accuracy rises steadily with more rounds: $23.8\,\%$ at round~3,
@@ -285,56 +335,54 @@ are reported in Appendix~\ref{app:perf:configs}.
 \subsection{Self-Reinforcement}
 \label{sec:results:sr}
 
-\subsubsection{Prevalence and Configuration Effects}
-\label{sec:results:sr:presence}
+Self-reinforcement (SR) is measured as the OLS slope $\beta_{\mathrm{run}}$
+of agent confidence on round number within each \emph{vote-stable run}
+(a maximal block of $\geq 3$ consecutive rounds where an agent holds the same
+vote).
+The prevalence $p_{\mathrm{SR}}$ is the fraction of runs with
+$\beta_{\mathrm{run}} > 0$; the null is 0.5 (random walk).
+Across the full dataset (21\,000 repetitions, both benchmarks, all 6 configs)
+the length filter yields 94\,173 run records.
+Of the 84\,000 agent trajectories, 43.5\,\% (36\,531) never flip their vote
+across the entire debate and form the extreme SR group; because a debate is
+recorded only once it has reached at least three rounds, every one of these
+never-flipping trajectories yields a vote-stable run of length $\geq 3$ and is
+retained.
+This agent-level count should not be confused with the ``never flipped'' subgroup
+of \autoref{tab:sr:subgroups} ($n = 12{,}748$ runs), which is defined at the
+\emph{repetition} level: it collects the runs that belong to the subset of
+repetitions in which \emph{no} agent ever flipped (a fully static debate), a
+stricter condition than an individual agent holding its vote while others move.
+The two numbers therefore measure different things, individual never-flipping
+agents versus runs inside fully static repetitions, and are not expected to match.
 
-% ─────────────────────────────────────────────────────────────
-% [Overview paragraph -- move here as intro to the subsection]
-% Measurement primitive: vote-stable run (maximal block ≥3 rounds,
-% OLS slope β_run of confidence on round). p_SR = fraction of runs
-% with β_run > 0. Baseline = 0.5. Descriptive counts: 57,716 run
-% records after length filter; 40.6% never-flipping agents.
-% ─────────────────────────────────────────────────────────────
-
-\begin{itemize}
-  \item $p_{\mathrm{SR}}$ is between 0.735 and 0.858 across all 12
-        (dataset, topology, $W$) cells (Table~\ref{tab:sr:overview}).
-  \item In every cell, all 35 tasks individually have $p_{\mathrm{SR}} > 0.5$
-        (binomial sign test: $p < 10^{-4}$ in all 12 cells).
-  \item The distribution of per-task $p_{\mathrm{SR}}$ values is shown in
-        Figure~\ref{fig:sr:psr_violin}. Every distribution sits well above
-        the dashed null line at 0.5.
-\end{itemize}
-
-\textbf{Finding:} self-reinforcement is present and universal in this system.
-There is no config or dataset where the SR signal disappears.
+\paragraph{Prevalence.}
+\autoref{tab:sr:overview} and \autoref{fig:sr:psr_violin} show
+$p_{\mathrm{SR}}$ and mean $\bar\beta$ for all 12 (dataset, topology, $W$)
+cells.
+$p_{\mathrm{SR}}$ ranges from 0.742 to 0.875 across all cells, well above
+the null of 0.5.
+In every cell all 35 tasks individually exceed 0.5
+(binomial sign test: $p < 10^{-4}$ in all 12 cells).
+Cluster-bootstrapped 95\,\% confidence intervals for $p_{\mathrm{SR}}$
+exclude 0.5 in all 12 cells; the same is true for $\bar\beta$ (all CIs
+exclude 0).
+\textbf{Self-reinforcement is a universal property of this system: it is
+present in every configuration and on both benchmarks.}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/sr/fig1_psr_violin.png}
-  \caption{Per-task $p_{\mathrm{SR}}$ (fraction of vote-stable runs with
+  \caption[Per-task self-reinforcement prevalence by configuration]{Per-task $p_{\mathrm{SR}}$ (fraction of vote-stable runs with
            positive slope) for all (dataset, topology, $W$) combinations.
-           Each point is one task ($n=35$ per panel); means are shown by
-           the violin interior marker.  Dashed line: null baseline of 0.5.}
+           Each point is one task ($n = 35$ per panel); the violin interior
+           marker shows the mean.  Dashed line: null baseline of 0.5.}
   \label{fig:sr:psr_violin}
 \end{figure}
 
-\subsubsection{Drivers, Mediation, and Impact}
-\label{sec:results:sr:config}
-
-% [Strength scaling by W and topology -- existing text below]
-
-Table~\ref{tab:sr:overview} reports mean run slope $\bar\beta$ and
-$p_{\mathrm{SR}}$ for all 12 cells.
-Figure~\ref{fig:sr:mean_slope_W} shows mean $\bar\beta$ by memory window,
-and Figure~\ref{fig:sr:heatmap} summarises all cells in a single heatmap.
-
 \begin{table}[H]
 \centering
-\caption{Mean $p_{\mathrm{SR}}$ and mean run slope $\bar\beta$
-         (confidence / round) per configuration.
-         $N_{\mathrm{tasks}} = 35$, $R = 30$.}
-\label{tab:sr:overview}
+
 \small
 \begin{tabular}{llcccccc}
 \toprule
@@ -342,43 +390,55 @@ and Figure~\ref{fig:sr:heatmap} summarises all cells in a single heatmap.
 \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
 Dataset & Topology & $p_{\mathrm{SR}}$ & $\bar{\beta}$ & $p_{\mathrm{SR}}$ & $\bar{\beta}$ & $p_{\mathrm{SR}}$ & $\bar{\beta}$ \\
 \midrule
-GPQA        & fc   & 0.846 & 0.570 & 0.806 & 0.501 & 0.752 & 0.443 \\
-GPQA        & star & 0.804 & 0.494 & 0.768 & 0.450 & 0.735 & 0.401 \\
-HiddenBench & fc   & 0.840 & 0.405 & 0.858 & 0.408 & 0.821 & 0.364 \\
-HiddenBench & star & 0.835 & 0.362 & 0.827 & 0.367 & 0.797 & 0.325 \\
+GPQA        & fc   & 0.825 & 0.519 & 0.815 & 0.498 & 0.769 & 0.449 \\
+GPQA        & star & 0.813 & 0.474 & 0.775 & 0.432 & 0.742 & 0.401 \\
+HiddenBench & fc   & 0.851 & 0.444 & 0.875 & 0.459 & 0.825 & 0.398 \\
+HiddenBench & star & 0.835 & 0.358 & 0.817 & 0.356 & 0.790 & 0.337 \\
 \bottomrule
 \end{tabular}
+\caption[Self-reinforcement prevalence and slope by configuration]{Mean $p_{\mathrm{SR}}$ and mean run slope $\bar\beta$
+         (confidence gain / round) per configuration.
+         $N_{\mathrm{tasks}} = 35$, $R = 50$.}
+\label{tab:sr:overview}
 \end{table}
+
+\paragraph{Configuration effects.}
+\autoref{fig:sr:mean_slope_W} and \autoref{fig:sr:heatmap}
+show how $\bar\beta$ varies across configurations.
 
 \begin{itemize}
   \item \textbf{Memory window ($W$).}
-        For GPQA (both topologies) $\bar\beta$ decreases monotonically as $W$
-        increases: $\bar\beta(W{=}1) > \bar\beta(W{=}2) > \bar\beta(W{=}5)$.
-        The pattern is less clean for HiddenBench ($W{=}2$ is marginally above
-        $W{=}1$).  Overall, the predicted strength-scaling ordering
-        $\bar\beta(W{=}5) > \bar\beta(W{=}1)$ is \emph{not} supported;
-        the relationship is in the opposite direction for GPQA.
-        Kruskal--Wallis tests across $W$ levels are not significant in most
-        cells, so this is a directional observation rather than a strong
-        finding.
+        On GPQA (both topologies) $\bar\beta$ decreases as $W$ increases:
+        the Page trend test for decreasing order
+        ($\bar\beta(W{=}1) > \bar\beta(W{=}2) > \bar\beta(W{=}5)$)
+        is highly significant for GPQA/fc ($p = 1.6 \times 10^{-6}$) and
+        GPQA/star ($p = 3.8 \times 10^{-8}$).
+        The predicted \emph{strength-scaling} order
+        ($\bar\beta$ increasing with $W$) is strongly refuted for GPQA.
+        On HiddenBench the trend is weaker (HB/star only marginally
+        significant at $p = 0.037$), suggesting that peer re-exposure,
+        rather than self re-exposure in longer contexts, drives
+        confidence accumulation.
 
   \item \textbf{Topology.}
-        Full-connected (fc) produces higher $\bar\beta$ than star in all 12
-        cells.  The difference is statistically significant at $W{=}1$
-        (GPQA: $p = 0.017$; HiddenBench: $p = 0.023$) and at $W{=}5$ for
-        HiddenBench ($p = 0.019$); it is marginal at the other $W$ values.
-        The effect size is roughly 0.04--0.08 per round.
+        Fully-connected (fc) consistently produces higher $\bar\beta$ than star.
+        The difference is highly significant for HiddenBench across all $W$
+        values ($p < 0.001$) and marginally significant for GPQA at $W{=}2$
+        ($p = 0.033$).  The effect size is 0.04--0.10 confidence points per
+        round.
 
   \item \textbf{Dataset.}
-        GPQA consistently shows higher $\bar\beta$ than HiddenBench
-        (0.40--0.57 vs.\ 0.32--0.41); all pairwise Mann--Whitney $U$ tests
-        are significant ($p < 0.0001$).
+        On the star topology GPQA has higher $\bar\beta$ than HiddenBench
+        across all $W$ ($p < 10^{-5}$ at $W{=}1$, $p = 0.003$ at $W{=}2$,
+        $p = 0.047$ at $W{=}5$).  On fc the difference is significant
+        only at $W{=}1$ ($p = 0.008$); at $W{=}2$ and $W{=}5$ fc slopes are
+        comparable between datasets.
 \end{itemize}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\linewidth]{plots/sr/fig2_mean_slope_W.png}
-  \caption{Mean run slope $\bar\beta$ by memory window for each
+  \caption[Mean self-reinforcement slope by memory window]{Mean run slope $\bar\beta$ by memory window for each
            (dataset, topology) panel.  Error bars: $\pm 1.96 \times
            \mathrm{SE}$ across the 35 tasks.}
   \label{fig:sr:mean_slope_W}
@@ -387,776 +447,1207 @@ HiddenBench & star & 0.835 & 0.362 & 0.827 & 0.367 & 0.797 & 0.325 \\
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\linewidth]{plots/sr/fig3_heatmap.png}
-  \caption{Mean run slope $\bar\beta$ across all 12 (dataset, topology, $W$)
-           configurations.  Colour scale: green = higher SR, red = lower.}
+  \caption[Self-reinforcement slope heatmap across configurations]{Mean run slope $\bar\beta$ across all 12 (dataset, topology, $W$)
+           configurations.  Colour scale: brighter (yellow) = higher SR,
+           darker (blue) = lower.}
   \label{fig:sr:heatmap}
 \end{figure}
 
-% ─────────────────────────────────────────────────────────────
-% [Subgroup analysis -- existing text below]
-
-Figure~\ref{fig:sr:subgroups} shows run-level slope distributions across five
-structural conditions.
-Table~\ref{tab:sr:subgroups} summarises group means and Mann--Whitney $U$
-test results.
+\paragraph{Structural drivers.}
+\autoref{fig:sr:subgroups} and \autoref{tab:sr:subgroups} show
+run-level $\bar\beta$ broken down by structural conditions.
 
 \begin{table}[H]
 \centering
-\caption{Mean run slope $\bar\beta$ and $p_{\mathrm{SR}}$ by subgroup condition
-         (all runs pooled across configs).
-         MWU: Mann--Whitney $U$ two-sided test between the two groups in each
-         split; all $p < 0.0001$.}
-\label{tab:sr:subgroups}
+
 \small
 \begin{tabular}{llrrl}
 \toprule
 Condition & Group & $n_{\mathrm{runs}}$ & $\bar\beta$ & $p_{\mathrm{SR}}$ \\
 \midrule
 \multirow{2}{*}{Ceiling}
-  & No ceiling   & 46{,}526 & 0.390 & 0.773 \\
-  & Ceiling hit  & 11{,}190 & 0.526 & 0.876 \\
+  & No ceiling   & 81{,}624 & 0.399 & 0.794 \\
+  & Ceiling hit  & 12{,}549 & 0.565 & 0.910 \\
 \midrule
 \multirow{2}{*}{Terminality}
-  & Non-terminal &  7{,}820 & 0.281 & 0.696 \\
-  & Terminal     & 49{,}896 & 0.438 & 0.816 \\
+  & Non-terminal & 10{,}644 & 0.261 & 0.676 \\
+  & Terminal     & 83{,}529 & 0.442 & 0.826 \\
 \midrule
 \multirow{2}{*}{Initial correctness}
-  & Init wrong majority   & 49{,}547 & 0.388 & 0.791 \\
-  & Init correct majority &  8{,}169 & 0.588 & 0.901 \\
+  & Init wrong majority   & 82{,}311 & 0.405 & 0.805 \\
+  & Init correct majority & 11{,}862 & 0.536 & 0.842 \\
 \midrule
 \multirow{2}{*}{Vote stability}
-  & Flipped       & 51{,}524 & 0.376 & 0.783 \\
-  & Never flipped &  6{,}192 & 0.754 & 0.930 \\
+  & Some agent flipped    & 81{,}425 & 0.378 & 0.793 \\
+  & Fully static rep.     & 12{,}748 & 0.698 & 0.910 \\
 \midrule
 \multirow{5}{*}{Init vote dist.}
-  & 4-0-0-0 &  7{,}010 & 0.706 & 0.909 \\
-  & 3-1-0-0 & 23{,}342 & 0.409 & 0.814 \\
-  & 2-2-0-0 & 12{,}048 & 0.361 & 0.785 \\
-  & 2-1-1-0 & 14{,}858 & 0.339 & 0.763 \\
-  & 1-1-1-1 &     458  & 0.349 & 0.664 \\
+  & 4-0-0-0 & 13{,}844 & 0.669 & 0.897 \\
+  & 3-1-0-0 & 35{,}302 & 0.409 & 0.819 \\
+  & 2-2-0-0 & 20{,}431 & 0.368 & 0.793 \\
+  & 2-1-1-0 & 23{,}717 & 0.344 & 0.763 \\
+  & 1-1-1-1 &     879  & 0.290 & 0.652 \\
 \bottomrule
 \end{tabular}
+\caption[Self-reinforcement slope by structural subgroup]{Mean run slope $\bar\beta$ and $p_{\mathrm{SR}}$ by subgroup
+         (all runs pooled across configs, $N = 94{,}173$).
+         Pooled run counts are descriptive; the subgroup orderings are
+         confirmed at the task level in the text.}
+\label{tab:sr:subgroups}
 \end{table}
 
-Key observations:
-
-\begin{itemize}
-  \item \textbf{Ceiling hits.}
-        Runs that reach the confidence ceiling (end\_conf $= 10$) have a
-        substantially higher mean slope (0.526 vs.\ 0.390, $p < 0.0001$).
-        This is expected: a run that climbs all the way to 10 necessarily has
-        a steep positive ramp.
-
-  \item \textbf{Terminal runs.}
-        Runs that persist until the end of the debate show higher SR
-        (0.438 vs.\ 0.281, $p < 0.0001$).  Agents that lock in early and
-        never flip accumulate the steepest confidence ramps.
-
-  \item \textbf{Initial correctness.}
-        When a majority of agents start on the correct answer, SR is
-        noticeably stronger (0.588 vs.\ 0.388, $p < 0.0001$).  Agents that
-        begin correct appear to commit more strongly and ramp faster.
-
-  \item \textbf{Never-flipping agents.}
-        Agents that hold the same vote throughout show the highest SR of any
-        subgroup ($\bar\beta = 0.754$, $p_{\mathrm{SR}} = 0.930$), well above
-        agents that flip at least once (0.376).  These are the extreme SR case.
-
-  \item \textbf{Initial vote distribution.}
-        SR decreases monotonically as the initial configuration becomes more
-        dispersed: from 4-0-0-0 ($\bar\beta = 0.706$) down to 2-1-1-0
-        ($\bar\beta = 0.339$).  The fully split 1-1-1-1 case ($n = 458$,
-        rare) sits at 0.349.  Kruskal--Wallis across all five distributions:
-        $H = 780.5$, $p < 0.0001$; all pairwise comparisons against 4-0-0-0
-        are significant ($p < 0.0001$).
-\end{itemize}
+The initial vote distribution is the largest single driver of SR intensity.
+Fully unanimous starting configurations (4-0-0-0) produce $\bar\beta = 0.669$;
+the fully split case (1-1-1-1) drops to 0.290, a gap of 0.38 confidence
+points per round.
+Because these run counts pool repetitions within tasks, we confirm the effect
+at the task level: comparing each GPQA task's mean slope under fully unanimous
+(4-0-0-0) versus fully split (1-1-1-1) starts, where both occur
+(task-paired Wilcoxon, $n = 21$), gives a median difference of $+0.42$
+($p < 10^{-4}$). This driver is substantially larger than the topology or
+$W$ effect (at most 0.10).
+Runs inside fully static repetitions, where no agent ever flips, accumulate the
+highest slopes of any subgroup
+($\bar\beta = 0.698$, $p_{\mathrm{SR}} = 0.910$) and represent the extreme
+case where SR runs unchecked for the full debate.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/sr/fig6_subgroups.png}
-  \caption{Run-level slope distributions across five subgroup conditions.
+  \caption[Slope distributions across structural subgroups]{Run-level slope distributions across structural subgroups.
            Boxes: interquartile range; whiskers: $1.5 \times$ IQR;
-           outliers suppressed.  Right panel: initial vote distribution
-           (sorted agent-vote counts); Kruskal--Wallis $p$ shown.}
+           outliers suppressed.  Right panel: slope by initial vote
+           distribution (sorted agent-vote counts);
+           Kruskal--Wallis $p$ shown.}
   \label{fig:sr:subgroups}
 \end{figure}
 
-
-% ─────────────────────────────────────────────────────────────
-% [Mediation analysis -- existing text below]
-
-The subgroup analysis showed that more diverse initial vote configurations
+\paragraph{Mediation: diversity $\to$ SR $\to$ rounds.}
+The subgroup results show that more dispersed initial vote configurations
 are associated with both lower SR and more rounds.
-To test whether the diversity--rounds relationship runs \emph{through} SR,
-or whether diversity affects rounds independently of it, we conducted a
-Baron--Kenny mediation analysis~\citep{baron1986moderator} with a
-bootstrapped indirect effect.
+To test whether SR mediates this diversity--rounds relationship,
+we applied Baron--Kenny mediation~\citep{baron1986moderator} with a
+5\,000-draw \emph{task-stratified} percentile bootstrap (resampling whole
+tasks, so the interval respects the clustering of repetitions within a task).
+Variables were z-scored within each (dataset, topology, $W$) cell
+to partial out config-level means ($n = 20{,}997$ repetitions).
 
-\subparagraph{Variables.}
-\begin{itemize}
-  \item \textbf{Treatment $X$: initial diversity.}
-        Measured as the Herfindahl diversity index
-        $D = 1 - \sum_k p_k^2$, where $p_k$ is the fraction of agents
-        on option $k$ at round 0.
-        $D = 0$ for a unanimous start (4-0-0-0);
-        $D \approx 0.75$ for a fully split start (1-1-1-1).
-
-  \item \textbf{Mediator $M$: self-reinforcement.}
-        The repetition-level mean run slope $\bar\beta$.
-
-  \item \textbf{Outcome $Y$: number of rounds.}
-        Rounds to consensus or early stopping ($T_r$).
-\end{itemize}
-
-All three variables were z-scored \emph{within} each
-(dataset, topology, $W$) cell before regression, so that
-config-level mean differences are partialled out and only
-within-config variation is modelled.
-This is equivalent to including a full set of config fixed effects.
-The sample is all repetitions with a valid $\bar\beta$
-($n = 12{,}595$).
-
-\subparagraph{Results.}
-Table~\ref{tab:sr:mediation} reports the three Baron--Kenny steps.
-
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Baron--Kenny mediation steps for the path
-         diversity ($X$) $\to$ SR ($M$) $\to$ rounds ($Y$).
-         All coefficients are in standardised units (z-scores within config).
-         $n = 12{,}595$ repetitions.}
-\label{tab:sr:mediation}
+
 \small
 \begin{tabular}{clrr}
 \toprule
 Step & Path & $b$ (std.) & $p$ \\
 \midrule
-1 & $X \to Y$ (total effect)          &  $+0.344$ & $<0.001$ \\
-2 & $X \to M$                         &  $-0.377$ & $<0.001$ \\
-3 & $M \to Y \mid X$ (mediator)       &  $-0.575$ & $<0.001$ \\
-3 & $X \to Y \mid M$ (direct effect)  &  $+0.128$ & $<0.001$ \\
+1 & $X \to Y$ (total effect)          &  $+0.402$ & $<0.001$ \\
+2 & $X \to M$                         &  $-0.376$ & $<0.001$ \\
+3 & $M \to Y \mid X$                  &  $-0.542$ & $<0.001$ \\
+3 & $X \to Y \mid M$ (direct)         &  $+0.199$ & $<0.001$ \\
 \midrule
-  & Indirect effect $a \times b$      &  $+0.217$ & --- \\
-  & Bootstrap 95\,\% CI               & \multicolumn{2}{c}{$[0.205,\ 0.229]$} \\
-  & Proportion mediated               & \multicolumn{2}{c}{$63\,\%$} \\
+  & Indirect $a \times b$             &  $+0.204$ &, \\
+  & Task-clustered 95\,\% CI          & \multicolumn{2}{c}{$[0.160,\ 0.246]$} \\
+  & Proportion mediated               & \multicolumn{2}{c}{$51\,\%$} \\
 \bottomrule
 \end{tabular}
+\caption[Diversity-SR-rounds mediation analysis]{Baron--Kenny mediation: diversity ($X$) $\to$ SR ($M$)
+         $\to$ rounds ($Y$). Standardised coefficients (z-scores
+         within config). $n = 20{,}997$.}
+\label{tab:sr:mediation}
 \end{table}
 
-\begin{itemize}
-  \item \textbf{Total effect (Step 1).}
-        More diverse initial configurations lead to more rounds
-        ($b = +0.344$, $p < 0.001$). \checkmark
-
-  \item \textbf{Diversity suppresses SR (Step 2).}
-        More diverse starts produce lower $\bar\beta$
-        ($b = -0.377$, $p < 0.001$). \checkmark
-
-  \item \textbf{SR predicts rounds after controlling for diversity (Step 3).}
-        Lower $\bar\beta$ is associated with more rounds even when diversity
-        is held constant ($b = -0.575$, $p < 0.001$).
-        The direct effect of diversity on rounds is positive but substantially
-        reduced ($b = +0.128$), indicating partial mediation.
-
-  \item \textbf{Indirect effect.}
-        The bootstrapped indirect effect is $0.217$
-        (10{,}000 draws, percentile method),
-        with a 95\,\% confidence interval of $[0.205,\ 0.229]$
-        that excludes zero.
-        Approximately \textbf{63\,\%} of the total effect of diversity on
-        rounds is transmitted through SR.
-
-  \item \textbf{By dataset.}
-        The mediated proportion differs between datasets:
-        for HiddenBench the indirect path accounts for approximately 82\,\%
-        of the total effect (indirect $= 0.190$, direct $= 0.041$),
-        while for GPQA the split is closer to equal
-        (indirect $= 0.205$, direct $= 0.253$).
-        On HiddenBench, SR is nearly the entire explanation for why
-        diverse starts produce longer debates.
-\end{itemize}
-
-\textbf{Interpretation.}
-The diversity--rounds relationship is a \emph{partial mediation}:
-roughly two-thirds of the effect of initial vote dispersion on debate
-length runs through SR, with the remaining third being a direct path
-(diverse starts add rounds independently of confidence dynamics,
-likely through richer argument exchange leading to more vote flips).
-The chain is therefore supported: aiming for diverse initial configurations
-is a plausible way to induce slower convergence, and SR is the primary
-mechanism by which this operates.
-
-
-
-% ─────────────────────────────────────────────────────────────
-% [Impact on accuracy and efficiency -- existing text below]
+More diverse starts produce more rounds ($b = +0.402$, step 1) and
+suppress SR ($b = -0.376$, step 2).
+After controlling for diversity, SR strongly predicts fewer rounds
+($b = -0.542$, step 3).
+The indirect path (diversity reduces SR, which in turn increases rounds)
+accounts for approximately \textbf{51\,\%} of the total effect,
+with the remaining 49\,\% being a direct path from diversity to rounds
+(richer argument exchange, more vote flips).
+This pooled proportion slightly exceeds both dataset-specific values
+(GPQA: 44\,\%, HiddenBench: 48\,\%); the pooled estimate is not a within-dataset
+quantity but is computed on the pooled, config-standardised sample, so it can lie
+outside the range of the two strata when the $X$--$M$ and $M$--$Y$ associations
+differ between them. We read all three as indicating that SR is a major but not
+exclusive mediator of why diverse initial conditions produce longer debates.
+Two caveats attach to this analysis. First, we use the Baron--Kenny causal-steps
+decomposition~\citep{baron1986moderator} with a bootstrapped indirect effect;
+this is a regression decomposition under standard no-unmeasured-confounding
+assumptions, not a counterfactual mediation analysis, and the mechanical
+association between run length and the opportunity for a slope to accumulate
+(\autoref{sec:discussion:limitations}) means the causal ordering should be read
+cautiously. Second, the $n = 20{,}997$ repetitions (of $21{,}000$) exclude three
+runs for which the diversity or SR summary was undefined.
 
 \paragraph{Efficiency.}
-Figure~\ref{fig:sr:efficiency} shows task-level mean rounds to consensus
-plotted against mean $\bar\beta$.
-
-\begin{itemize}
-  \item The Spearman correlation between $\bar\beta$ and mean rounds is
-        negative in all 12 cells, ranging from $\rho = -0.69$ to $-0.77$
-        ($p < 10^{-10}$ throughout).
-  \item Higher SR is consistently associated with \emph{fewer} rounds.
-  \item The relationship holds regardless of dataset, topology, and memory
-        window: the three $W$-coloured point clouds overlap on the same
-        trend line in every panel.
-\end{itemize}
+\autoref{fig:sr:efficiency} shows task-level mean rounds plotted against
+mean $\bar\beta$ for all (dataset, topology) panels.
+The Spearman correlation between $\bar\beta$ and mean rounds to consensus is
+negative in all 12 cells; computed at the task level ($n = 35$ tasks per cell)
+it ranges from $\rho = -0.77$ to $-0.91$ ($p < 10^{-6}$ throughout).
+Higher SR is consistently associated with \emph{fewer} rounds across all
+configurations.
+This finding is the clearest and most consistent result in the SR analysis:
+\textbf{self-reinforcement is the convergence mechanism of the debate.}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\linewidth]{plots/sr/fig4_sr_efficiency.png}
-  \caption{Mean run slope $\bar\beta$ (x-axis) vs.\ mean rounds to consensus
-           (y-axis) at the task level.  Each point is one task; colours
-           denote memory window.  Dashed line: pooled OLS fit.
-           Spearman $\rho$ shown in each panel.}
+  \caption[Self-reinforcement slope versus rounds to consensus]{Mean run slope $\bar\beta$ vs.\ mean rounds to consensus at the
+           task level.  Each point is one task; colours denote memory window.
+           Dashed line: pooled OLS fit.
+           Spearman $\rho$ reported in each panel.}
   \label{fig:sr:efficiency}
 \end{figure}
 
 \paragraph{Accuracy.}
-Figure~\ref{fig:sr:accuracy} shows the same $\bar\beta$ axis against task
-accuracy.
+\autoref{fig:sr:accuracy} shows $\bar\beta$ against task accuracy.
+\emph{Marginally}, the point-biserial correlation between SR and correctness
+is near zero in all 12 cells: $r_{pb}$ ranges from $-0.007$ to $+0.052$
+at the repetition level, and none of the GPQA cells reach significance
+($p > 0.3$ in all six).
+
+The marginal flatness is, however, a consequence of conditioning on the full
+dataset, not a substantive null result.
+When repetitions are split by whether the ground-truth option appeared in the
+initial vote distribution, the picture reverses:
 
 \begin{itemize}
-  \item For \textbf{GPQA}, the Pearson correlation between $\bar\beta$ and
-        accuracy is positive across all four (topology, $W$) sub-cells,
-        with point-biserial $r_{pb} \approx 0.07$--$0.18$ at the repetition
-        level (significant for fc at all $W$; marginal for star).
-        A median split confirms: high-SR repetitions have 0.571 accuracy
-        vs.\ 0.434 for low-SR (fc), a gap of $+13.7$ percentage points.
+  \item \textbf{GT absent from initial votes} (31\,\% of GPQA reps,
+        53\,\% of HiddenBench reps): SR is \emph{negatively} associated with
+        accuracy ($r_{pb} = -0.11$ on GPQA, $-0.04$ on HiddenBench).
+        At the task level the GPQA effect survives (cluster-bootstrap $95\,\%$
+        CI $[-0.16, -0.06]$), whereas the HiddenBench effect does not
+        (CI $[-0.08, +0.01]$, which includes zero). When no agent starts on
+        the correct answer, faster lock-in means the system converges on a
+        wrong answer sooner.
 
-  \item For \textbf{HiddenBench}, the same correlation is near zero or
-        slightly negative across all cells ($r_{pb}$ ranges from $-0.033$
-        to $+0.032$; all $p > 0.28$).  The median split shows essentially
-        no difference (high-SR: 0.316 vs.\ low-SR: 0.311 for fc).
-
-  \item The accuracy--SR relationship is therefore \emph{dataset-dependent}:
-        mildly positive on GPQA, absent on HiddenBench.
+  \item \textbf{GT present in initial votes}: SR is \emph{positively}
+        associated with accuracy ($r_{pb} = +0.20$ on GPQA, $+0.18$ on
+        HiddenBench; both $p < 10^{-10}$).  When the correct answer is
+        already represented, stronger reinforcement amplifies the correct
+        initial position.
 \end{itemize}
+
+These two effects are of similar magnitude and opposite sign, cancelling in
+the marginal to produce the near-zero $r_{pb}$ observed across the full
+sample.
+The linear probability model confirms this: with the slope standardised, the
+interaction term (SR $\times$ GT presence) is $+0.11$ per standard deviation of
+$\beta$ for both datasets ($p < 10^{-37}$); in raw slope units the interaction
+is $+0.42$ (GPQA) and $+0.48$ (HiddenBench). We use the linear
+probability model here because the coefficient is directly interpretable as a
+change in the probability of a correct outcome, which is the quantity of interest;
+the same interaction can be estimated with a logistic link if a bounded-probability
+specification is preferred.
+
+A further analysis shows that high-SR repetitions amplify the initial vote
+distribution more strongly: the Pearson correlation between initial GT
+fraction and accuracy is $r = 0.86$ in the high-SR half versus $r = 0.54$
+in the low-SR half (GPQA; HiddenBench: $0.59$ vs.\ $0.42$).
+\textbf{SR does not select for correct answers; it amplifies the initial
+vote composition.}
+Whether this helps accuracy depends entirely on whether the initial
+distribution already favours the correct option, a point the high-repetition
+analysis also establishes independently
+(\autoref{sec:results:highrep}).
+
+Also notable: confidence gain is essentially independent of correctness.
+Mean confidence rise from round 0 to the final round is 1.66 points (correct)
+vs.\ 1.64 points (incorrect) on GPQA and 1.51 vs.\ 1.48 on HiddenBench.
+At the task level the correct-versus-incorrect difference is not significant
+on GPQA (paired Wilcoxon $p = 0.10$, with an unstable sign) and only marginal
+on HiddenBench ($p = 0.004$, magnitude $\approx 0.05$ points).
+The system grows more confident regardless of whether its final answer is
+right or wrong.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\linewidth]{plots/sr/fig5_sr_accuracy.png}
-  \caption{Mean run slope $\bar\beta$ vs.\ task accuracy (task level,
-           pooled $W$).  Dashed line: pooled OLS fit.
-           Pearson $r$ shown in each panel.}
+  \caption[Self-reinforcement slope versus task accuracy]{Mean run slope $\bar\beta$ vs.\ task accuracy at the task level
+           (pooled $W$).  Dashed line: pooled OLS fit.
+           Pearson $r$ shown in each panel.  The near-zero correlations
+           reflect a cancellation between opposite effects in the GT-present
+           and GT-absent subpopulations (see text).}
   \label{fig:sr:accuracy}
 \end{figure}
 
-% ─────────────────────────────────────────────────────────────
-% [Design guidelines -- fold into end of this subsection]
 
-The findings above support the following practical observations.
-These are descriptive summaries of the data and should not be taken as
-causal claims.
-
-\begin{itemize}
-  \item \textbf{SR is the convergence mechanism.}  The strong negative
-        correlation between SR and rounds ($\rho \approx -0.7$) holds
-        universally.  Systems that exhibit more SR finish faster.
-
-  \item \textbf{SR is not uniformly beneficial for accuracy.}
-        On GPQA it correlates positively with accuracy; on HiddenBench it
-        does not.  Whether SR helps depends on whether the initial vote
-        distribution is reliable.
-
-  \item \textbf{Initial vote distribution is the largest driver of SR.}
-        Unanimous starting configurations (4-0-0-0) yield $\bar\beta = 0.706$;
-        fully split configurations (1-1-1-1) yield 0.349.  The topology and
-        memory window together shift $\bar\beta$ by at most 0.05--0.17;
-        the initial distribution shifts it by up to 0.37.
-
-  \item \textbf{Topology is the most accessible lever.}
-        Switching from fc to star reduces $\bar\beta$ by roughly
-        0.04--0.08 per round and is significant at $W{=}1$ for both datasets.
-        This is the clearest within-data design choice.
-
-  \item \textbf{Memory window has a weak, consistent effect.}
-        Smaller $W$ is associated with slightly higher SR (opposite to the
-        strength-scaling prediction).  The effect is not statistically
-        significant in most cells and should be treated as suggestive only.
-
-  \item \textbf{To amplify SR} (prioritise speed, accept faster convergence):
-        use fc topology; use $W{=}1$.
-
-  \item \textbf{To attenuate SR} (prioritise deliberation):
-        use star topology; use larger $W$;
-        consider a minimum-round floor to prevent very early stopping
-        driven by never-flipping agents. Use a diverse starting position. However, more debate does not necessarily mean better accuracy.
-\end{itemize}
-
+% OLD LC SECTION (R=30 dataset, pre-anti-conformity prompt) -- BEGIN COMMENTED BLOCK
+% Preserved for reference: contains qualitative log analysis (social deference,
+% argument recycling, question structure) that documents the cycle mechanism.
+% The quantitative funnel numbers below apply to the old dataset only.
+%
+%\subsection{Limit Cycles}
+%\label{sec:results:lc:OLD}
+%\subsubsection{Detection Funnel and Topology Contrast}
+%\label{sec:results:lc:prevalence:OLD}
+%Limit cycles are the rarest motif in the dataset.
+%Table~\ref{tab:lc_funnel} shows the detection funnel across all sequences.
+%The cooperative debate design suppresses sustained oscillation to near-zero:
+%99.0\,\% of agent sequences and 97.6\,\% of system sequences converge to fixed
+%points and are excluded before any test is run.
+%Of the small fraction that fail to converge (candidates), only 2.8\,\% and
+%5.4\,\% carry a statistically significant periodic signature, yielding
+%\textbf{14 agent-level} and \textbf{16 system-level} limit cycles across the
+%entire dataset.
+% OLD LC SECTION -- END COMMENTED BLOCK (see full text below)
 
 \subsection{Limit Cycles}
 \label{sec:results:lc}
 
-\subsubsection{Detection Funnel and Topology Contrast}
-\label{sec:results:lc:prevalence}
 Limit cycles are the rarest motif in the dataset.
-Table~\ref{tab:lc_funnel} shows the detection funnel across all sequences.
-The cooperative debate design suppresses sustained oscillation to near-zero:
-99.0\,\% of agent sequences and 97.6\,\% of system sequences converge to fixed
-points and are excluded before any test is run.
-Of the small fraction that fail to converge (candidates), only 2.8\,\% and
-5.4\,\% carry a statistically significant periodic signature, yielding
-\textbf{14 agent-level} and \textbf{16 system-level} limit cycles across the
-entire dataset.
+The cooperative debate design strongly suppresses sustained oscillation:
+99.4\,\% of agent vote sequences and 98.6\,\% of system composition sequences
+converge to fixed points and are excluded before any test is run.
+\autoref{tab:lc:funnel} shows the full detection funnel.
+Of the small fraction that fail to converge (candidates), 6.3\,\% (agent)
+and 7.9\,\% (system) carry a statistically significant periodic signature,
+yielding \textbf{29 agent-level} and \textbf{23 system-level} limit cycles
+across the dataset.
+Both counts are well above the null floor. Assessed at the repetition level
+(the unit that is independent under the null, since star spokes driven by a
+common hub are not independent successes), the agent-level excess gives
+$p \approx 1.7 \times 10^{-7}$ (17 flagged repetitions spanning 15 tasks) and
+the system-level excess $p \approx 2 \times 10^{-16}$: the flagged cases are
+genuine periodic structure, not test artefacts.
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
+
 \small
 \begin{tabular}{lrrrcc}
 \toprule
-Level & Total & Fixed points ($k \geq 3$) & Candidates & Flagged LCs
-      & $p_{\mathrm{LC}}$ (cond.) \\
+Level & Total & Fixed points & Candidates & Flagged & $p_{\mathrm{LC}}$ (cond.) \\
 \midrule
-Agent-level  & 50{,}400 & 49{,}896~(99.0\,\%) &  500~(1.0\,\%) & 14 & 0.028 \\
-System-level & 12{,}600 & 12{,}301~(97.6\,\%) &  298~(2.4\,\%) & 16 & 0.054 \\
+Agent-level  & 84{,}000 & 83{,}529~(99.4\,\%) &  463~(0.6\,\%) & 29 & 0.063 \\
+System-level & 21{,}000 & 20{,}707~(98.6\,\%) &  291~(1.4\,\%) & 23 & 0.079 \\
 \bottomrule
 \end{tabular}
-\caption{Limit-cycle detection funnel. \emph{Fixed points}: trailing constant
-run $k \geq 3$, excluded from the test. \emph{Candidates}: non-converged
-sequences with $L \geq 4$. \emph{Flagged}: DET above the 95th percentile of
-1{,}000 shuffle surrogates and dominant period $2 \leq \hat{P} \leq
-\lfloor L/2 \rfloor$, $p < 0.05$. $p_{\mathrm{LC}}$ is the conditional
-prevalence among candidates.}
-\label{tab:lc_funnel}
+\caption[Limit-cycle detection funnel]{Limit-cycle detection funnel. \emph{Fixed points}: trailing constant
+         run $k \geq 3$, excluded from the test.
+         \emph{Candidates}: non-converged sequences with $L \geq 4$.
+         \emph{Flagged}: DET above the 95th percentile of 1{,}000 shuffle
+         surrogates and dominant period $2 \leq \hat{P} \leq \lfloor L/2 \rfloor$,
+         $p < 0.05$.
+         The fixed-point and candidate counts do not sum exactly to the total
+         because a small residue of sequences are non-converged yet too short to
+         test ($L < 4$): 8 at the agent level ($83{,}529 + 463 + 8 = 84{,}000$)
+         and 2 at the system level ($20{,}707 + 291 + 2 = 21{,}000$). These are
+         excluded as untestable.}
+\label{tab:lc:funnel}
 \end{table}
 
-Flagged cases concentrate strongly in HiddenBench (12 of 14 agent-level,
-15 of 16 system-level), consistent with that benchmark's greater ambiguity
-keeping agents uncertain for longer.
-Every single flagged case runs the full $T = 15$ rounds: limit cycles are a
-\textbf{pure efficiency failure} in which early stopping never triggers and
-the group never reaches unanimity.
+\paragraph{Topology.}
+The star topology dominates: 27 of 29 agent-level and 18 of 23 system-level
+flagged cases occur in star configurations.
+All 52 flagged cases (both topologies) were inspected under the same fixed
+criteria used in the oscillation taxonomy below, a case counts as a genuine
+period-2 oscillation only if it shows a clean alternation with $\hat{P} = 2$,
+$DET \geq 0.70$, and no dominant long hold, so the classification is not applied
+selectively to the fc cases. Under these criteria the 7 fc cases (2 agent + 5
+system) are all stable-revisit or near-convergent artefacts (large uniform blocks
+from vote persistence, no periodic diagonal stripes), whereas the majority of star
+cases pass.
+\textbf{Only the star topology produces genuine limit cycles}, the same
+conclusion as in the qualitative analysis of the mechanism described below.
 
-\paragraph{Fully-connected topology: no genuine oscillations.}
-Figure~\ref{fig:lc_rec_fc} shows the recurrence matrices for all flagged
-agent-level cases in the fully-connected topology.
-None display the equally-spaced diagonal stripe pattern that is the
-unambiguous signature of periodic recurrence.
-Instead, each matrix is dominated by a large block produced by a long stable
-run of the majority vote, with one or two isolated stray votes.
-The formally detected period (e.g.\ $\hat{P} = 8$) merely reflects the
-distance between those stray votes, not a genuine oscillation.
-We conclude that the fully-connected topology produces \textbf{no genuine limit
-cycles}: the flagged cases are artefacts of near-convergent trajectories whose
-trailing run is $k = 1$ or $k = 2$, just below the convergence threshold
-$u = 3$.
+\paragraph{Dataset.}
+Flagged cases concentrate in HiddenBench: 24 of 29 agent-level, 21 of 23
+system-level.
+GPQA contributes a notable cluster: 5 agent flags all arise from two questions
+(qid~90 and qid~98, both star/$W{=}2$).
+The qid~90 / rep~43 case is the clearest collective cycle in the new dataset:
+all four agents flag as genuine period-2 oscillation simultaneously
+(DET ranging from 0.86 to 1.00), indicating full group synchrony.
 
-\begin{figure}[h]
+\paragraph{Oscillation taxonomy.}
+Among the 29 flagged agent cases, 20 (69\,\%) are classified as genuine
+period-2 oscillations (alternating sequence with no dominant long hold,
+$DET \geq 0.70$, $\hat{P} = 2$).
+The remaining 9 are cases whose determinism falls below the $0.70$ threshold
+or that contain a dominant long hold (4), higher-period stable-revisit
+patterns (4), or a single period-8 artefact.
+At the system level, 7 of 23 cases are genuine period-2 oscillations.
+
+\autoref{fig:lc:timelines} shows vote-sequence timelines for the two
+most informative cases.
+The left panel (GPQA/star/$W{=}2$/q90/rep~43) is a \emph{collective cycle}:
+all four agents alternate between votes B and C in near-perfect synchrony
+for all 15 rounds.
+The right panel (HiddenBench/star/$W{=}5$/q20/rep~45) shows a hub-driven
+cycle: the group starts fragmented, the hub (agent~0) locks into an
+A$\leftrightarrow$C alternation by round~5, and three of the four agents
+follow in synchrony until the hard cap.
+
+\begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{plots/lc/lc_rec_fc.png}
-  \caption{Recurrence matrices for all agent-level flagged cases in the
-           fully-connected topology. The dominant structure in every matrix
-           is a large uniform block from vote persistence, not periodic
-           diagonal stripes. These are near-fixed-point artefacts.}
-  \label{fig:lc_rec_fc}
+  \includegraphics[width=\linewidth]{plots/lc/lc_timelines_new.png}
+  \caption[Vote-sequence timelines for two limit cycles]{Vote-sequence timelines for two representative limit cycles.
+           Each cell shows the vote (letter) held by an agent (row) at
+           a given round (column); colour encodes the option.
+           Left (a): collective cycle, all four agents alternate together
+           (GPQA / star / $W{=}2$; ground truth B).
+           Right (b): hub-driven cycle, agents split into an alternating
+           A$\leftrightarrow$C pattern from round~5 onward
+           (HiddenBench / star / $W{=}5$; ground truth A).
+           Neither repetition reaches consensus; both run to $T = 15$.}
+  \label{fig:lc:timelines}
 \end{figure}
 
-\paragraph{Star topology: genuine hub-driven oscillations.}
-Figure~\ref{fig:lc_rec_star} shows the recurrence matrices for the star-topology
-cases. In contrast to the fully-connected matrices, these display clean
-equally-spaced diagonal stripes with DET $\geq 0.98$ and shuffle $p$-values
-of 0.001, the unambiguous signature of a genuine periodic orbit.
+\autoref{fig:lc:rec} shows the recurrence matrices for two agents from
+each of these cases.
+All four matrices display the equally-spaced checkerboard diagonal stripe
+pattern that is the unambiguous signature of a period-2 orbit (DET 0.80--0.98,
+$\hat{P} = 2$).
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{plots/lc/lc_rec_star.png}
-  \caption{Recurrence matrices for agent-level genuine limit cycles in the
-           star topology. Top row (left to right): hub-driven cycle in GPQA
-           ($q{=}86$, hub sequence \texttt{BABABABABABABABA}, DET = 1.00);
-           hub ($q{=}40$, \texttt{ACACACACACACACAC}, DET = 1.00) and its
-           mirroring spoke (\texttt{CACACACACACACACA}, DET = 1.00).
-           Bottom row: all four agents of the collective cycle ($q{=}51$,
-           rep~23), where hub and all three spokes cycle in near-perfect
-           synchrony ($p = 0.001$ for each). Note the clean diagonal stripe
-           structure, which is absent in the fully-connected cases.}
-  \label{fig:lc_rec_star}
+  \includegraphics[width=\linewidth]{plots/lc/lc_rec_new.png}
+  \caption[Recurrence matrices for two limit cycles]{Recurrence matrices for two agents from each of the cases in
+           \autoref{fig:lc:timelines}.
+           The alternating checkerboard diagonal stripe pattern (spacing~2)
+           is the characteristic RQA signature of a period-2 orbit.
+           DET (determinism) and dominant period $\hat{P}$ are shown above
+           each matrix.}
+  \label{fig:lc:rec}
 \end{figure}
 
-Figure~\ref{fig:lc_timelines} shows the vote sequence timelines for the two
-most informative cases, allowing the reader to see directly who is flipping
-and when.
+\autoref{fig:lc:onset} shows the onset and mechanism for a third case
+(HiddenBench/star/$W{=}5$/q25/rep~25): the hub (agent~1) enters the cycle from
+round~2, the three spokes follow by round~4, and the group then alternates
+between A and C with DET = 1.00 for the spoke agents.
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{plots/lc/lc_timelines.png}
-  \caption{Vote sequence timelines for the two most informative star-topology
-           limit cycles. Each row corresponds to one agent; colour encodes
-           the vote held in that round. Left: the hub-driven case ($q{=}86$,
-           GPQA) in which the hub (agent~0) alternates perfectly and the
-           spokes follow. Right: the collective case ($q{=}51$, HiddenBench)
-           in which all four agents, including the hub (agent~3), are locked
-           into a synchronised two-option alternation for the entire debate.}
-  \label{fig:lc_timelines}
+  \includegraphics[width=\linewidth]{plots/lc/lc_onset_new.png}
+  \caption[Onset of a hub-driven limit cycle]{Onset and mechanism of a hub-driven limit cycle
+           (HiddenBench / star / $W{=}5$ / q25 / rep~25; ground truth B).
+           (a) Vote timeline: agent~1 (hub, out-degree~3) initiates the
+           B$\to$A$\to$C alternation; all three spokes lock in by round~4.
+           (b) Hub recurrence matrix (DET = 0.86): the onset transition is
+           visible as an irregular block in rounds~0--5, followed by a clean
+           checkerboard pattern.
+           (c) Spoke recurrence matrix (DET = 1.00, $\hat{P} = 2$): perfect
+           period-2 from round~2 onward, with no transient.}
+  \label{fig:lc:onset}
 \end{figure}
 
-Two structural patterns are present across all genuine star-topology cases.
+\paragraph{Cross-level co-occurrence.}
+Six repetitions are flagged simultaneously at both agent and system level;
+five are in HiddenBench/star and the sixth is the GPQA/star qid~90/rep~43
+collective cycle described above, in which all four agents oscillate in
+synchrony.
+This is consistent with the mechanism: when the hub drives a genuine period-2
+cycle, all spokes typically join within one or two rounds, producing a
+system-level flag as well as individual agent-level flags.
 
-\begin{enumerate}
-  \item \textbf{Hub-driven cycle} ($q{=}86$, GPQA; $q{=}40$, HiddenBench).
-        The hub (degree-3 node, connected to all spokes) alternates between
-        two votes every round and broadcasts this alternation to all spokes
-        simultaneously.
-        In $q{=}86$ the hub sequence is \texttt{BABABABABABABABA}
-        (DET = 1.00, $\hat{P} = 2$, $p = 0.001$); all three spokes follow
-        with minor noise (visible in the timeline).
-        The mechanism is a positive feedback loop: the hub aggregates
-        conflicting signals from three spokes each round, cannot commit,
-        flips, and then re-broadcasts that flip to all spokes, who in turn
-        flip back.
+\paragraph{Non-convergence as a task property.}
+Non-convergence rates differ by task: on GPQA no task exceeds 1.7\,\% of
+repetitions failing to converge; on HiddenBench three tasks exceed 5\,\%
+(qid~8: 8.0\,\%, qid~9: 5.7\,\%, qid~31: 5.3\,\%).
+Cross-config rank consistency of per-task non-convergence is moderate
+(HiddenBench cross-config Spearman mean $\rho = 0.18$, GPQA near zero),
+suggesting that non-convergence reflects task-level ambiguity more on
+HiddenBench than on GPQA.
 
-  \item \textbf{Collective synchronised cycle} ($q{=}51$, rep~23,
-        HiddenBench/star/$W{=}5$).
-        All four agents cycle in synchrony: hub (agent~3) sequence is
-        \texttt{CBABABABABABABAB}; all three spokes carry DET $\geq 0.82$
-        with the same $\hat{P} = 2$ ($p = 0.001$ for three of four agents).
-        This is the only repetition in the entire dataset where both an
-        agent-level and a system-level limit-cycle flag coincide.
-        The group composition oscillates between $(1, 3, 0, 0)$ and
-        $(3, 1, 0, 0)$ for twelve consecutive rounds: a one-versus-three
-        majority that flips every round and cannot be broken.
-\end{enumerate}
+\paragraph{Mechanism.}
+Inspection of the flagged cases suggests a consistent causal picture, which we
+state as a hypothesis rather than a certified mechanism.
+Every limit cycle runs to the hard round cap ($T = 15$): limit cycles are a
+pure efficiency failure in which early stopping never triggers.
+The proposed causal chain has five conditions that appear to interact:
+(1) unconditional
+social deference (agents abandon their own Phase~A argument in Phase~B
+upon observing a peer majority); (2) the hub's broadcast power in the star
+topology reconstructs the majority for the opposite option after each flip;
+(3) arguments neither escalate nor resolve the underlying evidence ambiguity
+across rounds; (4) the question provides two independently defensible evidence
+threads with no dominant refutation; (5) the hub begins in a minority or tie.
+When all five hold, each flip appears to recreate the conditions that caused it,
+producing a self-sustaining alternation.
+The absence of genuine limit cycles in fc is consistent with condition~(2):
+no single node aggregates all peer signals simultaneously in fc, so the
+hub-driven inversion loop cannot form.
+A full qualitative log analysis certifying this chain, of the kind we conducted
+on an earlier dataset, is left to future work; here the five conditions are
+offered as a reading of the flagged trajectories, not as a proven cause.
 
-In both patterns the hub is the critical node. This contrasts with converged
-star-topology repetitions, in which the hub typically has the fewest vote
-flips of any agent, settling first due to its aggregator role. On genuinely
-ambiguous questions the same aggregator role becomes a liability: the hub
-receives conflicting signals, becomes the most uncertain node, and its
-broadcast power then propagates that uncertainty to the entire group.
+\paragraph{Accuracy and design implications.}
+Because every LC repetition runs to the hard cap without reaching consensus,
+the group's final majority vote is a low-confidence artefact of wherever
+the oscillation happens to land on round~15.
+LC prevalence is too low for reliable inferential comparison, but the
+structural implication is clear: star topology is the only configuration in
+this system capable of producing genuine limit cycles, and a hard round cap
+is the only reliable stopping condition for those cases.
+Flagging repetitions that reach $T$ as unresolved, rather than returning a
+spurious majority, is the recommended system response.
 
-\paragraph{System-level perspective.}
-The 16 system-level flagged cases tell the same story at the composition level.
-The most informative case ($q{=}51$, system DET = 0.944, $p = 0.001$,
-$\hat{P} = 4$) is the collective cycle described above, in which the
-composition of votes alternates between two states for the majority of the
-debate.
-A second pattern present in several cases is a \emph{stable split}: the
-composition locks into a constant two-way division (e.g.\ $(2, 0, 2, 0)$
-for ten consecutive rounds) rather than oscillating. This is a distinct
-failure mode from periodic oscillation but is correctly detected by the RQA
-machinery because the repeated identical composition state produces diagonal
-structure in the recurrence matrix.
+% OLD LC QUANTITATIVE + MECHANISM SECTION (preserved, applies to R=30 dataset)
+%\begin{table}[h]
+%\centering
+%\small
+%\begin{tabular}{lrrrcc}
+%\toprule
+%Level & Total & Fixed points ($k \geq 3$) & Candidates & Flagged LCs
+%      & $p_{\mathrm{LC}}$ (cond.) \\
+%\midrule
+%Agent-level  & 50{,}400 & 49{,}896~(99.0\,\%) &  500~(1.0\,\%) & 14 & 0.028 \\
+%System-level & 12{,}600 & 12{,}301~(97.6\,\%) &  298~(2.4\,\%) & 16 & 0.054 \\
+%\bottomrule
+%\end{tabular}
+%\caption[Limit-cycle detection funnel (old dataset)]{Limit-cycle detection funnel. \emph{Fixed points}: trailing constant
+%run $k \geq 3$, excluded from the test. \emph{Candidates}: non-converged
+%sequences with $L \geq 4$. \emph{Flagged}: DET above the 95th percentile of
+%1{,}000 shuffle surrogates and dominant period $2 \leq \hat{P} \leq
+%\lfloor L/2 \rfloor$, $p < 0.05$. $p_{\mathrm{LC}}$ is the conditional
+%prevalence among candidates.}
+%\label{tab:lc_funnel}
+%\end{table}
+%
+%Flagged cases concentrate strongly in HiddenBench (12 of 14 agent-level,
+%15 of 16 system-level), consistent with that benchmark's greater ambiguity
+%keeping agents uncertain for longer.
+%Every single flagged case runs the full $T = 15$ rounds: limit cycles are a
+%\textbf{pure efficiency failure} in which early stopping never triggers and
+%the group never reaches unanimity.
+%
+%\paragraph{Fully-connected topology: no genuine oscillations.}
+%Figure~\ref{fig:lc_rec_fc} shows the recurrence matrices for all flagged
+%agent-level cases in the fully-connected topology.
+%None display the equally-spaced diagonal stripe pattern that is the
+%unambiguous signature of periodic recurrence.
+%Instead, each matrix is dominated by a large block produced by a long stable
+%run of the majority vote, with one or two isolated stray votes.
+%The formally detected period (e.g.\ $\hat{P} = 8$) merely reflects the
+%distance between those stray votes, not a genuine oscillation.
+%We conclude that the fully-connected topology produces \textbf{no genuine limit
+%cycles}: the flagged cases are artefacts of near-convergent trajectories whose
+%trailing run is $k = 1$ or $k = 2$, just below the convergence threshold
+%$u = 3$.
+%
+%\begin{figure}[h]
+%  \centering
+%  \includegraphics[width=\textwidth]{plots/lc/lc_rec_fc.png}
+%  \caption[Recurrence matrices for flagged fully-connected cases]{Recurrence matrices for all agent-level flagged cases in the
+%           fully-connected topology. The dominant structure in every matrix
+%           is a large uniform block from vote persistence, not periodic
+%           diagonal stripes. These are near-fixed-point artefacts.}
+%  \label{fig:lc_rec_fc}
+%\end{figure}
+%
+%\paragraph{Star topology: genuine hub-driven oscillations.}
+%Figure~\ref{fig:lc_rec_star} shows the recurrence matrices for the star-topology
+%cases. In contrast to the fully-connected matrices, these display clean
+%equally-spaced diagonal stripes with DET $\geq 0.98$ and shuffle $p$-values
+%of 0.001, the unambiguous signature of a genuine periodic orbit.
+%
+%\begin{figure}[h]
+%  \centering
+%  \includegraphics[width=\textwidth]{plots/lc/lc_rec_star.png}
+%  \caption[Recurrence matrices for star-topology limit cycles]{Recurrence matrices for agent-level genuine limit cycles in the
+%           star topology. Top row (left to right): hub-driven cycle in GPQA
+%           ($q{=}86$, hub sequence \texttt{BABABABABABABABA}, DET = 1.00);
+%           hub ($q{=}40$, \texttt{ACACACACACACACAC}, DET = 1.00) and its
+%           mirroring spoke (\texttt{CACACACACACACACA}, DET = 1.00).
+%           Bottom row: all four agents of the collective cycle ($q{=}51$,
+%           rep~23), where hub and all three spokes cycle in near-perfect
+%           synchrony ($p = 0.001$ for each). Note the clean diagonal stripe
+%           structure, which is absent in the fully-connected cases.}
+%  \label{fig:lc_rec_star}
+%\end{figure}
+%
+%Figure~\ref{fig:lc_timelines} shows the vote sequence timelines for the two
+%most informative cases, allowing the reader to see directly who is flipping
+%and when.
+%
+%\begin{figure}[h]
+%  \centering
+%  \includegraphics[width=\textwidth]{plots/lc/lc_timelines.png}
+%  \caption[Vote-sequence timelines for star-topology limit cycles]{Vote sequence timelines for the two most informative star-topology
+%           limit cycles. Each row corresponds to one agent; colour encodes
+%           the vote held in that round. Left: the hub-driven case ($q{=}86$,
+%           GPQA) in which the hub (agent~0) alternates perfectly and the
+%           spokes follow. Right: the collective case ($q{=}51$, HiddenBench)
+%           in which all four agents, including the hub (agent~3), are locked
+%           into a synchronised two-option alternation for the entire debate.}
+%  \label{fig:lc_timelines}
+%\end{figure}
+%
+%Two structural patterns are present across all genuine star-topology cases.
+%
+%\begin{enumerate}
+%  \item \textbf{Hub-driven cycle} ($q{=}86$, GPQA; $q{=}40$, HiddenBench).
+%        The hub (degree-3 node, connected to all spokes) alternates between
+%        two votes every round and broadcasts this alternation to all spokes
+%        simultaneously.
+%        In $q{=}86$ the hub sequence is \texttt{BABABABABABABABA}
+%        (DET = 1.00, $\hat{P} = 2$, $p = 0.001$); all three spokes follow
+%        with minor noise (visible in the timeline).
+%        The mechanism is a positive feedback loop: the hub aggregates
+%        conflicting signals from three spokes each round, cannot commit,
+%        flips, and then re-broadcasts that flip to all spokes, who in turn
+%        flip back.
+%
+%  \item \textbf{Collective synchronised cycle} ($q{=}51$, rep~23,
+%        HiddenBench/star/$W{=}5$).
+%        All four agents cycle in synchrony: hub (agent~3) sequence is
+%        \texttt{CBABABABABABABAB}; all three spokes carry DET $\geq 0.82$
+%        with the same $\hat{P} = 2$ ($p = 0.001$ for three of four agents).
+%        This is the only repetition in the entire dataset where both an
+%        agent-level and a system-level limit-cycle flag coincide.
+%        The group composition oscillates between $(1, 3, 0, 0)$ and
+%        $(3, 1, 0, 0)$ for twelve consecutive rounds: a one-versus-three
+%        majority that flips every round and cannot be broken.
+%\end{enumerate}
+%
+%In both patterns the hub is the critical node. This contrasts with converged
+%star-topology repetitions, in which the hub typically has the fewest vote
+%flips of any agent, settling first due to its aggregator role. On genuinely
+%ambiguous questions the same aggregator role becomes a liability: the hub
+%receives conflicting signals, becomes the most uncertain node, and its
+%broadcast power then propagates that uncertainty to the entire group.
+%
+%\paragraph{System-level perspective.}
+%The 16 system-level flagged cases tell the same story at the composition level.
+%The most informative case ($q{=}51$, system DET = 0.944, $p = 0.001$,
+%$\hat{P} = 4$) is the collective cycle described above, in which the
+%composition of votes alternates between two states for the majority of the
+%debate.
+%A second pattern present in several cases is a \emph{stable split}: the
+%composition locks into a constant two-way division (e.g.\ $(2, 0, 2, 0)$
+%for ten consecutive rounds) rather than oscillating. This is a distinct
+%failure mode from periodic oscillation but is correctly detected by the RQA
+%machinery because the repeated identical composition state produces diagonal
+%structure in the recurrence matrix.
+%
+%\paragraph{Accuracy.}
+%The effects of limit cycles on accuracy cannot be reliably reported.
+%The sample size is too small (14 and 16 cases) for any inferential comparison
+%across configurations, and the raw accuracy difference between flagged and
+%non-flagged repetitions (0.60 vs.\ 0.40 at the agent level) is a selection
+%artefact: limit cycles arise precisely when the group is genuinely split,
+%which is also when a correct-answer minority was present and resisting
+%throughout.
+%
+%\paragraph{System design implications.}
+%
+%\begin{itemize}
+%  \item \textbf{Topology is a relevant design axis for worst-case efficiency.}
+%        Star topology can produce genuine limit cycles; fully-connected topology
+%        cannot, at least in this dataset. Because every limit cycle runs to the
+%        hard round cap, topology choice directly determines whether the system
+%        has a bounded worst-case runtime. This effect is rare but
+%        structurally guaranteed when it occurs, not random noise.
+%
+%  \item \textbf{A hard round cap is a necessary stopping condition.}
+%        Without it, star-topology debates on genuinely ambiguous questions
+%        have no self-termination mechanism. Reaching $T$ should be treated
+%        as a detectable failure signal and handled explicitly by the
+%        system (e.g.\ by flagging the output as unresolved rather than
+%        reporting a potentially spurious majority vote).
+%
+%  \item \textbf{The memory window $W$ is not a relevant design axis for limit
+%        cycles.}
+%        No effect of $W$ is observed across $W \in \{1, 2, 5\}$.
+%        However, the total number of flagged cases is too small to draw
+%        firm conclusions; future work with larger datasets and a wider range
+%        of $W$ should revisit this.
+%\end{itemize}
+%
+%
+%\subsubsection{Mechanism: Log Analysis}
+%\label{sec:results:lc:mechanism}
+%
+%\paragraph{Why limit cycles occur: evidence from log analysis.}
+%
+%To understand the causal structure behind the flagged star-topology cases, we
+%extracted and analysed the full Phase~A and Phase~B text logs of all 14
+%flagged agent-level trajectories (129 flip events total), comparing flip
+%events against stable rounds and against non-flagged control repetitions on
+%the same questions.
+%
+%\begin{itemize}
+%
+%  \item \textbf{Social deference.}
+%        For each flip event, we searched the agent's Phase~B reasoning for
+%        deference language (\emph{"after reviewing"}, \emph{"I am updating
+%        my vote"}, \emph{"strong defenses presented by"}) and self-conviction
+%        language (\emph{"I independently concluded"}, \emph{"my own
+%        analysis"}, \emph{"I realized"}).
+%        Deference phrases appear in 64\,\% of all 129 flip events;
+%        self-conviction phrases appear in 2\,\%.
+%        The key observation is that in every recorded flip, the agent's own
+%        Phase~A defense in the \emph{same} round argued for the position it
+%        then abandoned in Phase~B.
+%        In qid\,=\,86 (GPQA, round~1), agent~0 writes in Phase~A:
+%        \emph{"Option~B presents a 1H~NMR spectrum with chemical shifts
+%        consistent with a para-substituted benzene ring and a methyl group
+%        attached to a carbonyl"}\ --- then immediately writes in Phase~B of
+%        the same round:
+%        \emph{"After reviewing the Phase~A drafts, I'm reconsidering my vote.
+%        Agent2 and Agent4 have raised valid points about Option~A.
+%        The peak at 9.9\,ppm in Option~A is indeed characteristic of an
+%        aldehyde proton"} and switches to A.
+%        The same structure repeats at every subsequent flip across all 15
+%        rounds of that repetition.
+%        \textbf{The agent's own argument has no observable causal weight on
+%        the flip decision.}
+%
+%  \item \textbf{Peer consensus at flip time.}
+%        For each flip event we recorded the fraction of peers holding the
+%        new vote at round $t{-}1$.
+%        In period-2 cases 35\,\% of flips are preceded by unanimous peer
+%        consensus (3/3 peers on the new vote); 65\,\% by a 2/3 majority.
+%        The self-sustaining mechanism is visible in the round-by-round
+%        vote matrix of qid\,=\,86:
+%
+%        \smallskip
+%        \begin{center}
+%        \small
+%        \begin{tabular}{ccccc}
+%        \toprule
+%        Round & Hub (a0) & Spoke (a1) & Spoke (a2) & Spoke (a3) \\
+%        \midrule
+%        0 & B & B & A & A \\
+%        1 & \textbf{A} & B & A & A \\
+%        2 & \textbf{B} & A & A & A \\
+%        3 & \textbf{A} & B & B & B \\
+%        4 & \textbf{B} & A & A & A \\
+%        $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
+%        \bottomrule
+%        \end{tabular}
+%        \end{center}
+%        \smallskip
+%
+%        At round~1 the hub (agent~0, out-degree~3) sees 2/3 peers on~A,
+%        flips to~A. It now broadcasts an A-defending Phase~A to all three
+%        spokes. The spokes, who were on~A, read the hub's challenge and flip
+%        to~B at round~2, restoring 3/3 pressure on~B for the hub. The hub
+%        then flips back to~B at round~3, and so on.
+%        In qid\,=\,51 (HiddenBench, hub agent~3) the pattern is even
+%        cleaner: from round~3 onward the hub receives 3/3 unanimous pressure
+%        at every step and the cycle runs without noise for twelve consecutive
+%        rounds.
+%        \textbf{Each flip recreates the conditions that caused it.}
+%
+%  \item \textbf{Argument recycling.}
+%        We computed SequenceMatcher similarity between all pairs of Phase~A
+%        defenses an agent produced for the same option across non-consecutive
+%        rounds.
+%        For qid\,=\,86 the agent defends option~B at rounds~1,\,3,\,5,\,7,\,9,\,11
+%        and option~A at rounds~2,\,4,\,6,\,8,\,10,\,12,\,14.
+%        The B-defense at round~1 reads:
+%        \emph{"Option~B presents a 1H~NMR spectrum with chemical shifts
+%        consistent with a para-substituted benzene ring and a methyl group
+%        attached to a carbonyl. The chemical shifts at 7.8\,ppm and
+%        7.6\,ppm\ldots"}
+%        The B-defense at round~3 is word-for-word identical for the first
+%        220 characters (similarity\,=\,0.85 averaged over all B-defense pairs).
+%        The A-defenses are similarly repetitive (similarity\,=\,0.85):
+%        \emph{"Option~A's peak at 9.9\,ppm is highly indicative of an
+%        aldehyde proton, strongly aligning with the carbonyl group indicated
+%        by the FTIR spectrum. The peaks at 7.8 and 7.6\,ppm suggest aromatic
+%        protons\ldots"} appears with minor wording variation at rounds
+%        4,\,6,\,8,\,10,\,12,\,14.
+%        Neither side ever introduces a new piece of evidence, a
+%        numerical comparison, or an argument the other side has not already
+%        countered.
+%        The same pattern holds in qid\,=\,117 (GPQA, agent~2 defending
+%        option~D across ten rounds, mean similarity\,=\,0.92).
+%        \textbf{Arguments do not accumulate or escalate across rounds:
+%        the debate is effectively stateless with respect to argument quality.}
+%
+%  \item \textbf{Question structure.}
+%        All genuine LC cases involve questions where exactly two options are
+%        each supported by a distinct, independently defensible evidence
+%        thread with no formal contradiction between them.
+%        In qid\,=\,86 the competing options are:
+%
+%        \smallskip
+%        \begin{center}
+%        \small
+%        \begin{tabular}{ll}
+%        \toprule
+%        Option & 1H NMR peaks \\
+%        \midrule
+%        A & 9.9\,(1H,\,s),\ 7.8\,(2H,\,d),\ 7.6\,(2H,\,d),\ 3.7\,(2H,\,s) \\
+%        B & 7.8\,(2H,\,d),\ 7.6\,(2H,\,d),\ 2.3\,(3H,\,s) \\
+%        \bottomrule
+%        \end{tabular}
+%        \end{center}
+%        \smallskip
+%
+%        Option~A anchors on the 9.9\,ppm aldehyde peak as evidence for a
+%        carbonyl group; option~B anchors on the 2.3\,ppm singlet as evidence
+%        for a methyl-carbonyl.
+%        Both interpretations are chemically valid and neither refutes the
+%        other, so the argument can cycle indefinitely.
+%        In qid\,=\,51 (HiddenBench) the cycling pair is Green Valley
+%        Outpost~(A) vs.\ Red Cliff Lodge~(B): one defended on the grounds of
+%        southerly location reducing wind exposure, the other on solid stone
+%        construction; both are independently valid survival heuristics.
+%        In qid\,=\,40 the pair is Mars Colony~(A) vs.\ Orion Station~(C):
+%        one defended via confirmed shielding, the other via proximity
+%        (2--3\,hour travel vs.\ 3\,hours).
+%        The symmetry is quantified by round-0 vote distributions: in
+%        qid\,=\,40 the two cycling options start at 35\,\% and 37\,\% across
+%        all 30 repetitions; in qid\,=\,86 the minority cycling option
+%        captures 23\,\% of round-0 votes.
+%        \textbf{Limit cycles only arise when the question provides no
+%        argument that dominates across all agents simultaneously.}
+%
+%  \item \textbf{Initial vote assignment.}
+%        In every LC case the cycling agent begins in a minority or tie,
+%        creating adversarial pressure from round~0.
+%        The causal role of the initial draw is directly confirmed for
+%        qid\,=\,86 by comparing the three representative repetitions:
+%
+%        \smallskip
+%        \begin{center}
+%        \small
+%        \begin{tabular}{cccccc}
+%        \toprule
+%        Rep & Hub (out-deg\,3) & Spoke a1 & Spoke a2 & Spoke a3
+%            & Outcome \\
+%        \midrule
+%        0  & A & A & A & B & converges r4 \\
+%        1  & B & A & B & A$^\dagger$ & converges r7 \\
+%        11 & B & B & A & A & \textbf{limit cycle} \\
+%        \bottomrule
+%        \end{tabular}
+%        \end{center}
+%        \footnotesize{$^\dagger$ hub in rep~1 is agent~3 (out-degree~3).}
+%        \smallskip
+%
+%        \normalsize
+%        In rep~0 the hub starts on the majority option~A and immediately
+%        reinforces convergence.
+%        In rep~1 the hub starts on~B but is paired with a 3:1 majority for~A,
+%        collapsing within two rounds.
+%        In rep~11 the hub starts on~B while the three spokes are split 2A:2B,
+%        creating the symmetric adversarial pressure that initiates and sustains
+%        the oscillation.
+%        The question, model, temperature, and system prompt are identical
+%        across all 30 repetitions of qid\,=\,86.
+%        \textbf{The differentiating factor between an LC repetition and a
+%        converging repetition on the same question is the random initial
+%        vote draw, not argument quality.}
+%
+%\end{itemize}
+%
+%The five conditions interact as follows.
+%Conditions~1--2 produce the cycle structure: unconditional deference to the
+%perceived majority means that every flip immediately reconstructs the
+%majority for the opposite option.
+%Conditions~3--4 prevent the cycle from being broken: because arguments
+%neither escalate nor resolve the underlying evidence ambiguity, no single
+%round produces a decisive intervention.
+%Condition~5 determines which repetition out of 30 on the same question
+%enters the attractor: the cycle can only start if the hub begins with a
+%split or isolated initial vote.
+%The absence of genuine limit cycles in the fully-connected topology follows
+%from conditions~1--2: in a fully-connected graph no single node aggregates
+%all peer signals simultaneously, so the hub-driven inversion loop cannot
+%form.
+% END OLD LC SECTION
 
-\paragraph{Accuracy.}
-The effects of limit cycles on accuracy cannot be reliably reported.
-The sample size is too small (14 and 16 cases) for any inferential comparison
-across configurations, and the raw accuracy difference between flagged and
-non-flagged repetitions (0.60 vs.\ 0.40 at the agent level) is a selection
-artefact: limit cycles arise precisely when the group is genuinely split,
-which is also when a correct-answer minority was present and resisting
-throughout.
 
-\paragraph{System design implications.}
-
-\begin{itemize}
-  \item \textbf{Topology is a relevant design axis for worst-case efficiency.}
-        Star topology can produce genuine limit cycles; fully-connected topology
-        cannot, at least in this dataset. Because every limit cycle runs to the
-        hard round cap, topology choice directly determines whether the system
-        has a bounded worst-case runtime. This effect is rare but
-        structurally guaranteed when it occurs, not random noise.
-
-  \item \textbf{A hard round cap is a necessary stopping condition.}
-        Without it, star-topology debates on genuinely ambiguous questions
-        have no self-termination mechanism. Reaching $T$ should be treated
-        as a detectable failure signal and handled explicitly by the
-        system (e.g.\ by flagging the output as unresolved rather than
-        reporting a potentially spurious majority vote).
-
-  \item \textbf{The memory window $W$ is not a relevant design axis for limit
-        cycles.}
-        No effect of $W$ is observed across $W \in \{1, 2, 5\}$.
-        However, the total number of flagged cases is too small to draw
-        firm conclusions; future work with larger datasets and a wider range
-        of $W$ should revisit this.
-\end{itemize}
-
-
-\subsubsection{Mechanism: Log Analysis}
-\label{sec:results:lc:mechanism}
-
-\paragraph{Why limit cycles occur: evidence from log analysis.}
-
-To understand the causal structure behind the flagged star-topology cases, we
-extracted and analysed the full Phase~A and Phase~B text logs of all 14
-flagged agent-level trajectories (129 flip events total), comparing flip
-events against stable rounds and against non-flagged control repetitions on
-the same questions.
-
-\begin{itemize}
-
-  \item \textbf{Social deference.}
-        For each flip event, we searched the agent's Phase~B reasoning for
-        deference language (\emph{"after reviewing"}, \emph{"I am updating
-        my vote"}, \emph{"strong defenses presented by"}) and self-conviction
-        language (\emph{"I independently concluded"}, \emph{"my own
-        analysis"}, \emph{"I realized"}).
-        Deference phrases appear in 64\,\% of all 129 flip events;
-        self-conviction phrases appear in 2\,\%.
-        The key observation is that in every recorded flip, the agent's own
-        Phase~A defense in the \emph{same} round argued for the position it
-        then abandoned in Phase~B.
-        In qid\,=\,86 (GPQA, round~1), agent~0 writes in Phase~A:
-        \emph{"Option~B presents a 1H~NMR spectrum with chemical shifts
-        consistent with a para-substituted benzene ring and a methyl group
-        attached to a carbonyl"}\ --- then immediately writes in Phase~B of
-        the same round:
-        \emph{"After reviewing the Phase~A drafts, I'm reconsidering my vote.
-        Agent2 and Agent4 have raised valid points about Option~A.
-        The peak at 9.9\,ppm in Option~A is indeed characteristic of an
-        aldehyde proton"} and switches to A.
-        The same structure repeats at every subsequent flip across all 15
-        rounds of that repetition.
-        \textbf{The agent's own argument has no observable causal weight on
-        the flip decision.}
-
-  \item \textbf{Peer consensus at flip time.}
-        For each flip event we recorded the fraction of peers holding the
-        new vote at round $t{-}1$.
-        In period-2 cases 35\,\% of flips are preceded by unanimous peer
-        consensus (3/3 peers on the new vote); 65\,\% by a 2/3 majority.
-        The self-sustaining mechanism is visible in the round-by-round
-        vote matrix of qid\,=\,86:
-
-        \smallskip
-        \begin{center}
-        \small
-        \begin{tabular}{ccccc}
-        \toprule
-        Round & Hub (a0) & Spoke (a1) & Spoke (a2) & Spoke (a3) \\
-        \midrule
-        0 & B & B & A & A \\
-        1 & \textbf{A} & B & A & A \\
-        2 & \textbf{B} & A & A & A \\
-        3 & \textbf{A} & B & B & B \\
-        4 & \textbf{B} & A & A & A \\
-        $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
-        \bottomrule
-        \end{tabular}
-        \end{center}
-        \smallskip
-
-        At round~1 the hub (agent~0, out-degree~3) sees 2/3 peers on~A,
-        flips to~A. It now broadcasts an A-defending Phase~A to all three
-        spokes. The spokes, who were on~A, read the hub's challenge and flip
-        to~B at round~2, restoring 3/3 pressure on~B for the hub. The hub
-        then flips back to~B at round~3, and so on.
-        In qid\,=\,51 (HiddenBench, hub agent~3) the pattern is even
-        cleaner: from round~3 onward the hub receives 3/3 unanimous pressure
-        at every step and the cycle runs without noise for twelve consecutive
-        rounds.
-        \textbf{Each flip recreates the conditions that caused it.}
-
-  \item \textbf{Argument recycling.}
-        We computed SequenceMatcher similarity between all pairs of Phase~A
-        defenses an agent produced for the same option across non-consecutive
-        rounds.
-        For qid\,=\,86 the agent defends option~B at rounds~1,\,3,\,5,\,7,\,9,\,11
-        and option~A at rounds~2,\,4,\,6,\,8,\,10,\,12,\,14.
-        The B-defense at round~1 reads:
-        \emph{"Option~B presents a 1H~NMR spectrum with chemical shifts
-        consistent with a para-substituted benzene ring and a methyl group
-        attached to a carbonyl. The chemical shifts at 7.8\,ppm and
-        7.6\,ppm\ldots"}
-        The B-defense at round~3 is word-for-word identical for the first
-        220 characters (similarity\,=\,0.85 averaged over all B-defense pairs).
-        The A-defenses are similarly repetitive (similarity\,=\,0.85):
-        \emph{"Option~A's peak at 9.9\,ppm is highly indicative of an
-        aldehyde proton, strongly aligning with the carbonyl group indicated
-        by the FTIR spectrum. The peaks at 7.8 and 7.6\,ppm suggest aromatic
-        protons\ldots"} appears with minor wording variation at rounds
-        4,\,6,\,8,\,10,\,12,\,14.
-        Neither side ever introduces a new piece of evidence, a
-        numerical comparison, or an argument the other side has not already
-        countered.
-        The same pattern holds in qid\,=\,117 (GPQA, agent~2 defending
-        option~D across ten rounds, mean similarity\,=\,0.92).
-        \textbf{Arguments do not accumulate or escalate across rounds:
-        the debate is effectively stateless with respect to argument quality.}
-
-  \item \textbf{Question structure.}
-        All genuine LC cases involve questions where exactly two options are
-        each supported by a distinct, independently defensible evidence
-        thread with no formal contradiction between them.
-        In qid\,=\,86 the competing options are:
-
-        \smallskip
-        \begin{center}
-        \small
-        \begin{tabular}{ll}
-        \toprule
-        Option & 1H NMR peaks \\
-        \midrule
-        A & 9.9\,(1H,\,s),\ 7.8\,(2H,\,d),\ 7.6\,(2H,\,d),\ 3.7\,(2H,\,s) \\
-        B & 7.8\,(2H,\,d),\ 7.6\,(2H,\,d),\ 2.3\,(3H,\,s) \\
-        \bottomrule
-        \end{tabular}
-        \end{center}
-        \smallskip
-
-        Option~A anchors on the 9.9\,ppm aldehyde peak as evidence for a
-        carbonyl group; option~B anchors on the 2.3\,ppm singlet as evidence
-        for a methyl-carbonyl.
-        Both interpretations are chemically valid and neither refutes the
-        other, so the argument can cycle indefinitely.
-        In qid\,=\,51 (HiddenBench) the cycling pair is Green Valley
-        Outpost~(A) vs.\ Red Cliff Lodge~(B): one defended on the grounds of
-        southerly location reducing wind exposure, the other on solid stone
-        construction; both are independently valid survival heuristics.
-        In qid\,=\,40 the pair is Mars Colony~(A) vs.\ Orion Station~(C):
-        one defended via confirmed shielding, the other via proximity
-        (2--3\,hour travel vs.\ 3\,hours).
-        The symmetry is quantified by round-0 vote distributions: in
-        qid\,=\,40 the two cycling options start at 35\,\% and 37\,\% across
-        all 30 repetitions; in qid\,=\,86 the minority cycling option
-        captures 23\,\% of round-0 votes.
-        \textbf{Limit cycles only arise when the question provides no
-        argument that dominates across all agents simultaneously.}
-
-  \item \textbf{Initial vote assignment.}
-        In every LC case the cycling agent begins in a minority or tie,
-        creating adversarial pressure from round~0.
-        The causal role of the initial draw is directly confirmed for
-        qid\,=\,86 by comparing the three representative repetitions:
-
-        \smallskip
-        \begin{center}
-        \small
-        \begin{tabular}{cccccc}
-        \toprule
-        Rep & Hub (out-deg\,3) & Spoke a1 & Spoke a2 & Spoke a3
-            & Outcome \\
-        \midrule
-        0  & A & A & A & B & converges r4 \\
-        1  & B & A & B & A$^\dagger$ & converges r7 \\
-        11 & B & B & A & A & \textbf{limit cycle} \\
-        \bottomrule
-        \end{tabular}
-        \end{center}
-        \footnotesize{$^\dagger$ hub in rep~1 is agent~3 (out-degree~3).}
-        \smallskip
-
-        \normalsize
-        In rep~0 the hub starts on the majority option~A and immediately
-        reinforces convergence.
-        In rep~1 the hub starts on~B but is paired with a 3:1 majority for~A,
-        collapsing within two rounds.
-        In rep~11 the hub starts on~B while the three spokes are split 2A:2B,
-        creating the symmetric adversarial pressure that initiates and sustains
-        the oscillation.
-        The question, model, temperature, and system prompt are identical
-        across all 30 repetitions of qid\,=\,86.
-        \textbf{The differentiating factor between an LC repetition and a
-        converging repetition on the same question is the random initial
-        vote draw, not argument quality.}
-
-\end{itemize}
-
-The five conditions interact as follows.
-Conditions~1--2 produce the cycle structure: unconditional deference to the
-perceived majority means that every flip immediately reconstructs the
-majority for the opposite option.
-Conditions~3--4 prevent the cycle from being broken: because arguments
-neither escalate nor resolve the underlying evidence ambiguity, no single
-round produces a decisive intervention.
-Condition~5 determines which repetition out of 30 on the same question
-enters the attractor: the cycle can only start if the hub begins with a
-split or isolated initial vote.
-The absence of genuine limit cycles in the fully-connected topology follows
-from conditions~1--2: in a fully-connected graph no single node aggregates
-all peer signals simultaneously, so the hub-driven inversion loop cannot
-form.
-
-
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
 \subsection{Bistability}
 \label{sec:results:bistability}
 
-\subsubsection{Attractor Coexistence and Basin Selection}
-\label{sec:results:bistability:coexistence}
+Bistability is measured per (task, config) cell using two complementary
+signatures: $N_{\mathrm{eff}}$ (inverse Simpson diversity over endpoint
+attractors, measuring coexistence) and Cramér's $V$ with a permutation
+$p$-value (measuring whether the initial-vote distribution selects the
+attractor, i.e.\ basin sensitivity).
+A repetition is eligible if it settles (trailing-constant $k \geq 3$) on a
+unanimous endpoint; non-unanimous-split endings are excluded
+(2.12\,\% of reps).
+Cells are labelled \emph{monostable} ($N_{\mathrm{eff}} < 1.5$),
+\emph{multistable} ($N_{\mathrm{eff}} \geq 1.5$ and $p_{\mathrm{basin}} < 0.05$),
+or \emph{stochastic} ($N_{\mathrm{eff}} \geq 1.5$ but $p_{\mathrm{basin}} \geq 0.05$).
 
-% [TO WRITE]
-% Key quantities to report (all from NB 020):
-%   - Accounting funnel: settled / converged-unanimous / excluded reps
-%   - N_eff distribution across cells; median close to 1 (monostable
-%     domination); fraction of cells with N_eff >= 1.5
-%   - Label breakdown: monostable / multistable / stochastic counts
-%   - Cramér's V and permutation-p for basin selection
-%   - Dominant attractor = correct option: fraction by dataset
-%   - Energy landscape figure for representative multistable cell
-% Note: N_eff > M bug (split attractors counted separately) means a
-% small number of cells have inflated N_eff; flag in text or footnote.
-% HiddenBench: report M=3 and M=4 cells separately (do not pool).
+\paragraph{Convergence accounting.}
+Of 21\,000 repetitions, 98.6\,\% settle within the hard round cap and
+96.5\,\% converge to a unanimous attractor.
+No cell has fewer than two converged repetitions, so all 420 cells are
+classified.
+
+\paragraph{Prevalence.}
+\autoref{tab:bistab:overview} summarises the label distribution.
+Of the 420 cells, 90 (21.4\,\%) are monostable, 176 (41.9\,\%) are
+multistable, and 154 (36.7\,\%) are stochastic.
+\autoref{fig:bistab:violin} shows the $N_{\mathrm{eff}}$ and $V$
+distributions stratified by option count $M$.
+$N_{\mathrm{eff}} > 1.5$ in 330 of 420 cells (78.6\,\%);
+the overall mean is 2.06 (median 2.01).
+
+\begin{table}[H]
+\centering
+
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset & Monostable & Multistable & Stochastic &
+  $N_{\mathrm{eff}}$ mean & $V$ mean & Dom.\ correct \\
+\midrule
+GPQA ($M=4$)          & 72 & 102 & 36 & 1.91 & 0.46 & 47.1\,\% \\
+HiddenBench ($M \in \{3,4\}$) & 18 &  74 & 118 & 2.20 & 0.35 & 23.8\,\% \\
+\bottomrule
+\end{tabular}
+\caption[Bistability label distribution by dataset]{Bistability label distribution across all 420 (task, config) cells
+         ($N_{\mathrm{tasks}} = 35$, $R = 50$).
+         The label counts pool all tasks per benchmark; HiddenBench mixes $31$
+         three-option and $4$ four-option tasks. The $N_{\mathrm{eff}}$ column is
+         a within-benchmark mean and should be read against the per-$M$ strata in
+         \autoref{fig:bistab:violin}, since $N_{\mathrm{eff}}$ is bounded by
+         $M$ and is not directly comparable across option counts.}
+\label{tab:bistab:overview}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{plots/bistab/fig1_neff_v_violin.png}
+  \caption[Effective attractors and Cramér's V per stratum]{$N_{\mathrm{eff}}$ (left) and Cramér's $V$ (right) per stratum.
+           Each point is one (task, config) cell, coloured by label
+           (blue = monostable, red = multistable, orange = stochastic).
+           Dashed line: $N_{\mathrm{eff}} = 1.5$ threshold.}
+  \label{fig:bistab:violin}
+\end{figure}
+
+The stochastic class deserves comment: every one of the 154 stochastic cells
+has $N_{\mathrm{eff}} \geq 1.5$ (mean 2.31).
+Stochastic cells are \emph{not} monostable, they exhibit genuine
+multi-attractor coexistence at roughly the same $N_{\mathrm{eff}}$ level as
+multistable cells (mean 2.27), but the final attractor does not depend
+deterministically on the initial-vote composition.
+The distinction between multistable and stochastic is therefore about
+\emph{basin sensitivity}, not about the number of attractors.
+
+\paragraph{Configuration effects.}
+\autoref{fig:bistab:heatmaps} shows mean $N_{\mathrm{eff}}$ and $V$
+across all 12 (dataset, topology, $W$) configurations.
+Neither topology (fc vs.\ star) nor memory window $W$ produces a significant
+or consistent effect on either metric. Testing at the task level (unit $=$
+task, $n = 35$), all 12 topology comparisons (per dataset $\times$ $W$, for
+each metric) have paired differences whose $95\,\%$ confidence intervals contain
+zero (smallest Mann--Whitney $p = 0.16$; none survive Benjamini--Hochberg
+correction), and the memory-$W$ effect is non-significant in all eight
+(dataset, topology) strata (effect sizes near zero, none surviving
+correction). We report this as an absence of evidence for a structural effect
+rather than as proof of strict equivalence.
+\textbf{Bistability is, to the precision we can measure, topology- and
+memory-invariant in this system.}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{plots/bistab/fig4_config_heatmaps.png}
+  \caption[Bistability metrics across configurations]{Mean $N_{\mathrm{eff}}$ (left) and Cramér's $V$ (right) across
+           all 12 configurations.  The absence of a consistent gradient in
+           either direction confirms that topology and memory window do not
+           drive bistability.}
+  \label{fig:bistab:heatmaps}
+\end{figure}
+
+\paragraph{Task-level consistency.}
+The question of whether bistability is a property of the task or a config
+artefact is answered by the pairwise Spearman correlation of per-task
+$N_{\mathrm{eff}}$ across the six configurations.
+For GPQA the mean pairwise $\rho = 0.913$ (min 0.869, max 0.941);
+for HiddenBench $\rho = 0.782$ (min 0.597, max 0.880).
+Of the 35 GPQA tasks, 17 are labelled multistable in $\geq 4$ of the 6
+configs, and 9 HiddenBench tasks meet this criterion.
+\textbf{Bistability is a stable property of specific tasks, not a config
+artefact.}
+
+\paragraph{Accuracy.}
+\autoref{fig:bistab:accuracy} plots $N_{\mathrm{eff}}$ against task
+accuracy.
+On GPQA the Spearman correlation is $\rho = +0.03$, flat.
+On HiddenBench the cell-level correlation is a weak positive
+($\rho = +0.15$), but it does not survive aggregation to the task level:
+the task-level Spearman ($n = 35$) is $\rho = +0.14$ ($p = 0.43$) on
+HiddenBench and $\rho = +0.04$ ($p = 0.81$) on GPQA, and the partial
+correlation controlling for initial-vote diversity $D_0$ is likewise
+non-significant on HiddenBench ($\rho_{\mathrm{partial}} = +0.18$,
+$p = 0.32$).
+We therefore do not read $N_{\mathrm{eff}}$ as predicting accuracy in either
+direction; the apparent cell-level association reflects the non-independence
+of repetitions within a task.
+
+Label-wise, on HiddenBench stochastic cells have the lowest mean accuracy
+(0.256) and multistable cells the highest (0.338), but a task-clustered
+bootstrap of this difference straddles zero (diff $= -0.082$, $95\,\%$ CI
+$[-0.17, +0.00]$, $p \approx 0.06$), so the apparent accuracy penalty on
+random-convergence cells is at most a marginal task-level trend rather than
+a significant effect.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{plots/bistab/fig3_neff_accuracy.png}
+  \caption[Effective attractors versus task accuracy]{$N_{\mathrm{eff}}$ vs.\ task accuracy, coloured by bistability
+           label.  Dashed line: pooled OLS fit.  Spearman $\rho$ shown.
+           GPQA shows no correlation; on HiddenBench a weak cell-level
+           positive association does not survive aggregation to the task
+           level.}
+  \label{fig:bistab:accuracy}
+\end{figure}
+
+\paragraph{Correct-basin depth.}
+A notable finding concerns the association between attractor correctness and
+basin selection strength.
+Because plug-in Cramér's $V$ depends on the contingency-table dimension, we
+make this comparison within a fixed option count: among the HiddenBench
+three-option ($M = 3$) cells, those whose dominant attractor is the correct
+answer have substantially higher $V$ than those whose dominant attractor is
+wrong ($0.435$ vs.\ $0.333$; cell-level $p = 1.8 \times 10^{-5}$).
+Aggregating to the task level, a cluster bootstrap over the $31$ three-option
+HiddenBench tasks gives a $V$ difference of $0.102$ ($95\,\%$ CI
+$[0.03,\ 0.18]$, $p = 0.005$), so the effect survives task clustering.
+On GPQA ($M = 4$) the difference is negligible ($V = 0.464$ vs.\ $0.457$,
+cell-level $p = 0.49$; task-level bootstrap $p = 0.81$).
+Correct attractors therefore exhibit stronger basin selection on HiddenBench:
+not only is the correct answer more likely to dominate when it does dominate,
+but the initial-vote composition predicts that outcome more reliably.
+Two caveats attach. First, plug-in $V$ (like plug-in $N_{\mathrm{eff}}$) is
+biased upward in sparse tables; the bias-corrected $V$ shows the same ordering
+(bias-corrected means $0.347$ for correct- vs.\ $0.226$ for wrong-dominant
+cells). Second, we restrict the contrast to $M = 3$ cells and never compare
+raw $V$ across benchmarks with different option counts.
+
+\paragraph{Cross-motif: SR and bistability.}
+Monostable cells have the highest mean SR slope (0.555), followed by
+multistable (0.412) and stochastic (0.370); this ordering is consistent
+across configurations.
+At the task level ($n = 35$) the association between $N_{\mathrm{eff}}$ and
+mean SR slope is strong and significant on GPQA ($\rho = -0.79$,
+$p \approx 0$) but does not reach significance on HiddenBench
+($\rho = -0.26$, $p = 0.13$).
+This negative relationship has a natural interpretation: SR is the
+within-basin amplification mechanism.
+In cells where one attractor dominates (monostable), agents lock in early
+and accumulate steep confidence ramps.
+In multistable cells the system splits across attractors, different
+agent subgroups lock into different options, so the SR signal is
+diluted across multiple trajectories.
+Bistability and self-reinforcement are therefore complementary at the
+system level: strong SR $\to$ fast within-basin convergence;
+high $N_{\mathrm{eff}}$ $\to$ the system visits multiple basins across
+repetitions.
 
 
-\subsubsection{Configuration Effects}
-\label{sec:results:bistability:config}
-
-% [TO WRITE]
-% Key quantities to report (all from NB 020):
-%   - Topology effect: fc vs star on N_eff and multistable fraction
-%   - W effect: Kruskal-Wallis across W levels within topology
-%   - Cross-motif: multistable cells vs mean_sr_slope (stronger SR
-%     in multistable cells -- entrenchment amplifies basin selection)
-%   - Accuracy correlation: Spearman N_eff vs accuracy per dataset
-%   - Cross-config rank consistency: per-task N_eff stable across
-%     topology/W (bistability is a task property, not a config artefact)
-%   - Overall: HiddenBench shows stronger bistability signal than GPQA
-
-
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
 \subsection{Dominance}
 \label{sec:results:dominance}
 
-\subsubsection{Influence Concentration and Topology}
-\label{sec:results:dominance:concentration}
+Dominance is measured via the Herfindahl index $D$ over the
+confidence-weighted influence graph: how concentrated is the total
+conversion credit among agents?
+$D = 0$ means influence is distributed equally; $D = 1$ means one agent
+causes all opinion changes.
+The surrogate null randomises the source identity within each neighbourhood,
+testing whether concentration exceeds what the topology alone would produce.
+The star topology's null is degenerate for 73--87\,\% of repetitions
+(leaf conversions are forced onto the centre), so \emph{emergent excess}
+($z$-score and flagged fraction) is only identified for the
+fully-connected topology; raw $D$ is reported for both.
 
-% [TO WRITE]
-% Key quantities to report (all from NB 022):
-%   - D distribution per topology and dataset; star >> fc on raw D
-%     (mechanically expected -- document but do not over-interpret)
-%   - FC: flagged fraction (p < 0.05 vs surrogate null) as the
-%     behavioural excess concentration signal; star null degenerate
-%     for ~82% of reps (only ~18% testable), so z/flag NOT
-%     identifiable in star -- report raw D within star only
-%   - Hub concentration: p_hub distribution; hub_is_consensus
-%     (does hub's vote become group answer?); hub_capitulation rate
-%   - Representative repetition: worked example analogous to the
-%     existing dominance worked example in Section 5.5
+\paragraph{Accounting.}
+Of 21\,000 repetitions, 17\,801 (84.8\,\%) involve at least one vote
+change and have a well-defined $D$.
+The 3\,199 excluded reps (15.2\,\%) converged unanimously from round 0
+or had no opinion changes; they carry no dominance information.
+Of the valid fc repetitions, 72\,\% (GPQA) and 83\,\% (HiddenBench) have
+a non-degenerate null and contribute to the $z$ analysis.
+
+\paragraph{Topology dominates raw D.}
+\autoref{tab:dom:overview} and \autoref{fig:dom:D_dist} show the
+$D$ distributions.
+Star topology produces 3.1--4.1$\times$ higher $D$ than fc across all
+(dataset, $W$) combinations (paired Wilcoxon, all $p < 10^{-10}$).
+This is partly mechanical: the star's centre is the sole eligible
+conversion source for every leaf, so its influence share is structurally
+inflated.
+The magnitude difference is therefore expected and should not be
+over-interpreted as a behavioural finding.
+
+\begin{table}[H]
+\centering
+
+\small
+\begin{tabular}{llccccc}
+\toprule
+ & & \multicolumn{3}{c}{Mean $D$} & \multicolumn{2}{c}{fc excess (pooled $W$)} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-7}
+Dataset & Topology & $W=1$ & $W=2$ & $W=5$ & $\bar{z}$ & Flagged \\
+\midrule
+GPQA        & fc   & 0.147 & 0.155 & 0.154 & $+0.53$ & 7.3\,\% \\
+GPQA        & star & 0.609 & 0.600 & 0.610 & \multicolumn{2}{c}{, } \\
+HiddenBench & fc   & 0.158 & 0.179 & 0.178 & $+0.75$ & 11.3\,\% \\
+HiddenBench & star & 0.529 & 0.562 & 0.562 & \multicolumn{2}{c}{, } \\
+\bottomrule
+\end{tabular}
+\caption[Mean dominance by configuration]{Mean raw $D$ per (dataset, topology, $W$) cell.
+         fc emergent excess ($z > 0$) reported as mean $z$ and flagged
+         fraction (star null degenerate, not reported there).
+         $N_{\mathrm{tasks}} = 35$, $R = 50$.}
+\label{tab:dom:overview}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{plots/dominance/fig1_D_distribution.png}
+  \caption[Dominance distributions by topology and dataset]{Per-repetition dominance $D$ by topology and dataset.
+           Dashed line: median; dotted: mean.
+           The star topology produces a bimodal distribution with most
+           mass near $D = 0.5$--$0.7$; fc mass clusters near 0.}
+  \label{fig:dom:D_dist}
+\end{figure}
+
+\paragraph{Emergent excess in fc.}
+Even without a structural hub, fc debates produce influence concentration
+above the topology-keyed null.
+Aggregating to the task level (unit $=$ task, $n = 35$), mean $z > 0$ for all
+$35$ tasks in both datasets (task-level Wilcoxon $p = 2.9 \times 10^{-11}$).
+The flagged fraction exceeds the 5\,\% chance baseline in both datasets
+(GPQA: 7.3\,\%, task-level $p = 0.006$;
+HiddenBench: 11.3\,\%, $p = 1.7 \times 10^{-5}$).
+On HiddenBench the excess is particularly pronounced at $W \geq 2$
+($\bar{z} \approx 0.80$), suggesting that longer context windows allow
+a de-facto leader to emerge even when all agents are topologically
+equivalent.
+\textbf{Influence concentration emerges behaviourally in fc, not only as
+a structural consequence of the star topology.}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{plots/dominance/fig2_excess_fc.png}
+  \caption[Emergent dominance excess in fully-connected debates]{Left: distribution of excess $z$-scores in fc (testable
+           repetitions only); dashed line: $z = 0$ (null).
+           Right: flagged fraction by memory window; dashed: 5\,\%
+           chance baseline.
+           HiddenBench consistently exceeds GPQA in both magnitude and
+           flagged rate.}
+  \label{fig:dom:excess}
+\end{figure}
+
+\paragraph{Memory window effect.}
+The W effect on $D$ is significant for HiddenBench only:
+paired Wilcoxon (W=1 vs W=5) gives $p = 0.003$ for fc and
+$p = 0.001$ for star ($\Delta D \approx +0.02$--$0.03$).
+On GPQA both topologies are flat ($p > 0.19$).
+The pattern is an entrenchment effect: more message history gives an
+emerging leader more prior material to reference, slightly strengthening
+its position. But the effect size is modest ($\Delta D < 0.04$) and
+task-specific.
+
+\paragraph{Hub concentration and correctness.}
+In fc the hub (highest-influence agent) holds on average 42--45\,\% of total
+influence share (GPQA $0.42$, HiddenBench $0.45$); in star it holds 76--79\,\%.
+The hub's vote coincides with the final group consensus in virtually every
+repetition (hub\_is\_consensus $\approx 1.0$ across all configs). This is close
+to definitional, since the hub is the agent others converted \emph{toward}, and
+in a run ending in unanimity that is nearly by construction the agent whose vote
+the group adopted; we note it only to motivate the more informative quantities
+below, hub correctness and capitulation, which are not fixed by the definition.
+
+Because the hub vote coincides with the group's, ``hub correctness'' here is
+just the group's accuracy under another name; we therefore read it only as
+such and defer the non-tautological question, whether the \emph{recurring}
+dominant hub is better informed, to the stability analysis below.
+On GPQA the group's final accuracy exceeds the $1/M$ chance baseline
+(task-level, one-sided $p = 0.003$); on HiddenBench it is at or below the
+$1/3$ baseline (31.7\,\%, not significant), so the dominant agent on
+HiddenBench is not systematically the better-informed one.
+
+\paragraph{Hub identity stability.}
+Hub identity is moderately unstable across repetitions of the same task
+(normalised HHI over hub identities: 0.02--0.16; dominant agent wins
+33--49\,\% of reps).
+The hub role is not permanently attached to a specific agent but shifts
+across runs.
+Yet the dominant hub, \emph{when} it recurs, is more likely to hold the
+correct answer on GPQA (40.5\,\% vs 25\,\% baseline; task-level
+$p \approx 0.01$, surviving correction) and at chance on HiddenBench.
+This suggests that on GPQA a question-specific ``expertise signal''
+partially determines which agent wins the hub role, while on HiddenBench
+hub assignment is effectively random with respect to correctness.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{plots/dominance/fig3_hub_stability.png}
+  \caption[Dominant-hub win rate and correctness]{Left: fraction of repetitions won by the dominant hub agent
+           per cell, by topology; dashed: uniform baseline ($1/N$).
+           Right: dominant-hub stability vs correctness fraction.
+           GPQA cells (both topologies) cluster above the chance
+           baseline; HiddenBench cells fall at or below it.}
+  \label{fig:dom:hub_stability}
+\end{figure}
+
+\paragraph{Dominance and accuracy.}
+We test this at the task level ($n = 35$), pairing each task's accuracy
+against its mean $D$.
+On \textbf{HiddenBench/fc} higher $D$ predicts higher accuracy
+(task-level Spearman $\rho = +0.44$, $p = 0.008$; correct runs have
+$D = 0.219$ vs $0.150$ for incorrect, task-paired $d = +0.059$,
+$p = 1 \times 10^{-4}$; survives Benjamini--Hochberg correction).
+On \textbf{GPQA/fc} the same direction is only marginal ($d = +0.025$,
+$p = 0.044$) and does not survive correction across the four cells
+($q = 0.06$). The rep-level GPQA/star association reported in earlier drafts
+does \emph{not} survive task aggregation ($d = +0.003$, $p = 0.81$).
+Crucially, \textbf{HiddenBench/star runs the other way}: higher $D$ predicts
+\emph{lower} accuracy ($d = -0.051$, $p = 0.010$, survives correction).
+Dominance is therefore not uniformly benign: on HiddenBench a decisive leader
+helps when every agent sees every other (fc) but hurts when influence is
+forced through a single hub (star).
+
+The mechanism differs by dataset and topology.
+On GPQA the hub is somewhat more likely to be correct, so a high-$D$ rep is
+one where a more-likely-correct agent accumulates most conversion credit.
+On HiddenBench/fc the hub is not more correct, yet high-$D$ reps still have
+higher accuracy, suggesting that decisive leadership per se (avoiding diffuse
+indecision among equally uninformed agents) can be productive; but on
+HiddenBench/star, where a single hub broadcasts to isolated spokes, that same
+concentration entrenches the shared initial bias and lowers accuracy.
+
+\paragraph{Conversion structure.}
+$D$ correlates strongly with the fraction of total conversion
+weight attributed to the single most influential source agent
+(task-level Spearman $\rho = 0.85$ on GPQA, $0.84$ on HiddenBench).
+$D$ measures exactly conversion concentration, as intended.
+Notably, $D$ is \emph{negatively} correlated with total conversion
+volume ($\rho = -0.34$ to $-0.56$): high-$D$ repetitions involve fewer
+total opinion changes, but those that occur are concentrated on one
+agent.
+The dominant pattern is a single persuasive agent triggering a small
+cascade, not a high-activity debate converging by attrition.
+
+\paragraph{Independence from bistability.}
+$D$ is uncorrelated with $N_{\mathrm{eff}}$ in both datasets
+($\rho = -0.07$ to $+0.01$, all $p > 0.3$) and does not differ
+significantly across bistability labels (monostable/multistable/stochastic).
+Dominance and bistability operate on orthogonal dimensions: one describes
+\emph{who} drives opinion change within a run; the other describes
+\emph{how many attractors} the system visits across runs.
 
 
-\subsubsection{Memory Window and Accuracy}
-\label{sec:results:dominance:window}
-
-% [TO WRITE]
-% Key quantities to report (all from NB 022):
-%   - W effect on D: Spearman rho(W, D) significant in star
-%     (D increases with W), flat/weak in fc
-%   - Mechanism: with more memory the hub becomes less likely to be
-%     overruled -- hub capitulation decreases with W in star, flat fc
-%   - Accuracy: D weakly negatively correlated with accuracy in some
-%     cells (entrenchment of wrong leader); report Spearman per dataset
-%   - Summary finding: star D ~3-4x fc; fc emergent excess z > 0
-%     highly significant both datasets; W entrenches-then-saturates
-
-
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
 \subsection{High-Repetition Distribution Analysis}
 \label{sec:results:highrep}
 
 The preceding sections characterise system behaviour at the task-population level,
-aggregating over 35 tasks per dataset at $R = 30$ repetitions each.
+aggregating over 35 tasks per dataset at $R = 50$ repetitions each.
 This section takes a complementary, within-task perspective: three individual GPQA
 questions (q84, q125, q144) were each run for $R = 1{,}000$ repetitions under the
 fixed configuration $W = 2$, fully-connected topology, $N = 4$ agents.
 The aim is to characterise the distribution of outcomes across many runs of the same
 task and to identify which properties of the initial vote composition predict
 accuracy and convergence speed.
-The three tasks were selected on the basis of mid-range accuracy ($0.27$--$0.51$
-under $R = 30$) and high initial-vote entropy, ensuring genuinely uncertain outcomes
+The three tasks were selected on the basis of mid-range accuracy and
+high initial-vote entropy, ensuring genuinely uncertain outcomes
 and substantial run-to-run variability.
 
 For each run the following quantities are extracted.
@@ -1175,12 +1666,12 @@ minus mean initial confidence).
 The dominant finding is stark: whether the ground-truth option appears at all in
 the initial vote distribution is by far the strongest predictor of final accuracy,
 consistent across all three tasks
-(Figure~\ref{fig:highrep:init_votes_split}, Table~\ref{tab:highrep:init_votes}).
+(\autoref{fig:highrep:init_votes_split}, \autoref{tab:highrep:init_votes}).
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/highrep/fig1_init_votes_split.png}
-  \caption{System accuracy conditioned on whether the ground-truth option is
+  \caption[Accuracy by ground-truth presence at initialization]{System accuracy conditioned on whether the ground-truth option is
            present in the initial vote distribution at $t=0$.
            Left bars: runs where at least one agent voted correctly before debate;
            right bars: runs where no agent did.
@@ -1202,7 +1693,7 @@ q125 & 0.273 & 0.031~(293) & 0.373~(707) & 0.552~(250) \\
 q144 & 0.509 & 0.069~(144) & 0.583~(856) & 0.717~(403) \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy by ground-truth presence in the initial vote distribution,
+\caption[Accuracy by ground-truth presence per task]{Accuracy by ground-truth presence in the initial vote distribution,
          $R=1{,}000$ per task.
          GT absent/present: whether the correct option appears in the vote profile
          at $t=0$.
@@ -1226,13 +1717,13 @@ The capacity to surface a correct answer that no agent endorsed at the outset is
 negligible under the present design.
 
 \paragraph{Initial vote entropy and efficiency.}
-Figure~\ref{fig:highrep:h0} shows accuracy and mean rounds to consensus as a
+\autoref{fig:highrep:h0} shows accuracy and mean rounds to consensus as a
 function of $H_0$.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/highrep/fig2_h0_accuracy_efficiency.png}
-  \caption{(a) System accuracy and (b) mean rounds to consensus by initial vote
+  \caption[Accuracy and rounds by initial vote entropy]{(a) System accuracy and (b) mean rounds to consensus by initial vote
            entropy $H_0$.  X-axis labels show the vote pattern.
            Wilson 95\,\% CI for accuracy; $\pm$SEM for rounds.
            $R=1{,}000$ per task, $W=2$, fully-connected.}
@@ -1253,13 +1744,13 @@ correct option being present but decreases its initial plurality and thus its ch
 of winning.
 
 \paragraph{Debate length, trajectory turbulence, and confidence change.}
-Figure~\ref{fig:highrep:rounds} shows the relationship between rounds to consensus
+\autoref{fig:highrep:rounds} shows the relationship between rounds to consensus
 and accuracy, and between vote-flip count and mean rounds.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/highrep/fig3_rounds_accuracy_flips.png}
-  \caption{(a) P(correct) as a function of rounds to consensus
+  \caption[Accuracy versus rounds and vote flips]{(a) P(correct) as a function of rounds to consensus
            (Wilson 95\,\% CI, $n \geq 15$ per point).
            (b) Mean rounds to consensus as a function of total vote flips
            ($\pm$SEM, $n \geq 10$ per bin).
@@ -1276,49 +1767,384 @@ Vote flips and rounds are tightly coupled ($r = 0.83$--$0.92$, all $p \approx 0$
 turbulent trajectories with many opinion changes are the same runs that fail to
 reach fast consensus.
 Confidence increases monotonically across rounds regardless of outcome (mean gain
-$\approx 1.6$--$1.9$ points on the 1--10 scale) and carries no predictive signal for
-final correctness ($|r| < 0.09$ across all tasks and all confidence features).
+$\approx 1.6$--$1.9$ points on the 1--10 scale) and carries at most a negligible
+predictive signal for final correctness ($|r| < 0.09$ across all tasks and all
+confidence features; only one of the three tasks reaches nominal significance).
 The distributions of confidence change for correct and incorrect runs overlap
-almost perfectly across all three tasks (Figure~\ref{fig:app:highrep:distributions}
+almost perfectly across all three tasks (\autoref{fig:app:highrep:distributions}
 in Appendix~\ref{app:highrep}), confirming that confidence gain is a property of
 the debate process itself rather than a signal of outcome quality.
 Full feature-by-outcome correlations are reported in Appendix~\ref{app:highrep}.
 
-% ─────────────────────────────────────────────────────────────────────────────
+% -----------------------------------------------------------------------------
+\subsection{A Causal Test: Seeded Initial Conditions}
+\label{sec:results:seeded}
+
+The preceding analysis is observational: whether the ground truth is present at
+$t=0$ co-varies with task difficulty, agent confidence, and initial entropy, so its
+apparent effect on accuracy could be confounded.
+To isolate the causal contribution of the initial vote composition, we ran a
+controlled intervention on $34$ GPQA tasks (the same $W=2$,
+fully-connected, $N=4$ configuration, $R=50$ repetitions each).
+These are GPQA Tier-3 tasks from the same task population as the main study (the
+three high-repetition tasks q84, q125, and q144 are among them); the seeded arm
+requires a response pool rich enough to construct both conditions, and one of the
+$35$ tasks could not be paired across both arms and is excluded, leaving $34$.
+For each task we first collected a pool of genuine, independent single-agent
+responses, then constructed the initial four-agent vote profile of each run by
+sampling from that pool under one of two constraints:
+\begin{itemize}
+  \item \textbf{init\_0} (ground truth absent): exactly zero of the four agents
+        begin on the correct option;
+  \item \textbf{init\_1} (ground truth seeded): exactly one of the four agents
+        begins on the correct option, i.e.\ the ground truth is present but as a
+        $1/4$ minority.
+\end{itemize}
+Only the \emph{composition} of the starting votes is manipulated; every initial
+vote is a real agent response, and the debate that follows is unmodified.
+The contrast between the two conditions therefore measures the causal effect of
+placing the ground truth into the initial distribution, and the init\_0 arm
+separately measures the system's capacity to \emph{generate} the correct answer de
+novo when no agent starts with it.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/fig4_seeded_causal.png}
+  \caption[Causal effect of seeding the ground truth]{Causal effect of seeding the ground truth into the initial vote
+           distribution.
+           (a) Per-task accuracy for all $34$ tasks, paired: grey = init\_0
+           (ground truth absent), blue = init\_1 (ground truth seeded as a $1/4$
+           minority).
+           (b) Pooled accuracy with Wilson 95\,\% CI.
+           $R=50$ per task per condition, $W=2$, fully-connected.}
+  \label{fig:highrep:seeded_causal}
+\end{figure}
+
+The effect is large and unambiguous (\autoref{fig:highrep:seeded_causal}).
+Pooled over $1{,}700$ runs per condition, seeding a single correct agent raises
+accuracy from $1.8\,\%$ (init\_0) to $23.7\,\%$ (init\_1), a roughly $13\times$
+increase (pooled two-proportion $\chi^2 = 364$; we treat the task-paired test
+below as the primary one).
+The lift holds in \emph{every} task: init\_1 exceeds init\_0 in all $34$ of $34$
+tasks (paired Wilcoxon signed-rank $p = 3.6\times10^{-7}$, median per-task lift
+$0.18$).
+This confirms causally what the $R=1{,}000$ analysis showed observationally: the
+presence of the correct option in the opening vote profile is the single largest
+determinant of whether the system arrives at it.
+At the same time, init\_0 accuracy is not exactly zero.
+The correct answer was recovered de novo in $15$ of $34$ tasks
+($31$ runs in total), so the debate does possess a weak generative channel rather
+than acting as a pure amplifier.
+
+\paragraph{De-novo recovery is bounded by task difficulty.}
+That generative channel is not a general reasoning capacity: it fires only on tasks
+that are already easy, and vanishes on the hard ones.
+We measure difficulty independently of the debate by the task's single-agent
+accuracy $\mathrm{acc}_1 = n_\text{correct}/200$, the correct fraction of the fixed
+pool of $200$ independent single-agent responses from which the initial votes are
+drawn (identical across both conditions).
+This index is a faithful measure of intrinsic difficulty rather than an artifact of
+the seeding procedure: for the three $R=1{,}000$ tasks it matches the naturally
+observed $t=0$ per-agent accuracy almost exactly (q84 $0.30$ vs $0.28$, q125 $0.28$
+vs $0.26$, q144 $0.39$ vs $0.40$).
+De-novo recovery rises monotonically with $\mathrm{acc}_1$ across the $34$ tasks
+(Spearman $\rho = 0.51$, $p = 2.3\times10^{-3}$;
+\autoref{fig:highrep:recovery_difficulty}), and the dependence is stark at the
+hard end: the hardest quartile of tasks (single-agent accuracy $0.5$--$12.5\,\%$)
+recovers the ground truth in \emph{zero} of its $400$ init\_0 runs.
+Concretely, on the biased, low-accuracy tasks, exactly those where independent
+reasoning would be most valuable, the system never manufactures the correct answer
+that no agent initially held; it only rediscovers answers that are intrinsically
+defensible to begin with.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.72\linewidth]{plots/highrep/fig7_recovery_difficulty.png}
+  \caption[De-novo recovery rate versus task difficulty]{Init\_0 de-novo recovery rate against task difficulty, measured as
+           single-agent accuracy ($n_\text{correct}/200$ from the response pool;
+           higher $=$ easier), one point per task (marker size $\propto$ number of
+           recovered runs).
+           Red diamonds: quartile means.
+           The hardest quartile (shaded) recovers the ground truth in $0$ of $400$
+           runs; recovery only occurs on easier tasks.
+           Spearman $\rho = 0.51$, $p = 2.3\times10^{-3}$.}
+  \label{fig:highrep:recovery_difficulty}
+\end{figure}
+
+\paragraph{Convergence dynamics: convert-all or capitulate-all.}
+Both conditions reach fully unanimous final states in $100\,\%$ of runs, so the
+seeded correct agent has a strictly binary fate: it either converts the entire group
+or capitulates completely, no run ends with the ground truth surviving as a
+minority (\autoref{fig:highrep:seeded_dynamics}a).
+Across the $1{,}700$ init\_1 runs, the seed converts the group in $23.7\,\%$ of runs
+and capitulates in the remaining $76.3\,\%$.
+When the minority does win, it does so early: the correct option climbs to a
+plurality within the first one to two debate rounds
+(\autoref{fig:highrep:seeded_dynamics}b), and de-novo recoveries in init\_0
+appear equally early (mean first-appearance round $1.45$).
+Persuasion in this system is front-loaded, the opening exchange, not protracted
+deliberation, decides the outcome, echoing the earlier finding that longer debates
+do not produce better answers.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/fig5_seeded_dynamics.png}
+  \caption[Convergence dynamics under seeding]{Convergence dynamics under seeding.
+           (a) Fate of the single correct agent in init\_1: every run ends
+           unanimous, so the seed either converts the group (blue) or capitulates
+           (grey).
+           (b) Round at which the correct answer takes hold, when it reaches a
+           plurality in won init\_1 runs (blue) and when it first re-appears in
+           recovered init\_0 runs (red).}
+  \label{fig:highrep:seeded_dynamics}
+\end{figure}
+
+\paragraph{What lets the minority win, and does the intervention match observation?}
+Within init\_1, the correct agent's odds depend on how its three opponents are
+arranged (\autoref{fig:highrep:seeded_mechanism}a).
+A unified wrong bloc (all three opponents on one option, $3$-$0$-$0$) holds the
+ground truth to a $19.5\,\%$ win rate, whereas a fully split opposition ($1$-$1$-$1$)
+lets it win $32.3\,\%$ of the time (pooled $\chi^2 = 7.9$, $p = 4.9\times10^{-3}$).
+Aggregated to the task level this difference is only suggestive: across the $31$
+tasks that contain both bloc types the paired per-task difference is not significant
+(Wilcoxon $p = 0.053$; cluster-bootstrap $95\,\%$ CI for the win-rate gap
+$[-0.00,\ +0.15]$, marginally including zero).
+A task-clustered logistic model (GEE with an exchangeable working correlation,
+grouped by task) of the win outcome on standardised predictors confirms three
+contributions, though only one is strong once clustering is respected: a divided
+opposition helps ($\beta = -0.16$ per unit of top-bloc size, $p = 9.5\times10^{-4}$),
+a starting confidence advantage for the correct agent helps ($\beta = +0.16$,
+$p = 0.03$), and the task's intrinsic defensibility (correct fraction of the pool)
+also helps ($\beta = +0.33$, $p = 0.03$).
+The small pseudo-$R^2$ ($0.03$) indicates that these initial features shift the odds
+but do not determine the outcome, leaving substantial room for the stochastic course
+of the debate itself.
+Finally, the intervention is broadly consistent with the observational data: for the
+three $R=1{,}000$ tasks, seeded init\_1 accuracy has the same rank order as the
+naturally-occurring ``exactly one correct minority vote'' subset
+(\autoref{fig:highrep:seeded_mechanism}b; q144 $0.28$ seeded vs $0.365$ observed,
+q84 $0.16$ vs $0.19$, q125 $0.12$ vs $0.25$).
+Seeded accuracy runs somewhat below the observational value in all three tasks, so we
+read this as directional external support rather than exact reproduction; the gap is
+consistent with the seeded pool enforcing an exact $1/4$ minority rather than sampling
+the natural minority configurations.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/fig6_seeded_mechanism.png}
+  \caption[Minority conversion mechanism and external validity]{Mechanism of minority conversion and external validity.
+           (a) P(ground truth wins) in init\_1 by the arrangement of the three
+           opposing votes at $t=0$; a divided opposition is easier to convert
+           (Wilson 95\,\% CI).
+           (b) Interventional (seeded\_init\_1) accuracy against the observational
+           $R=1{,}000$ ``one correct minority vote'' subset for the three
+           high-repetition tasks.}
+  \label{fig:highrep:seeded_mechanism}
+\end{figure}
+
+Taken together, the seeded experiment upgrades the central claim of this section
+from association to intervention: the multi-agent system functions predominantly as
+a \emph{selective amplifier} of its initial vote distribution.
+Seeding the correct answer as a lone minority multiplies accuracy roughly $13$-fold,
+yet even then the correct agent is out-voted three times out of four, and the system
+almost never manufactures a correct answer that no agent initially held.
+The composition of the opening votes, not the length or intensity of the debate, is
+the dominant lever on whether collective reasoning succeeds.
+This intervention was run on GPQA only; the observational ground-truth-presence
+result holds on both benchmarks (\autoref{sec:results:sr}), but the causal claim
+itself is established here for GPQA, and its extension to HiddenBench is discussed as
+a limitation in \autoref{sec:discussion:limitations}.
+
+% -----------------------------------------------------------------------------
 \subsection{Linguistic Dimensions}
 \label{sec:results:linguistic}
 
-\subsubsection{Score Distributions}
-\label{sec:results:linguistic:distributions}
+The four motifs above are read from the discrete vote and the numeric
+confidence.
+This section examines the complementary textual channel: each public message is
+scored on three ordinal $1$--$5$ dimensions, \emph{conviction} (how certain
+the message sounds), \emph{anchoring} (whether the stated belief source is the
+agent's own reasoning or deference to peers), and \emph{dialogic orientation}
+(engagement with a named peer), as defined in
+\autoref{sec:method:linguistic}.
+Because the scorer is an instance of the same model family as the debate agents,
+these scores are used only for \emph{relative} comparisons and never as an
+absolute measure of argument quality; the associations below are reported at the
+task-cell level (420 cells) with rank statistics throughout.
 
-% [TO WRITE]
-% Key quantities to report (from NB 027, results/linguistic_mistral/):
-%   - Value counts and distributions for Conviction, Anchoring,
-%     Dialogic across all 420 cells (reps 0-4)
-%   - By topology: fc vs star mean scores per dimension
-%   - By W: scores across W=1,2,5
-%   - By dataset: GPQA vs HiddenBench
-%   - Round-level trajectories: how do scores evolve across rounds?
-%   - Hub vs leaf (star): mean scores by role
-% Caveat to state: scorer is Mistral-Medium, same model as debate
-% agents -- not an independent rater.
+\paragraph{Level effects are weak; diversity is the signal.}
+The mean level of each dimension carries little information about system
+behaviour.
+Across all 420 cells the Spearman correlations between a cell's mean dimension
+score and its MAS metrics are uniformly small: for accuracy all three are
+$|\rho| \leq 0.11$; the largest correlation of any mean score with any metric is
+conviction with mean rounds at $\rho = -0.30$ ($p < 10^{-3}$).
+Dataset differences in level exist but are modest, GPQA messages score
+slightly higher than HiddenBench on all three dimensions (e.g.\ system-level
+conviction $3.55$ vs.\ $3.30$, dialogic $3.01$ vs.\ $2.51$), and the
+hub and leaf roles in the star topology are nearly indistinguishable
+(hub vs.\ leaf conviction $3.44$ vs.\ $3.44$, $p = 0.99$; small but significant
+differences on anchoring and dialogic, both $|\Delta| < 0.05$).
+The informative quantity is not how the agents talk on average but how
+\emph{differently} they talk from one another within a run.
+
+\paragraph{Stylistic diversity predicts faster convergence.}
+For each run we compute the between-agent standard deviation of each dimension
+, a measure of within-run stylistic diversity, and correlate it with
+outcomes at the cell level (\autoref{tab:ling:diversity}).
+All three diversity measures are strongly and negatively associated with mean
+rounds to consensus: conviction diversity $\rho = -0.55$, anchoring diversity
+$\rho = -0.54$, dialogic diversity $\rho = -0.51$ (all $p < 10^{-10}$).
+Runs in which agents adopt visibly different argumentative styles resolve
+\emph{faster} than runs in which they sound alike.
+The effect holds within each dataset separately (GPQA: anchoring-diversity
+$\rho = -0.41$, dialogic $\rho = -0.32$; HiddenBench: dialogic $\rho = -0.38$,
+anchoring $\rho = -0.35$; all $p < 10^{-3}$), so it is not an artefact of pooling
+two benchmarks with different base rates.
+Diversity is also weakly associated with lower attractor multiplicity
+(conviction-diversity vs.\ $N_{\mathrm{eff}}$: $\rho = -0.19$, $p = 10^{-4}$),
+consistent with the interpretation below.
+
+\begin{table}[H]
+\centering
+
+\small
+\begin{tabular}{lccc}
+\toprule
+Diversity measure & Rounds & Accuracy (GPQA) & Accuracy (HB) \\
+\midrule
+Conviction diversity & $-0.55^{***}$ & $+0.11$      & $-0.24^{***}$ \\
+Anchoring diversity  & $-0.54^{***}$ & $+0.18^{**}$  & $-0.16^{*}$   \\
+Dialogic diversity   & $-0.51^{***}$ & $+0.08$       & $+0.00$       \\
+\bottomrule
+\end{tabular}
+\caption[Stylistic diversity versus system outcomes]{Within-run between-agent stylistic diversity (standard deviation of
+         each dimension across the four agents) vs.\ system outcomes,
+         Spearman $\rho$ at the cell level ($n = 420$).
+         Accuracy associations are weak and dataset-dependent; the efficiency
+         association is strong and consistent.}
+\label{tab:ling:diversity}
+\end{table}
+
+\paragraph{Interpretation and its limits.}
+The efficiency association has a natural reading that connects to the
+self-reinforcement finding.
+When agents argue in a uniform style, similar conviction, similar stance
+toward peers, there is little genuine friction to resolve, and the group locks
+into whichever position it already leans toward: this is within-basin
+self-reinforcement, which produces steep confidence ramps and fast, but not
+necessarily correct, convergence (\autoref{sec:results:sr}).
+Stylistically heterogeneous groups instead sustain genuine back-and-forth, which
+lengthens the debate.
+The accuracy side of this story does not generalise: stylistic diversity is
+mildly \emph{beneficial} on GPQA (anchoring diversity $\rho = +0.18$) but mildly
+\emph{harmful} on HiddenBench (conviction diversity $\rho = -0.24$), so diversity
+buys deliberation time without a consistent accuracy payoff, the same
+dataset-dependence seen for every other motif.
+Two caveats bound these results.
+First, the scorer shares a model family with the agents, so absolute levels may
+be biased and only the relative, rank-based associations should be trusted.
+Second, these are cell-level correlations, not interventions: we did not
+manipulate stylistic diversity directly, so the direction of causation between
+style and convergence speed is not established here.
+We therefore report stylistic diversity as a further, weaker diagnostic
+correlate of convergence dynamics, not as an independent design lever.
 
 
-\subsubsection{Stylistic Diversity and Convergence Speed}
-\label{sec:results:linguistic:diversity}
+% -----------------------------------------------------------------------------
+\subsection{Synthesis: One Mechanism, Four Signatures}
+\label{sec:results:synthesis}
 
-% [TO WRITE]
-% Key finding from NB 028 (the main novel result of this section):
-%   - Within-run between-agent std of Anchoring and Dialogic scores
-%     predicts significantly fewer rounds: Spearman rho ~ -0.51 to
-%     -0.54, p < 0.001, consistent across GPQA and HiddenBench and
-%     across both topologies
-%   - Mechanism: linguistically similar agents have higher p_sr
-%     (entrenchment); heterogeneous groups create genuine back-and-
-%     forth and resolve faster
-%   - Individual mean scores show weak correlations with MAS metrics
-%     (rho < 0.2 for conviction/anchoring/dialogic means vs accuracy,
-%     SR, dominance) -- diversity is the dominant signal, not level
-%   - Spearman correlation heatmap: 3 dimensions x 8 MAS metrics
-%   - Score distributions by bistability label (monostable vs
-%     multistable vs stochastic)
+The preceding sections measured four motifs, a high-repetition distribution, and
+a linguistic channel independently.
+Read together, they do not describe four separate phenomena but four views of a
+single underlying mechanism.
+This subsection states that mechanism explicitly, shows how each measurement is a
+signature of it, and separates what the data establish from what they do not.
+
+\paragraph{The convergent finding.}
+Across every analysis in this chapter, the property that most strongly governs
+the group's final answer is the composition of the votes \emph{before any debate
+takes place}.
+The high-repetition experiment shows this observationally: whether the
+ground-truth option is present at $t = 0$ moves per-task accuracy from near zero
+(0.4--6.9\,\%) to 36--58\,\%, and the seeded-initialisation experiment shows it
+causally: placing a single correct agent into an otherwise-wrong opening profile
+raises pooled accuracy roughly thirteen-fold (1.8\,\% to 23.7\,\%), in all 34
+tasks tested (Sections~\ref{sec:results:highrep} and~\ref{sec:results:seeded}).
+The self-reinforcement analysis supplies the mechanism by which the opening
+profile is converted into the outcome: SR is universal
+($p_{\mathrm{SR}} \in [0.74, 0.88]$ in every cell), it is the convergence engine
+(task-level $\rho(\bar\beta, \text{rounds}) \in [-0.91, -0.77]$ everywhere), and
+its accuracy effect is a pure amplification, positive when the correct option
+is already present ($r_{pb} = +0.20$ GPQA / $+0.18$ HB) and negative when it is
+absent ($-0.11$ / $-0.04$), cancelling to near zero in the margin.
+In short, the debate reliably \emph{amplifies} whichever position the opening
+distribution favours; it only rarely \emph{generates} a position no agent
+initially held (de-novo recovery in 15 of 34 seeded tasks, but at just 1.8\,\%
+of runs).
+We state this as the central empirical claim of the thesis: within the system we
+tested, deliberation functions predominantly as a selective amplifier of its
+initial vote distribution rather than as a mechanism that reasons a new answer
+into existence.
+
+\paragraph{How each motif is a signature of the same mechanism.}
+The remaining three motifs describe \emph{how} the amplification plays out, not a
+separate process.
+\emph{Bistability} is the cross-run face of amplification: because the outcome is
+selected by the (stochastic) opening profile, repeated runs of the same task land
+in different basins, so multi-attractor coexistence is common
+($N_{\mathrm{eff}} \geq 1.5$ in 78.6\,\% of cells) and is a stable property of the
+task rather than of the configuration (cross-config $\rho = 0.78$--$0.91$).
+The negative coupling between bistability and self-reinforcement
+(task-level $\rho(N_{\mathrm{eff}}, \bar\beta) = -0.79$ on GPQA) is exactly what the
+amplifier picture predicts: strong within-basin amplification means fast lock-in
+to one attractor per run, whereas high attractor multiplicity dilutes the SR
+signal across competing basins.
+\emph{Dominance} is the within-run face: amplification is typically driven by a
+small, concentrated cascade ($D$ correlates $\approx 0.85$ with the top source's
+share and \emph{negatively} with total conversion volume), i.e.\ one agent tips a
+near-balanced start rather than the group converging by diffuse attrition.
+\emph{Limit cycles} are the boundary case in which amplification fails to
+terminate: when the opening profile is symmetric between two defensible options
+and the star hub sits in the minority, each flip reconstructs the opposing
+majority and the group never locks in, running to the hard cap.
+The linguistic channel adds one more consistent correlate: stylistically uniform
+groups amplify faster (diversity vs.\ rounds $\rho \approx -0.5$), the textual
+shadow of within-basin self-reinforcement.
+
+\paragraph{The one axis that matters, and the one that does not.}
+Two negative results sharpen the picture.
+First, the \emph{structural} design axes we varied, communication topology and
+memory window, do not change \emph{whether} the system reaches the correct
+answer: topology has no accuracy effect at the task level (the confidence
+interval for the fc--star gap contains zero on both benchmarks), the memory
+window has none that survives multiple-comparison correction (a single
+HiddenBench/fc cell is nominally significant, $q = 0.08$), and bistability is
+invariant to both.
+Their influence is confined to the \emph{dynamics}: star topology is slower,
+is the sole source of genuine limit cycles, and mechanically concentrates
+influence; larger memory windows speed HiddenBench convergence slightly.
+Second, the system's own internal signals are not indicators of correctness:
+confidence rises by essentially the same amount on correct and incorrect runs
+($+1.66$ vs.\ $+1.64$ on GPQA), and on HiddenBench early unanimity is
+anti-correlated with accuracy (round-2 stops reach only 6.4\,\%).
+What \emph{does} move accuracy, the opening vote composition, is set before
+any of these knobs act.
+
+\paragraph{Scope of the claim.}
+These statements are bounded by what we varied and what we held fixed.
+We manipulated topology, memory window, task difficulty, benchmark, and (in the
+seeded experiment) the opening vote composition; we did \emph{not} vary the base
+model, the number of agents ($N = 4$), agent heterogeneity, or the cooperative
+framing.
+The amplifier characterisation is therefore established \emph{for a homogeneous,
+cooperative, four-agent debate on one model family across two benchmarks}, with
+one axis (initial composition) tested causally and the rest observationally.
+Whether the same mechanism dominates for heterogeneous models, larger groups, or
+adversarial protocols is an open question we return to in
+\autoref{sec:discussion}.
+The value of the motif lens, developed in the next chapter, is that each of these
+signatures is separately measurable from ordinary interaction logs, so a
+practitioner can check which regime a given system is in rather than having to
+assume it.

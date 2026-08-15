@@ -45,12 +45,12 @@ and the other through a confident slide into a shared mistake. Understanding
 a vocabulary for the interaction dynamics themselves. \citet{miehling2025agentic}
 make precisely this argument at a conceptual level, contending that agentic AI
 must be studied through a systems-theoretic lens because emergent group-level
-behavior cannot be predicted from individual agent properties alone. Their
+behaviour cannot be predicted from individual agent properties alone. Their
 position, however, remains programmatic and offers no empirical instrument for
-detecting such behavior in practice.
+detecting such behaviour in practice.
 
 Complex-systems theory supplies exactly such an instrument. Systems of many
-interacting units that produce ordered collective behavior without central
+interacting units that produce ordered collective behaviour without central
 control, the defining feature of self-organization \citep{ashby1947principles},
 are known to fall into a small number of recurring dynamical regimes. These
 regimes have precise names and precise signatures: \emph{self-reinforcement},
@@ -61,7 +61,7 @@ oscillations that never settle \citep{strogatz2015nonlinear};
 initial conditions; and \emph{dominance}, the concentration of influence onto a
 single node. Such patterns are studied as \emph{motifs}, recurring structural or
 dynamical building blocks whose presence in a system is both detectable and
-diagnostic of its behavior \citep{milo2002network, alon2007network,
+diagnostic of its behaviour \citep{milo2002network, alon2007network,
 driscoll2024dynamical}. The pathologies documented in the MAD literature read
 naturally as instances of this vocabulary: escalating confidence is a
 self-reinforcement signature, premature consensus is a fixed-point attractor
@@ -86,9 +86,42 @@ genuine information pooling. The contrast between the two isolates whether
 observed dynamics depend on the presence of a reliable individual signal or
 persist even when the group must correct a shared bias. Throughout, we treat
 motif detection not as a competitor to accuracy but as an explanatory layer
-beneath it: a way to characterize the trajectory that produces an outcome, and
+beneath it: a way to characterise the trajectory that produces an outcome, and
 thereby to understand which design choices shape the deliberative dynamics of
 LLM collectives.
+
+This explanatory layer has a practical purpose. As multi-agent systems are
+deployed in consequential settings, an operator needs to know not only whether a
+configuration tends to produce correct answers but whether a given deliberation
+is proceeding soundly or pathologically, whether the group is genuinely
+correcting an error or confidently converging on a shared mistake, and whether it
+will terminate at all. Outcome metrics cannot answer these questions, and no
+lightweight instrument for them currently exists \citep{miehling2025agentic}. A
+central thread of this thesis is therefore that each motif detector, being
+computed from ordinary interaction logs, doubles as a candidate \emph{diagnostic}
+of deliberative health. We do not deliver a validated diagnostic tool; we deliver
+the empirical groundwork for one, a set of measurable signatures, characterised
+across a controlled grid, together with tiered, evidence-graded design principles
+that state honestly how far each is supported by our data.
+
+In one sentence, the objective of this thesis is to understand \emph{how} a
+cooperative LLM debate arrives at its answer, by measuring the self-organization
+patterns in its trajectory, and to turn that understanding into evidence-graded
+guidance for building such systems.
+
+The remainder of the thesis is organised as follows.
+\autoref{sec:infsub} introduces the necessary background on self-organization
+and multi-agent debate, and \autoref{sec:related} situates the work against the
+literature on debate, its failure modes, and the alternative ways of analysing such
+systems.
+\autoref{sec:exp} specifies the debate protocol and experimental grid, and
+\autoref{sec:method} defines the four motif detectors together with their null
+models.
+\autoref{sec:results} reports the empirical findings, including the causal
+seeded-initialisation experiment, and synthesises them into the single amplifier
+mechanism.
+\autoref{sec:discussion} interprets the findings, states their limitations, and
+derives the design principles, and \autoref{sec:conclusion} concludes.
 
 
 \subsection{Research Questions}
@@ -96,8 +129,8 @@ LLM collectives.
 
 The overarching goal of this thesis is to establish whether the dynamical
 vocabulary of complex systems can be applied empirically to LLM-based
-multi-agent debate, and to characterize the conditions under which
-self-organization patterns emerge. We decompose this goal into three research
+multi-agent debate, and to characterise the conditions under which
+self-organization patterns emerge. We decompose this goal into four research
 questions.
 
 \begin{itemize}
@@ -121,9 +154,16 @@ questions.
         diagnostic indicators of when deliberation helps, when it merely
         entrenches an initial disposition, and when it fails to terminate at
         all.
+
+  \item[\textbf{RQ4}] \textbf{The role of initial conditions.} To what extent is
+        the outcome of the debate determined by the composition of the votes
+        \emph{before} deliberation begins, and can this be established causally
+        rather than observationally? We address this both observationally, through
+        the ground-truth-presence analysis, and causally, through a seeded
+        initial-condition experiment that manipulates only the opening vote profile.
 \end{itemize}
 
-A recurring methodological commitment cuts across all three questions. Because
+A recurring methodological commitment cuts across all four questions. Because
 fast, homogeneous convergence is expected to suppress most of these dynamics, we
 treat the \emph{absence} of a motif as an informative result rather than a
 failed measurement, and we compare every detector against a principled null
@@ -137,7 +177,7 @@ chance regularities of a small, discrete state space.
 This thesis makes the following contributions.
 
 \begin{itemize}
-  \item \textbf{A formalized cooperative debate protocol as a measurement
+  \item \textbf{A formalised cooperative debate protocol as a measurement
         instrument.} We define a two-phase synchronous multi-agent debate
         protocol with an explicit separation of public messages from private
         beliefs and confidences, designed so that the interaction logs expose
@@ -146,8 +186,9 @@ This thesis makes the following contributions.
         perturbation axes, and a difficulty-based screening procedure focuses
         the compute budget on the tasks where non-trivial dynamics can occur.
 
-  \item \textbf{Four literature-grounded motif detectors.} We develop and
-        formally specify detectors for self-reinforcement (a slope test on
+  \item \textbf{\suitename: a suite of four motif detectors.} We develop and
+        formally specify \suitename{} (Self-Organization Motif Analysis), a suite
+        of literature-grounded detectors for self-reinforcement (a slope test on
         within-position confidence trajectories against a sign-test null), limit
         cycles (categorical recurrence quantification analysis with a
         surrogate-data null and a period guard), bistability (an effective-number
@@ -175,10 +216,46 @@ This thesis makes the following contributions.
         explanations for outcome variability rather than as guarantees of
         improvement (Sections \ref{sec:results} and \ref{sec:discussion}).
 
-  \item \textbf{Design implications for multi-agent systems.} From the above we
-        derive concrete, evidence-based guidance on the effects of topology and
-        memory on convergence speed, worst-case runtime, and the entrenchment of
-        dominant agents, including the observation that a hard round cap is a
-        necessary safeguard because only certain topologies admit
-        non-terminating oscillatory debates (Section \ref{sec:discussion}).
+  \item \textbf{A causal test of the initial-condition effect.} Beyond the
+        observational analyses, we run a controlled seeded-initialisation
+        experiment that manipulates only the composition of the opening votes,
+        holding the debate itself unchanged. Inserting a single correct agent into
+        an otherwise-incorrect opening raises accuracy roughly thirteen-fold and in
+        every task tested, while the system almost never recovers a correct answer
+        that no agent initially held. This upgrades the central claim from
+        association to intervention: the opening vote distribution, not the length
+        or intensity of debate, is the dominant lever on the outcome
+        (Section \ref{sec:results}).
+
+  \item \textbf{Design principles and diagnostic groundwork for multi-agent
+        systems.} From the above we derive evidence-based guidance, graded by how
+        strongly our data support each claim, on the effects of topology and memory
+        on convergence speed, worst-case runtime, and the entrenchment of dominant
+        agents, including the observation that a hard round cap is a necessary
+        safeguard because only certain topologies admit non-terminating oscillatory
+        debates. We further show that each \suitename{} detector, computed from
+        ordinary interaction logs, can serve as an instrument for monitoring
+        deliberative health, and we lay out the mapping from principle to
+        measurement as groundwork for a diagnostic suite, built on these detectors,
+        that we do not ourselves package into a tool
+        (Section \ref{sec:discussion}).
 \end{itemize}
+
+\paragraph{Structure of this thesis.}
+\autoref{sec:infsub} reviews the background the work draws on, self-organization
+and dynamical motifs in complex systems and the current state of LLM-based
+multi-agent debate. \autoref{sec:related} surveys related work and the ways
+multi-agent systems are presently analysed, and locates the research gap this
+thesis addresses. \autoref{sec:exp} specifies the debate system as a measurement
+instrument: the notation and system macrostate, the two-phase protocol and
+stopping rule, the two deliberately contrasting benchmarks, and the experimental
+grid. \autoref{sec:method} defines the four \suitename{} detectors and the
+principled null models each is tested against, together with the statistical
+conventions used throughout. \autoref{sec:results} reports the empirical
+characterization: system performance, the four motifs in turn, the
+high-repetition and seeded-initialisation experiments, and a synthesis arguing
+that the motifs are four faces of one amplifier mechanism. \autoref{sec:discussion}
+interprets these findings and distils them into tiered, evidence-graded design
+principles. \autoref{sec:limitations} states the scope and methodological limits of
+the study and the research agenda they imply. \autoref{sec:conclusion} summarises
+the answers to the four research questions.

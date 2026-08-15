@@ -1,55 +1,78 @@
 % ============================================================
-% 8.1 SUMMARY OF FINDINGS
-% ------------------------------------------------------------
-% Concise answer to each research question:
-%
-%   RQ1 (Can motifs be detected?): Yes -- SR is universal;
-%   limit cycles rare but genuine in star; bistability present
-%   on HiddenBench; dominance concentration significant in fc.
-%
-%   RQ2 (Under what conditions?): Topology is the dominant
-%   structural axis. Star produces hub-driven limit cycles and
-%   higher dominance; fc produces stronger SR. Memory window W
-%   has modest secondary effects. Task difficulty (Tier 3) is
-%   a prerequisite for all motif signals.
-%
-%   RQ3 (What do motifs reveal about outcomes?): SR drives
-%   convergence speed universally (rho ~ -0.7); its accuracy
-%   effect is dataset-dependent (positive on GPQA, absent on
-%   HiddenBench). Dominance and bistability are informative
-%   about the dynamical regime but do not dominate outcome
-%   variance. Linguistic stylistic diversity within a run
-%   predicts faster resolution.
-%
-% One paragraph per RQ, then a brief closing sentence on the
-% broader contribution (motif detection as an explanatory lens
-% for MAD, complementing outcome-focused evaluation).
+% CHAPTER 8: CONCLUSION
+% Citations reuse verified entries in bibliography.bib only.
 % ============================================================
+
 \subsection{Summary of Findings}
+\label{sec:conclusion:summary}
 
-% [TO WRITE: ~0.5 page]
+This thesis asked whether the dynamical vocabulary of complex systems can be
+applied empirically to LLM-based multi-agent debate, and what such a treatment
+reveals that outcome metrics cannot. We built a controlled cooperative debate
+system, developed four literature-grounded motif detectors, and ran the full grid
+on two deliberately contrasting benchmarks, comprising 21{,}000 debates. We
+answer the four research questions in turn.
+
+\paragraph{RQ1: detectability.}
+The motifs are detectable, at very different prevalences, and each detector
+distinguishes genuine structure from a principled null. Self-reinforcement is
+\emph{universal}: positive confidence trends dominate in every configuration
+($p_{\mathrm{SR}} \in [0.74, 0.88]$, all cluster-bootstrap intervals excluding the
+$0.5$ baseline). Bistability is \emph{common and task-intrinsic}: most task--config
+cells show genuine multi-attractor coexistence ($N_{\mathrm{eff}} \geq 1.5$ in
+$78.6\,\%$), and this is a stable property of the task rather than the
+configuration. Dominance appears as \emph{behavioural influence concentration}
+above the topology-keyed null even in fully-connected debate. Limit cycles are
+\emph{rare but real}: $99\,\%$ of sequences converge, and the small residue that
+does not contains genuine, statistically significant period-2 oscillations
+($29$ agent-level, $23$ system-level) arising almost exclusively under the star
+topology through a hub-driven mechanism. The absence of genuine cycles in
+fully-connected debate is itself a clean result rather than a measurement failure.
+
+\paragraph{RQ2: conditions of emergence.}
+The two structural axes we varied shape the \emph{dynamics} but not the
+\emph{correctness} of debate. Topology is the dominant structural lever: the star
+is slower, concentrates influence roughly threefold, and is the sole source of
+genuine limit cycles, while the fully-connected topology produces stronger
+self-reinforcement and faster convergence. The memory window has only secondary,
+mostly HiddenBench-specific effects on convergence speed and none on accuracy, and
+bistability is invariant to both axes. Task difficulty and, above all, the
+\emph{composition of the opening votes} are the conditions that matter most: they
+determine which regime, refinement or correction, the system operates in.
+
+\paragraph{RQ3: relation to outcomes.}
+The motifs are informative about outcomes, but as diagnostics of a dynamical
+process rather than as guarantees of quality. Self-reinforcement is the
+convergence mechanism everywhere (task-level $\rho(\bar\beta,\text{rounds}) \in
+[-0.91, -0.77]$), yet it amplifies the initial vote distribution rather than
+selecting for the correct answer: it helps accuracy when the correct option is
+initially present and hurts when it is absent. Dominance is helpful when every
+agent sees every other but harmful when influence is forced through a single hub
+(on HiddenBench it lowers accuracy in the star topology),
+bistability marks the tasks where convergence is least reliable, and limit cycles
+mark pure efficiency failures. The motifs thus form an explanatory layer beneath
+accuracy rather than competing with it, and are the basis for the tiered,
+empirically-grounded design principles of \autoref{sec:discussion:design}: the
+groundwork for a diagnostic suite that reads the health of a deliberation from its
+dynamics, which we offer as principles and instruments rather than as a finished
+tool.
+
+\paragraph{RQ4: the role of initial conditions.}
+The outcome is largely determined before deliberation begins. Observationally,
+whether the ground-truth option is present in the opening votes is the strongest
+predictor of accuracy; causally, the seeded-initialisation experiment shows that
+placing one correct agent into an otherwise-wrong opening raises accuracy roughly
+thirteen-fold and in every task tested, while the system almost never manufactures
+a correct answer no agent initially held. The overarching finding, stated with its
+scope, is that \emph{within a homogeneous, cooperative, four-agent debate on one
+model family across two benchmarks}, deliberation functions predominantly as a
+selective amplifier of its initial vote distribution rather than as a mechanism
+that reasons a new answer into existence.
 
 
-% ============================================================
-% 8.2 FUTURE WORK
-% ------------------------------------------------------------
-% Prioritized list:
-%   1. Fix SR null model (survivorship bias from downward
-%      confidence drift censoring) -- already identified,
-%      priority before final submission.
-%   2. Causal perturbation experiments: seeded initialization
-%      to certify basin geometry; asynchronous protocol variant
-%      to isolate synchrony-induced cycles.
-%   3. High-R single-task deep dive (NB 030 has the task
-%      selection ready; experiment not yet run): 500-1000 reps
-%      on one Tier-3 GPQA task for high-power motif analysis.
-%   4. Extension to heterogeneous models: capability-asymmetry
-%      effects on dominance (Wynn et al. 2025 framing).
-%   5. Mixed-motive setting: LLM-Deliberation as a third track
-%      for negotiation dynamics (flagged as future work in §4.3).
-%   6. Independent linguistic scorer: replace Mistral judge
-%      with a different model to eliminate same-model bias.
-% ============================================================
-\subsection{Future Work}
-
-% [TO WRITE: ~0.5 page]
+Multi-agent debate is often presented as a way to make language models reason
+better together. Our results suggest a more precise and more cautious picture: in
+the homogeneous cooperative setting we studied, the debate mostly amplifies what
+its members already believe, and the useful contribution of a complex-systems lens
+is that it makes this amplification, and the conditions under which it helps,
+stalls, or fails to terminate, something one can actually measure.

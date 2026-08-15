@@ -1,42 +1,158 @@
 % ============================================================
-% 2.1 COMPLEX SYSTEMS AND SELF-ORGANIZATION
-% ------------------------------------------------------------
-% Cover: what self-organization means (order from local
-% interactions without central control), why it matters for
-% collective AI. Introduce structural vs dynamical motifs
-% (Milo et al. 2002, Driscoll et al. 2024): structural = wiring
-% pattern, dynamical = trajectory pattern. Introduce the four
-% motifs that will be studied: positive autoregulation
-% (self-reinforcement), limit cycle, bistability, dominance hub.
-% Brief mention of opinion dynamics (DeGroot, Jia 2015) as the
-% formal home of influence concentration.
-% Keep short -- ~1 page. Reader only needs enough to follow
-% the motif definitions in Section 5.
+% CHAPTER 2: BACKGROUND
+% All citations in this chapter reuse entries already present in
+% bibliography.bib and verified during the Chapter 3 literature
+% review. No new references are introduced here.
+% ============================================================
+
+This chapter provides the minimum conceptual background needed to follow the
+rest of the thesis. \autoref{sec:bg:complex} introduces self-organization
+and the notion of a dynamical motif, which supplies the analytical vocabulary
+used throughout. \autoref{sec:bg:llm} fixes what we mean by an LLM agent.
+\autoref{sec:bg:mad} describes multi-agent debate and its known failure
+modes, which are the phenomena the motif lens is meant to explain. Formal
+definitions of the four detectors are deferred to \autoref{sec:method}; here we
+only establish the ideas.
+
 % ============================================================
 \subsection{Complex Systems and Self-Organization}
+\label{sec:bg:complex}
 
+A \emph{complex system} is a collection of many components whose interactions
+produce collective behaviour that cannot be read off from the components in
+isolation. When such a system settles into ordered, coordinated behaviour
+without any central controller imposing it, the behaviour is called
+\emph{self-organizing} \citep{ashby1947principles}. The order is a property of
+the interaction structure, not of any single unit: no agent ``decides'' the
+global outcome, yet a global outcome reliably emerges. This is exactly the
+regime a multi-agent debate occupies. Four homogeneous agents, each following
+the same local rule (read the others, reconsider, vote), collectively produce a
+group trajectory, consensus, deadlock, or oscillation, that none of them
+individually selects. The central premise of this thesis is that such
+trajectories are amenable to the same descriptive tools developed for physical,
+biological, and social self-organizing systems.
 
-% ============================================================
-% 2.2 LARGE LANGUAGE MODELS AND AGENTS
-% ------------------------------------------------------------
-% Very brief: transformer + RLHF/instruction tuning in 2-3
-% sentences. Then: what an LLM agent is (LLM + state + action
-% loop). Mention temperature sampling as source of stochasticity
-% and why it matters for multi-agent diversity (Zhu et al. 2026).
-% ~0.5 page. No need to explain attention in detail -- assume
-% reader knows LLMs at a high level.
+A recurring theme in that literature is that the space of collective behaviours
+is not arbitrary: interacting systems tend to fall into a small number of
+qualitatively distinct \emph{regimes}, each with a characteristic signature.
+It is useful to separate two senses in which a recurring pattern is called a
+\emph{motif}. A \emph{structural} motif is a pattern in the wiring: a small
+subgraph, such as a feed-forward loop, that appears in a network more often than
+chance and that generates characteristic input--output behaviour
+\citep{milo2002network, alon2007network}. A \emph{dynamical} motif is a pattern
+in the trajectory rather than the wiring: a recurring feature of how the
+system's state evolves over time, such as an attractor or a periodic orbit, a
+notion recently formalised for recurrent neural networks
+\citep{driscoll2024dynamical}. This thesis is concerned with dynamical motifs:
+we hold the communication structure fixed as an experimental variable and ask
+what patterns appear in the temporal evolution of the group's votes and
+confidences.
+
+Four dynamical regimes are central to this work, each classical in nonlinear
+dynamics \citep{strogatz2015nonlinear}. \emph{Self-reinforcement} is positive
+feedback: a state that, once entered, amplifies its own persistence. The
+canonical example is lock-in through increasing returns, where an early lead
+becomes self-perpetuating independently of intrinsic merit
+\citep{arthur1989competing}. \emph{Limit cycles} are self-sustained periodic
+oscillations: the system never settles to a fixed point but instead revisits the
+same states in a repeating order. \emph{Bistability} (more generally
+multistability) is the coexistence of several stable outcomes for the same
+system, with the initial condition selecting which one is reached; the set of
+starting states leading to a given outcome is its \emph{basin of attraction}.
+\emph{Dominance} is the concentration of causal influence onto one component, so
+that a single node disproportionately drives the collective state. These four
+were chosen because each has a precise, testable signature and because each
+corresponds directly to a pathology already reported informally in the debate
+literature (\autoref{sec:related}).
+
+The influence side of this picture has its own formal home in
+\emph{opinion dynamics}, which studies how agreement and social power propagate
+through a network of interacting agents. The classical DeGroot model treats each
+agent's opinion as a weighted average of its neighbours' opinions and asks when
+this process reaches consensus \citep{degroot1974consensus}; later work shows how
+the same dynamics let social power concentrate on particular nodes across
+repeated interactions \citep{jia2015opinion}. Our agents differ from the classical
+setting in one important respect: they hold a latent, continuous confidence but
+cast a discrete vote. This continuous-opinion, discrete-action structure is
+itself a studied variant of opinion dynamics \citep{martins2008coda}, and it is
+what lets us measure self-reinforcement on the continuous channel (confidence)
+while detecting cycles and attractors on the discrete channel (votes).
+
 % ============================================================
 \subsection{Large Language Models and Agents}
+\label{sec:bg:llm}
 
+A large language model (LLM) is a neural network, in current practice a
+Transformer, trained to predict the next token in a sequence and subsequently
+aligned to follow instructions through supervised fine-tuning and reinforcement
+learning from human feedback \citep{ouyang2022instructgpt}. The result is a model
+that maps a textual prompt to a distribution over continuations, from which text
+is sampled. Prompting the model to produce intermediate reasoning steps before an
+answer, \emph{chain-of-thought} prompting, substantially improves performance on
+multi-step reasoning tasks \citep{wei2022chainofthought, kojima2022zeroshot}, and
+modern instruction-tuned models such as those in the GPT-4 family are capable of
+following structured, multi-part instructions of the kind our protocol requires
+\citep{achiam2023gpt4}.
 
-% ============================================================
-% 2.3 MULTI-AGENT DEBATE
-% ------------------------------------------------------------
-% Cover: the foundational Du et al. (2024) paradigm -- N agents
-% independently answer, share reasoning, update. Why it improves
-% over single-agent (diversity, error correction). Key design
-% axes introduced here: topology, memory, synchrony. Note the
-% known failure modes (Degeneration-of-Thought, sycophancy,
-% conformity pressure) that motivate the motif lens. ~1 page.
+An \emph{LLM agent}, in the sense used here, is an LLM placed in a loop: it is
+given a state (the task, its own prior position, and messages from other agents),
+it produces an action (a written argument and a vote), and the resulting state is
+fed back to it on the next step. Sampling is stochastic: at a positive
+temperature the model does not return a single deterministic answer but samples
+from its output distribution, so two agents given the identical prompt can
+produce different responses. This stochasticity is the source of the initial
+diversity that multi-agent debate relies on, and, as later chapters show, it is
+also what makes repeated runs of the \emph{same} task on the \emph{same}
+configuration land on different outcomes, the raw material for a bistability
+analysis. Because we use a single model family throughout, all four agents share
+the same priors and the same competence; any diversity in the group is a product
+of sampling, not of heterogeneous models. This is a deliberate design choice
+(\autoref{sec:exp}) that isolates the dynamics of a \emph{homogeneous} collective,
+and it is also a scope limitation we return to in \autoref{sec:discussion}.
+
 % ============================================================
 \subsection{Multi-Agent Debate}
+\label{sec:bg:mad}
+
+\emph{Multi-agent debate} (MAD) is a protocol in which several LLM agents
+independently propose an answer to a question and then exchange and revise their
+reasoning over multiple rounds before the group commits to a final decision
+\citep{du2024improving}. The motivating intuition is an error-correction argument:
+if agents make partially independent mistakes, deliberation gives the group a
+chance to surface and correct them, much as an ensemble of independent voters can
+outperform its average member. Reported gains on factual and mathematical
+reasoning \citep{du2024improving, liang2024encouraging, chen2024reconcile}, and
+the use of debate panels as more reliable evaluators \citep{chan2024chateval},
+follow from this idea.
+
+Debate designs vary along a few structural axes that recur throughout this thesis.
+The \emph{communication topology} fixes who can read whom: a fully-connected group
+in which every agent sees every other, versus sparser arrangements such as a star,
+in which spokes communicate only through a central hub. Sparser topologies can
+match fully-connected debate at lower token cost \citep{li2024sparsetopology}, so
+topology is a genuine design decision rather than a cosmetic one. The
+\emph{memory window} fixes how much interaction history each agent retains from
+one round to the next. The \emph{decision protocol} fixes how individual positions
+are aggregated into a group answer, and whether the group is asked to vote or to
+reach explicit consensus; this choice alone can change which tasks benefit from
+debate \citep{kaesberg2025voting}. We treat topology and memory window as
+controlled experimental axes and hold the protocol fixed.
+
+Crucially for this thesis, the same interaction that enables error correction also
+admits systematic failure. A purely cooperative framing can collapse the debate
+into mutual agreement that entrenches an initial mistake, the
+\emph{Degeneration-of-Thought} failure mode \citep{liang2024encouraging}. When two
+models debate, both tend to grow more confident that they are winning as the
+exchange proceeds, even absent new evidence \citep{prasad2025certain}, and agents
+frequently abandon a correct answer to conform to a confident peer
+\citep{wynn2025talk}. When the information needed for the correct answer is
+distributed across agents rather than shared, groups lock onto the shared evidence
+and fail to pool the private pieces, so collective accuracy collapses far below
+what a single fully-informed agent achieves \citep{li2026hiddenbench}; this is the
+LLM analogue of the hidden-profile effect long documented in human groups
+\citep{stasser1985pooling}. These pathologies are not accidents of a particular
+prompt but properties of \emph{how positions evolve and influence one another over
+rounds}, that is, they are dynamical. They are precisely the behaviours the
+motif vocabulary of \autoref{sec:bg:complex} is designed to name, and
+providing an empirical instrument for detecting them is the task of the following
+chapters.

@@ -7,7 +7,7 @@
 \subsection{System Performance: Full Configuration Table}
 \label{app:perf:configs}
 
-Table~\ref{tab:app:perf:configs} reports accuracy, mean rounds to consensus,
+\autoref{tab:app:perf:configs} reports accuracy, mean rounds to consensus,
 fraction of repetitions hitting the hard cap $T = 15$, and mean vote flips
 for all 12 (dataset, topology, $W$) configurations
 ($R = 50$ repetitions per task, $n = 1{,}750$ repetitions per cell).
@@ -34,7 +34,7 @@ HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
             & star / $W=5$ & $28.6\,\%$ & $6.54$ & $11.0\,\%$ & $5.64$ \\
 \bottomrule
 \end{tabular}
-\caption{Full system performance per configuration
+\caption[System performance by configuration]{Full system performance per configuration
          ($R = 50$, $35$ tasks, $n = 1{,}750$ repetitions per cell).}
 \label{tab:app:perf:configs}
 \end{table}
@@ -45,7 +45,7 @@ HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/general/fig5_rounds_vs_accuracy.png}
-  \caption{Mean accuracy as a function of rounds to consensus,
+  \caption[Accuracy versus rounds to consensus]{Mean accuracy as a function of rounds to consensus,
            for GPQA (left) and HiddenBench (right).
            Points show means over repetitions reaching each round count
            (minimum $n = 20$).
@@ -58,13 +58,13 @@ HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
 
 This appendix provides the full feature-by-outcome breakdown and correlation
 matrix for the high-repetition experiment described in
-Section~\ref{sec:results:highrep} ($R = 1{,}000$, three GPQA tasks,
+\autoref{sec:results:highrep} ($R = 1{,}000$, three GPQA tasks,
 $W = 2$, fully-connected topology, $N = 4$ agents).
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{plots/highrep/figA_full_feature_breakdown.png}
-  \caption{Full breakdown of accuracy (top row) and efficiency (bottom row, where
+  \caption[Accuracy and efficiency by run-level feature]{Full breakdown of accuracy (top row) and efficiency (bottom row, where
            applicable) as a function of six run-level features.
            (a) Accuracy by initial plurality size.
            (b) Accuracy by vote-flip count (binned, Wilson 95\,\% CI, $n \geq 10$).
@@ -80,7 +80,7 @@ $W = 2$, fully-connected topology, $N = 4$ agents).
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{plots/highrep/figA_correlation_heatmap.png}
-  \caption{Feature-outcome correlation matrix for the high-repetition experiment.
+  \caption[Feature-outcome correlation matrix]{Feature-outcome correlation matrix for the high-repetition experiment.
            Left: point-biserial correlation $r$ between each feature and binary
            accuracy (correct/incorrect).
            Right: Pearson $r$ between each feature and rounds to consensus.
@@ -91,7 +91,7 @@ $W = 2$, fully-connected topology, $N = 4$ agents).
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{plots/highrep/figA_distributions_by_outcome.png}
-  \caption{Feature distributions split by outcome (correct: colour; incorrect: grey)
+  \caption[Feature distributions by outcome]{Feature distributions split by outcome (correct: colour; incorrect: grey)
            for three GPQA tasks, $R=1{,}000$ each, $W=2$, fully-connected.
            Rows: q84, q125, q144.
            Columns: vote flips, mean initial confidence, mean final confidence,
@@ -102,9 +102,131 @@ $W = 2$, fully-connected topology, $N = 4$ agents).
            confidence at the same rate regardless of whether the system reaches the
            correct answer.
            Vote flip and round distributions separate in task-dependent directions
-           (see Section~\ref{sec:results:highrep}).}
+           (see \autoref{sec:results:highrep}).}
   \label{fig:app:highrep:distributions}
 \end{figure}
+
+\subsection{System-Prompt Robustness Check}
+\label{app:sysprompt}
+
+The agent persona used throughout this thesis includes an explicit
+anti-conformity instruction. To check whether the motif structure is an artefact
+of that particular wording, we compare the final dataset against an earlier run
+that used a milder persona, on the same 35 HiddenBench questions and six
+configurations (GPQA was not part of the earlier run, so this check is
+HiddenBench-only). The two personas differ in one appended sentence: the milder
+version ends at ``Be critical, your neighbours may be wrong, and so may you,''
+while the version used here adds ``Do not change your position simply because
+others disagree; only update if you encounter a specific argument you cannot
+counter.''
+
+The earlier run used $R = 30$ repetitions and the final run $R = 50$; we therefore
+pair by question within each configuration and test the paired difference
+(Wilcoxon signed-rank, Holm-corrected across the six configurations), so the
+differing repetition counts affect only per-task precision, not the pairing.
+\autoref{tab:app:sysprompt} reports the pooled means and the number of the six
+configurations with a Holm-significant paired shift.
+
+\begin{table}[H]
+\centering
+\small
+
+\begin{tabular}{lccc}
+\toprule
+Measure & Milder & Critical & Sig.\ configs \\
+\midrule
+Accuracy               & 0.316 & 0.294 & 0/6 \\
+Mean rounds            & 6.85  & 6.04  & 3/6 ($-$) \\
+Ceiling-hit fraction   & 0.146 & 0.073 & 3/6 ($-$) \\
+Convergence rate       & 0.862 & 0.935 & 3/6 ($+$) \\
+Dominance $D$          & 0.375 & 0.363 & 0/6 \\
+Hub capitulation       & 0.146 & 0.169 & 4/6 ($+$) \\
+Self-reinf.\ $p_{\mathrm{SR}}$ & 0.830 & 0.832 & 0/6 \\
+Self-reinf.\ slope     & 0.372 & 0.392 & 1/6 ($+$) \\
+Limit cycle (agent)    & 0.019 & 0.042 & 0/6 \\
+Limit cycle (system)   & 0.040 & 0.084 & 0/6 \\
+Bistability $N_{\mathrm{eff}}$ & 2.04 & 2.20 & 1/6 ($+$) \\
+Bistability Cram\'er's $V$ & 0.394 & 0.350 & 0/6 \\
+\bottomrule
+\end{tabular}
+\caption[System-prompt effect on motif measures]{Effect of the anti-conformity system prompt on each motif measure,
+         HiddenBench only. ``Milder'' is the earlier persona, ``critical'' the one
+         used throughout this thesis. \emph{Sig.\ configs}: number of the six
+         (topology, $W$) configurations showing a Holm-significant paired shift,
+         with the shared sign. The prompt changes convergence dynamics but not
+         accuracy, and does not suppress self-reinforcement.}
+\label{tab:app:sysprompt}
+\end{table}
+
+The pattern is consistent: the more critical prompt changes the \emph{dynamics},
+faster fully-connected convergence (rounds down by roughly one to one and a half,
+ceiling-hits roughly halved) and a higher unanimous-convergence rate, but leaves
+accuracy unchanged (0/6) and does not reduce self-reinforcement prevalence (0/6).
+The shift toward higher $N_{\mathrm{eff}}$ and more flagged limit cycles is a
+by-product of more runs converging (more unanimous endpoints to count) rather than
+a reduction in multistability, and Cram\'er's $V$ if anything trends down. The
+amplifier mechanism therefore survives a deliberate attempt to make the agents
+less conformist, which is mild evidence that it reflects the interaction structure
+rather than one prompt. This is a single HiddenBench comparison and is not evidence
+of robustness across models or group sizes.
+
+\subsection{Prompt Templates}
+\label{app:prompts}
+
+For reproducibility we reproduce the core prompt components verbatim. The shared
+\emph{persona} (with \texttt{\{name\}} the agent identifier) frames the task and
+the two-phase protocol and carries the anti-conformity instruction analysed in
+Appendix~\ref{app:sysprompt}:
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+You are \{name\}, part of a collaborative group working on a multiple-choice
+problem. Your goal is to help the group find the correct answer, agreement should
+follow from better arguments, not the other way around.
+
+Each round (after round 0) has two phases:
+
+\ Phase A: output three structured fields, defense (a new concrete reason your
+current vote is correct), challenge (dispute a specific current peer claim, or
+concede it and name any remaining disagreement), question (a targeted question to a
+named peer referencing a concrete claim). Do not change your vote in this phase.
+
+\ Phase B: you see your neighbors' Phase A outputs. Produce your updated vote,
+private reasoning, and public message.
+
+Be critical, your neighbors may be wrong, and so may you. Do not change your
+position simply because others disagree; only update if you encounter a specific
+argument you cannot counter.
+\end{quote}
+\caption[Shared agent persona (system prompt)]{Shared agent persona (system prompt): the two-phase protocol and the
+anti-conformity instruction, with \texttt{\{name\}} the agent identifier.}
+\label{prompt:persona}
+\end{prompt}
+
+The three per-step instructions appended to the persona and the running context
+are:
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+Round 0: Carefully read the question and options. Produce your initial vote,
+private reasoning, and public message.
+
+Phase A: Produce your Phase A structured output. Do not change your vote in this
+phase.
+
+Phase B: Update your belief, private reasoning, and public message. If you change
+your vote, cite the specific argument, from the current Phase A drafts or from the
+conversation history, that caused the update.
+\end{quote}
+\caption[Per-step agent instructions by phase]{Per-step instructions appended to the persona (round~0, Phase~A, and
+Phase~B), controlling what each agent is asked to produce at each step.}
+\label{prompt:steps}
+\end{prompt}
+
+In Phase B each agent additionally receives its own Phase-A draft and its
+neighbours' Phase-A drafts in randomised order, truncated to the memory window $W$;
+confidence is elicited as an integer from $1$ to $10$. The complete prompt-assembly
+code is in the electronic appendix.
 
 \subsection{Motifs Beyond the Present Selection}
 \label{app:future_motifs}
