@@ -12,14 +12,20 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, fit, calc, backgrounds}
 \usepackage{pifont} % For checkmark symbol
+\usepackage{titlesec}
+\titlespacing*{\paragraph}{0pt}{0pt}{0.5em}
 
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage[utf8]{inputenc}
 \usepackage{textcomp}
 
 \newcommand{\mytitle}{Self-Organization Patterns in LLM-based MAS}
 \newcommand{\myname}{Eric Echtermeyer}
 \newcommand{\mysupervisor}{Prof. Dr. Hinrich Schütze, Ali Modarressi}
-\newcommand{\suitename}{\textit{SOMA}}
+\newcommand{\suitename}{\textsc{soma}}
+\newcommand{\arguephase}{\textit{Argue}}
+\newcommand{\updatephase}{\textit{Update}}
 
 \usepackage[a4paper, width = 160mm, top = 35mm, bottom = 30mm, 
 bindingoffset = 0mm]{geometry}
@@ -46,6 +52,15 @@ bindingoffset = 0mm]{geometry}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
 \interfootnotelinepenalty = 10000
+
+% Force et al. for entries with 5+ authors
+\shortcites{du2024improving,chan2024chateval,liang2024encouraging,chen2024agentverse,
+  chuang2025debate,achiam2023gpt4,liu2025stopovervaluing,wei2022chainofthought,
+  rein2024gpqa,becker2025orchestration,ouyang2022instructgpt,li2024sparsetopology,
+  liu2024groupdebate,miehling2025agentic,zhou2024sotopia,chang2024partnr,
+  zhu2025multiagentbench,kenton2024debate,yang2025revisiting,zhang2024socialpsych,
+  choi2025groupconformity,hendrycks2021mmlu,hendrycks2021math,wang2023selfconsistency,
+  vaswani2017attention,zheng2023mtbench,zhu2026demystifying}
 
 \renewcommand{\sectionautorefname}{Section}
 \renewcommand{\subsectionautorefname}{Section}
@@ -145,7 +160,7 @@ Beyond detecting the motifs, we show that each detector, computed from ordinary
 logs, can serve as a diagnostic of deliberative health, and we distil the findings
 into design principles graded by evidential strength, as groundwork for a diagnostic
 suite. All claims are bounded to the tested setting, a homogeneous, cooperative,
-four-agent debate on one model family, and the absence of a motif is treated as an
+3--4 agent debate on one model family, and the absence of a motif is treated as an
 informative result throughout.
 
 \end{abstract}
@@ -287,25 +302,21 @@ I hereby confirm that I have written all parts of this work myself. The followin
 \vspace{0.3cm}
 
 \begin{itemize}
-    \item \textbf{Anthropic Claude Sonnet 4.5} (AI as Tutor): Used initially to explore and understand core concepts in complex-systems theory and multi-agent debate.
     \item \textbf{GitHub Copilot} (Inline Completion): Used for inline code completion suggestions during development. All outputs were reviewed and modified as appropriate.
-    \item \textbf{Anthropic Claude Opus 4.5} (Performance and Resource Optimization): Used to parallelize the evaluation pipeline for the experiments described in \autoref{sec:exp} and reported in \autoref{sec:results}. The generated code was reviewed and tested carefully.
-    \item \textbf{Anthropic Claude Opus 4.5} (Code Documentation): Used to generate a first draft of the project's README.md file in the electronic appendix. 
-    \item \textbf{Anthropic Claude Opus 4.6} (Peer Review Simulation): Used for proofreading, including identification of inconsistencies, typo errors, and grammar errors.
-    \item \textbf{Google Gemini 3} (Improve Writing Style, Paraphrasing and Reformulation): Used for linguistic refinement and paraphrasing. Suggestions were not adopted verbatim but were manually reviewed, adapted, and reformulated.
+    \item \textbf{Anthropic Claude Sonnet 5} (AI as Tutor): Used to explore and understand core concepts in complex-systems theory and multi-agent debate.
+    \item \textbf{Anthropic Claude Opus 5} (Performance and Resource Optimization): Used to parallelize the evaluation pipeline for the experiments described in \autoref{sec:exp} and reported in \autoref{sec:results}. The generated code was reviewed and tested carefully.
+    \item \textbf{Anthropic Claude Opus 5} (Improve Writing Style, Paraphrasing and Reformulation): Used for proofreading, linguistic refinement, and paraphrasing. Suggestions were not adopted verbatim but were manually reviewed, adapted, and reformulated.
 \end{itemize}
 
 All AI outputs and suggestions were independently evaluated and selectively adopted after critical review.
 
 \vspace{0.8cm}
-\textcolor{orange}{München, 06.02.2026} \\
+München, 30.09.2026 \\
 
 \vspace{1cm}
 
 \noindent\rule{0.5\textwidth}{0.4pt} \\
 
-\textcolor{orange}{Name}
-\normalsize
 \myname
 
 % ------------------------------------------------------------------------------

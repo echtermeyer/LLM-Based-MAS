@@ -1,0 +1,364 @@
+### CELL: import sys
+/Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+setup ok
+
+### CELL: def load_all():
+Run records : 94,173
+Rep records : 21,000
+Task records: 420
+
+dataset      topology  W
+gpqa         fc        1    7435
+                       2    7263
+                       5    7330
+             star      1    7722
+                       2    7538
+                       5    7620
+hiddenbench  fc        1    8102
+                       2    7787
+                       5    7805
+             star      1    9015
+                       2    8288
+                       5    8268
+
+### CELL: # Descriptive accounting
+──────────────────────────────────────────────────────────
+RUN FILTER ACCOUNTING
+──────────────────────────────────────────────────────────
+All stable runs (no length filter)  : 169,060
+  dropped  length < 3               :  74,887  (44.3%)
+  kept (length ≥ 3) = run records   :  94,173  (55.7%)
+    of which flat β = 0             :  16,221  (17.2%)
+
+Ceiling hits (end_conf=10)          :  12,549  (13.3% of run records)
+
+Agent trajectories total            :  84,000
+Never flipped (single vote)         :  36,531  (43.5%)
+Flipped at least once               :  47,469  (56.5%)
+
+### CELL: # p_SR per cell
+p_SR mean and SEM per cell:
+    dataset topology  W   mean    sem
+       gpqa       fc  1 0.8254 0.0114
+       gpqa       fc  2 0.8145 0.0166
+       gpqa       fc  5 0.7686 0.0166
+       gpqa     star  1 0.8129 0.0114
+       gpqa     star  2 0.7748 0.0165
+       gpqa     star  5 0.7424 0.0163
+hiddenbench       fc  1 0.8512 0.0094
+hiddenbench       fc  2 0.8751 0.0096
+hiddenbench       fc  5 0.8250 0.0114
+hiddenbench     star  1 0.8350 0.0083
+hiddenbench     star  2 0.8174 0.0104
+hiddenbench     star  5 0.7905 0.0114
+
+=== Binomial sign test: p_SR > 0.5 per (dataset, topology, W) ===
+  GPQA         fc    W=1  p_sr=0.825  above=35/35  p=0.0000
+  GPQA         fc    W=2  p_sr=0.815  above=35/35  p=0.0000
+  GPQA         fc    W=5  p_sr=0.769  above=35/35  p=0.0000
+  GPQA         star  W=1  p_sr=0.813  above=35/35  p=0.0000
+  GPQA         star  W=2  p_sr=0.775  above=35/35  p=0.0000
+  GPQA         star  W=5  p_sr=0.742  above=35/35  p=0.0000
+  HiddenBench  fc    W=1  p_sr=0.851  above=35/35  p=0.0000
+  HiddenBench  fc    W=2  p_sr=0.875  above=35/35  p=0.0000
+  HiddenBench  fc    W=5  p_sr=0.825  above=35/35  p=0.0000
+  HiddenBench  star  W=1  p_sr=0.835  above=35/35  p=0.0000
+  HiddenBench  star  W=2  p_sr=0.817  above=35/35  p=0.0000
+  HiddenBench  star  W=5  p_sr=0.790  above=35/35  p=0.0000
+
+### CELL: # Cluster bootstrap 95% CI
+=== Cluster bootstrap 95% CI (n_boot=2000) ===
+  GPQA         fc    W=1  p_SR=0.824 [0.814, 0.833] p_SR>0.5  slope=0.516 [0.506, 0.527] slope>0
+  GPQA         fc    W=2  p_SR=0.813 [0.803, 0.823] p_SR>0.5  slope=0.496 [0.485, 0.507] slope>0
+  GPQA         fc    W=5  p_SR=0.766 [0.756, 0.776] p_SR>0.5  slope=0.446 [0.434, 0.457] slope>0
+  GPQA         star  W=1  p_SR=0.810 [0.802, 0.819] p_SR>0.5  slope=0.469 [0.458, 0.480] slope>0
+  GPQA         star  W=2  p_SR=0.772 [0.760, 0.782] p_SR>0.5  slope=0.428 [0.418, 0.438] slope>0
+  GPQA         star  W=5  p_SR=0.738 [0.727, 0.750] p_SR>0.5  slope=0.395 [0.385, 0.406] slope>0
+  HiddenBench  fc    W=1  p_SR=0.849 [0.840, 0.857] p_SR>0.5  slope=0.440 [0.430, 0.450] slope>0
+  HiddenBench  fc    W=2  p_SR=0.873 [0.864, 0.881] p_SR>0.5  slope=0.456 [0.447, 0.466] slope>0
+  HiddenBench  fc    W=5  p_SR=0.822 [0.813, 0.832] p_SR>0.5  slope=0.395 [0.386, 0.405] slope>0
+  HiddenBench  star  W=1  p_SR=0.833 [0.824, 0.841] p_SR>0.5  slope=0.355 [0.346, 0.364] slope>0
+  HiddenBench  star  W=2  p_SR=0.815 [0.805, 0.824] p_SR>0.5  slope=0.353 [0.343, 0.361] slope>0
+  HiddenBench  star  W=5  p_SR=0.788 [0.778, 0.798] p_SR>0.5  slope=0.334 [0.325, 0.343] slope>0
+
+### CELL: # Fig 1 — p_SR violin
+<Figure size 1690x1040 with 4 Axes>
+fig1 saved
+
+### CELL: # Mean slope table
+Mean p_SR and slope per cell:
+                          p_sr  mean_slope
+dataset     topology W                    
+gpqa        fc       1  0.8254      0.5190
+                     2  0.8145      0.4978
+                     5  0.7686      0.4488
+            star     1  0.8129      0.4735
+                     2  0.7748      0.4323
+                     5  0.7424      0.4014
+hiddenbench fc       1  0.8512      0.4444
+                     2  0.8751      0.4592
+                     5  0.8250      0.3981
+            star     1  0.8350      0.3580
+                     2  0.8174      0.3555
+                     5  0.7905      0.3368
+
+=== Page trend test: mean_slope ordered W1 < W2 < W5 ===
+  GPQA         fc     W1/W2/W5=0.519/0.498/0.449  p_up=1.00e+00  p_down=1.57e-06  (n=35)
+  GPQA         star   W1/W2/W5=0.474/0.432/0.401  p_up=1.00e+00  p_down=3.75e-08  (n=35)
+  HiddenBench  fc     W1/W2/W5=0.444/0.459/0.398  p_up=1.00e+00  p_down=2.64e-04  (n=35)
+  HiddenBench  star   W1/W2/W5=0.358/0.356/0.337  p_up=9.64e-01  p_down=3.65e-02  (n=35)
+
+=== Topology comparison: fc vs star (MWU two-sided) ===
+  GPQA         W=1  fc=0.519  star=0.474  p=0.1358
+  GPQA         W=2  fc=0.498  star=0.432  p=0.0325
+  GPQA         W=5  fc=0.449  star=0.401  p=0.1050
+  HiddenBench  W=1  fc=0.444  star=0.358  p=0.0000
+  HiddenBench  W=2  fc=0.459  star=0.356  p=0.0000
+  HiddenBench  W=5  fc=0.398  star=0.337  p=0.0002
+
+=== Dataset comparison: GPQA vs HiddenBench (MWU two-sided) ===
+  fc    W=1  GPQA=0.519  HiddenBench=0.444  p=0.0077
+  fc    W=2  GPQA=0.498  HiddenBench=0.459  p=0.3181
+  fc    W=5  GPQA=0.449  HiddenBench=0.398  p=0.2497
+  star  W=1  GPQA=0.474  HiddenBench=0.358  p=0.0000
+  star  W=2  GPQA=0.432  HiddenBench=0.356  p=0.0027
+  star  W=5  GPQA=0.401  HiddenBench=0.337  p=0.0471
+
+### CELL: # Fig 2 — mean slope by W
+<Figure size 1690x1040 with 4 Axes>
+fig2 saved
+
+### CELL: # Fig 3 — heatmap
+<Figure size 910x520 with 2 Axes>
+fig3 saved
+
+### CELL: # Annotate runs_df with rep-level context
+                Group  n_runs  p_SR  mean_slope
+          Ceiling hit   12549 0.910       0.565
+           No ceiling   81624 0.794       0.399
+             Terminal   83529 0.826       0.442
+         Non-terminal   10644 0.676       0.261
+Init majority correct   11862 0.842       0.536
+  Init majority wrong   82311 0.805       0.405
+     Never flip (rep)   12748 0.910       0.698
+   Flip at some point   81425 0.793       0.378
+
+=== Init distribution stats ===
+  4-0-0-0  n=13,844  p_SR=0.897  mean_slope=0.669
+  3-1-0-0  n=35,302  p_SR=0.819  mean_slope=0.409
+  2-2-0-0  n=20,431  p_SR=0.793  mean_slope=0.368
+  2-1-1-0  n=23,717  p_SR=0.763  mean_slope=0.344
+  1-1-1-1  n=879  p_SR=0.652  mean_slope=0.290
+Kruskal-Wallis across init_dist: H=7914.1  p=0.0000e+00
+
+=== MWU tests for binary splits ===
+  No ceiling           mu=0.399  vs  Ceiling hit          mu=0.565  p=0.0000
+  Non-terminal         mu=0.261  vs  Terminal             mu=0.442  p=0.0000
+  Init wrong           mu=0.405  vs  Init correct         mu=0.536  p=0.0000
+  Flipped              mu=0.378  vs  Never flipped        mu=0.698  p=0.0000
+
+### CELL: DIST_ORDER  = ['4-0-0-0', '3-1-0-0', '2-2-0-0', '2-1-1-0', '1-1-1-1']
+/var/folders/92/yglwvnmx2bsg0b42jym1s8lh0000gn/T/ipykernel_80573/1200010032.py:60: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  plt.tight_layout()
+<Figure size 2080x1430 with 5 Axes>
+fig6 saved
+
+### CELL: # Efficiency: Spearman n_rounds ~ mean_slope
+=== Rep-level Spearman: n_rounds ~ mean_slope ===
+  GPQA         fc    W=1  rho=-0.668  p=0.0000  mean_rounds=3.85
+  GPQA         fc    W=2  rho=-0.745  p=0.0000  mean_rounds=3.64
+  GPQA         fc    W=5  rho=-0.805  p=0.0000  mean_rounds=3.81
+  GPQA         star  W=1  rho=-0.678  p=0.0000  mean_rounds=4.22
+  GPQA         star  W=2  rho=-0.715  p=0.0000  mean_rounds=4.15
+  GPQA         star  W=5  rho=-0.792  p=0.0000  mean_rounds=4.31
+  HiddenBench  fc    W=1  rho=-0.646  p=0.0000  mean_rounds=5.47
+  HiddenBench  fc    W=2  rho=-0.649  p=0.0000  mean_rounds=4.91
+  HiddenBench  fc    W=5  rho=-0.708  p=0.0000  mean_rounds=4.99
+  HiddenBench  star  W=1  rho=-0.751  p=0.0000  mean_rounds=7.56
+  HiddenBench  star  W=2  rho=-0.737  p=0.0000  mean_rounds=6.78
+  HiddenBench  star  W=5  rho=-0.725  p=0.0000  mean_rounds=6.54
+
+=== Rep-level rpb: correct ~ mean_slope (GPQA only) ===
+  GPQA fc    W=1  rpb=0.023  p=0.3428  correct=0.538  incorrect=0.526
+  GPQA fc    W=2  rpb=-0.005  p=0.8309  correct=0.503  incorrect=0.506
+  GPQA fc    W=5  rpb=0.003  p=0.9029  correct=0.459  incorrect=0.458
+  GPQA star  W=1  rpb=0.015  p=0.5260  correct=0.495  incorrect=0.487
+  GPQA star  W=2  rpb=-0.007  p=0.7617  correct=0.439  incorrect=0.442
+  GPQA star  W=5  rpb=0.002  p=0.9392  correct=0.415  incorrect=0.414
+
+=== Rep-level rpb: correct ~ mean_slope (HiddenBench only) ===
+  HiddenBench fc    W=1  rpb=0.049  p=0.0410
+  HiddenBench fc    W=2  rpb=0.026  p=0.2688
+  HiddenBench fc    W=5  rpb=0.030  p=0.2155
+  HiddenBench star  W=1  rpb=0.036  p=0.1325
+  HiddenBench star  W=2  rpb=0.052  p=0.0309
+  HiddenBench star  W=5  rpb=0.034  p=0.1553
+
+=== Median split accuracy ===
+  GPQA         fc     high-SR=0.410  low-SR=0.405  diff=+0.006
+  GPQA         star   high-SR=0.408  low-SR=0.407  diff=+0.001
+  HiddenBench  fc     high-SR=0.311  low-SR=0.293  diff=+0.018
+  HiddenBench  star   high-SR=0.297  low-SR=0.276  diff=+0.021
+
+### CELL: # Fig 4 — efficiency scatter
+<Figure size 1690x1170 with 4 Axes>
+fig4 saved
+
+### CELL: # Fig 5 — accuracy scatter
+<Figure size 1690x1170 with 4 Axes>
+fig5 saved
+
+### CELL: from collections import Counter as _C
+Mediation sample: 20,997 reps
+
+Baron-Kenny Mediation: diversity(X) -> SR(M) -> rounds(Y)
+  Step1 X->Y (total):       b=+0.402  p=0.0000
+  Step2 X->M:               b=-0.376  p=0.0000
+  Step3 M->Y|X:             b=-0.542
+  Step3 X->Y|M (direct):    b=+0.199
+  Indirect a*b:             +0.204
+  Bootstrap 95% CI:         [0.194, 0.214]
+  Proportion mediated:      51%
+
+=== By dataset ===
+  GPQA          indirect=0.237  direct=0.302  prop=44%
+  HiddenBench   indirect=0.127  direct=0.139  prop=48%
+
+### CELL: from src.metrics.stats_utils import (
+acc_df rows: 20,997
+
+### CELL: print('=== PART 4b — ACCURACY AMPLIFICATION (rep-level provenance) ===')
+=== PART 4b — ACCURACY AMPLIFICATION (rep-level provenance) ===
+
+(a) marginal rpb per cell:
+  GPQA         fc    W=1  rpb(p_sr)=-0.014  rpb(mean_slope)=+0.023
+  GPQA         fc    W=2  rpb(p_sr)=+0.029  rpb(mean_slope)=-0.005
+  GPQA         fc    W=5  rpb(p_sr)=-0.039  rpb(mean_slope)=+0.003
+  GPQA         star  W=1  rpb(p_sr)=+0.008  rpb(mean_slope)=+0.015
+  GPQA         star  W=2  rpb(p_sr)=+0.010  rpb(mean_slope)=-0.007
+  GPQA         star  W=5  rpb(p_sr)=+0.003  rpb(mean_slope)=+0.002
+  HiddenBench  fc    W=1  rpb(p_sr)=+0.017  rpb(mean_slope)=+0.049
+  HiddenBench  fc    W=2  rpb(p_sr)=-0.033  rpb(mean_slope)=+0.026
+  HiddenBench  fc    W=5  rpb(p_sr)=+0.005  rpb(mean_slope)=+0.030
+  HiddenBench  star  W=1  rpb(p_sr)=+0.011  rpb(mean_slope)=+0.036
+  HiddenBench  star  W=2  rpb(p_sr)=+0.032  rpb(mean_slope)=+0.052
+  HiddenBench  star  W=5  rpb(p_sr)=-0.013  rpb(mean_slope)=+0.034
+  marginal rpb max (mean_slope) = +0.0516   (p_sr) = +0.0315
+
+(b) GT-presence split + rpb(mean_slope, correct) within subset:
+  GPQA: GT-absent frac=0.312  GT-present frac=0.688
+     GT-absent   rpb=-0.112  p=1.12e-10  n=3,280
+     GT-present  rpb=+0.196  p=3.02e-63  n=7,218
+  HiddenBench: GT-absent frac=0.534  GT-present frac=0.466
+     GT-absent   rpb=-0.041  p=2.19e-03  n=5,608
+     GT-present  rpb=+0.178  p=5.51e-36  n=4,891
+
+(c) SR x GT_presence interaction (linear probability model):
+  GPQA         z-scored  interaction coef=+0.1103  p=2.88e-38
+  GPQA         raw-unit  interaction coef=+0.4221  p=2.88e-38
+  HiddenBench  z-scored  interaction coef=+0.1033  p=4.25e-38
+  HiddenBench  raw-unit  interaction coef=+0.4780  p=4.25e-38
+
+(d) amplification: rpb(init_correct_frac, correct) high-SR vs low-SR (median split):
+  GPQA         high-SR r=0.863  low-SR r=0.542
+  HiddenBench  high-SR r=0.588  low-SR r=0.418
+
+(e) confidence gain mean, correct vs incorrect:
+  GPQA         correct=1.660  incorrect=1.644
+  HiddenBench  correct=1.510  incorrect=1.483
+
+### CELL: print('=== TASK-LEVEL (n~35) CORRECTIONS ===')
+=== TASK-LEVEL (n~35) CORRECTIONS ===
+
+(1) Init-vote-distribution effect: task-paired Wilcoxon 4-0-0-0 vs 1-1-1-1 mean-slope (GPQA):
+  n=21  median_diff(4-0-0-0 - 1-1-1-1)=+0.424  W=0.0  p=9.537e-07
+
+(2) Efficiency task-level Spearman mean_slope ~ mean_rounds per cell:
+  GPQA         fc    W=1  rho=-0.777  p=4.04e-08  n=35
+  GPQA         fc    W=2  rho=-0.819  p=1.75e-09  n=35
+  GPQA         fc    W=5  rho=-0.852  p=8.33e-11  n=35
+  GPQA         star  W=1  rho=-0.778  p=3.69e-08  n=35
+  GPQA         star  W=2  rho=-0.898  p=2.76e-13  n=35
+  GPQA         star  W=5  rho=-0.912  p=2.47e-14  n=35
+  HiddenBench  fc    W=1  rho=-0.831  p=6.16e-10  n=35
+  HiddenBench  fc    W=2  rho=-0.765  p=8.71e-08  n=35
+  HiddenBench  fc    W=5  rho=-0.788  p=1.97e-08  n=35
+  HiddenBench  star  W=1  rho=-0.868  p=1.38e-11  n=35
+  HiddenBench  star  W=2  rho=-0.798  p=9.18e-09  n=35
+  HiddenBench  star  W=5  rho=-0.854  p=6.99e-11  n=35
+
+(3) GT-absent SR-accuracy rpb with task-cluster bootstrap 95% CI:
+  GPQA         rpb=-0.112  CI[-0.163, -0.059]  survives (excludes 0)
+  HiddenBench  rpb=-0.041  CI[-0.084, 0.010]  ns (includes 0)
+
+(4) Confidence-gain task-paired Wilcoxon (correct vs incorrect):
+  GPQA         n=34  median_diff(correct - incorrect)=-0.050  p=0.1012
+  HiddenBench  n=35  median_diff(correct - incorrect)=+0.054  p=0.0040
+
+### CELL: print('(5) Mediation indirect-effect: task-stratified (cluster) bootstrap CI:')
+(5) Mediation indirect-effect: task-stratified (cluster) bootstrap CI:
+  indirect a*b=0.204  prop mediated=51%  task-cluster CI[0.160, 0.246]
+  (rep-level CI [0.194, 0.214] was too tight; task-cluster CI is the honest one)
+
+### CELL: print('=== VALUE FIXES ===')
+=== VALUE FIXES ===
+
+Dataset comparison GPQA vs HiddenBench (MWU two-sided) — all six:
+  fc    W=1  GPQA=0.519  HB=0.444  p=0.0077  *
+  fc    W=2  GPQA=0.498  HB=0.459  p=0.3181  ns
+  fc    W=5  GPQA=0.449  HB=0.398  p=0.2497  ns
+  star  W=1  GPQA=0.474  HB=0.358  p=0.0000  ***
+  star  W=2  GPQA=0.432  HB=0.356  p=0.0027  **
+  star  W=5  GPQA=0.401  HB=0.337  p=0.0471  *
+
+### CELL: print('=== BH-FDR (q-values within each family, alpha=0.05) ===')
+=== BH-FDR (q-values within each family, alpha=0.05) ===
+--- simpson_gt_split (4 tests) ---
+  GPQA GT-absent             p=1.1179e-10  q=1.4905e-10  survives
+  GPQA GT-present            p=3.0173e-63  q=1.2069e-62  survives
+  HiddenBench GT-absent      p=2.1935e-03  q=2.1935e-03  survives
+  HiddenBench GT-present     p=5.5109e-36  q=1.1022e-35  survives
+
+--- confidence_gain (2 tests) ---
+  GPQA                       p=1.0123e-01  q=1.0123e-01  ns
+  HiddenBench                p=4.0291e-03  q=8.0581e-03  survives
+
+--- dataset_gpqa_hb (6 tests) ---
+  fc W=1                     p=7.6677e-03  q=1.5335e-02  survives
+  fc W=2                     p=3.1808e-01  q=3.1808e-01  ns
+  fc W=5                     p=2.4968e-01  q=2.9962e-01  ns
+  star W=1                   p=9.4989e-06  q=5.6993e-05  survives
+  star W=2                   p=2.7422e-03  q=8.2265e-03  survives
+  star W=5                   p=4.7135e-02  q=7.0702e-02  ns
+
+--- sr_page_trend (4 tests) ---
+  GPQA fc                    p=1.5704e-06  q=3.1408e-06  survives
+  GPQA star                  p=3.7548e-08  q=1.5019e-07  survives
+  HiddenBench fc             p=2.6397e-04  q=3.5196e-04  survives
+  HiddenBench star           p=3.6499e-02  q=3.6499e-02  survives
+
+--- topo_fc_star (6 tests) ---
+  GPQA W=1                   p=1.3576e-01  q=1.3576e-01  ns
+  GPQA W=2                   p=3.2534e-02  q=4.8801e-02  survives
+  GPQA W=5                   p=1.0503e-01  q=1.2603e-01  ns
+  HiddenBench W=1            p=5.4743e-06  q=1.6423e-05  survives
+  HiddenBench W=2            p=8.4982e-08  q=5.0989e-07  survives
+  HiddenBench W=5            p=1.7896e-04  q=3.5792e-04  survives
+
+### CELL: # Summary overview table
+=== OVERVIEW TABLE ===
+                        n_tasks   p_sr  mean_slope  accuracy  mean_rounds
+dataset     topology W                                                   
+gpqa        fc       1       35  0.825       0.519     0.396        3.853
+                     2       35  0.815       0.498     0.420        3.638
+                     5       35  0.769       0.449     0.406        3.805
+            star     1       35  0.813       0.474     0.399        4.223
+                     2       35  0.775       0.432     0.411        4.158
+                     5       35  0.742       0.401     0.412        4.315
+hiddenbench fc       1       35  0.851       0.444     0.288        5.467
+                     2       35  0.875       0.459     0.321        4.908
+                     5       35  0.825       0.398     0.297        4.988
+            star     1       35  0.835       0.358     0.278        7.559
+                     2       35  0.817       0.356     0.294        6.782
+                     5       35  0.790       0.337     0.286        6.536

@@ -1,32 +1,27 @@
 \contentsline {figure}{\numberline {1}{\ignorespaces Two-phase synchronous debate protocol}}{18}{figure.1}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Runtime saved by early stopping threshold}}{19}{figure.2}%
-\contentsline {figure}{\numberline {3}{\ignorespaces Task distribution across difficulty tiers}}{23}{figure.3}%
-\contentsline {figure}{\numberline {4}{\ignorespaces Accuracy decomposition: per-agent, majority, debate}}{39}{figure.4}%
-\contentsline {figure}{\numberline {5}{\ignorespaces Accuracy and rounds by memory window}}{43}{figure.5}%
-\contentsline {figure}{\numberline {6}{\ignorespaces Round-count distributions by configuration}}{44}{figure.6}%
-\contentsline {figure}{\numberline {7}{\ignorespaces Per-task self-reinforcement prevalence by configuration}}{46}{figure.7}%
-\contentsline {figure}{\numberline {8}{\ignorespaces Mean self-reinforcement slope by memory window}}{47}{figure.8}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Self-reinforcement slope heatmap across configurations}}{48}{figure.9}%
-\contentsline {figure}{\numberline {10}{\ignorespaces Slope distributions across structural subgroups}}{49}{figure.10}%
-\contentsline {figure}{\numberline {11}{\ignorespaces Self-reinforcement slope versus rounds to consensus}}{51}{figure.11}%
-\contentsline {figure}{\numberline {12}{\ignorespaces Self-reinforcement slope versus task accuracy}}{53}{figure.12}%
-\contentsline {figure}{\numberline {13}{\ignorespaces Vote-sequence timelines for two limit cycles}}{55}{figure.13}%
-\contentsline {figure}{\numberline {14}{\ignorespaces Recurrence matrices for two limit cycles}}{55}{figure.14}%
-\contentsline {figure}{\numberline {15}{\ignorespaces Onset of a hub-driven limit cycle}}{56}{figure.15}%
-\contentsline {figure}{\numberline {16}{\ignorespaces Effective attractors and Cramér's V per stratum}}{58}{figure.16}%
-\contentsline {figure}{\numberline {17}{\ignorespaces Bistability metrics across configurations}}{59}{figure.17}%
-\contentsline {figure}{\numberline {18}{\ignorespaces Effective attractors versus task accuracy}}{60}{figure.18}%
-\contentsline {figure}{\numberline {19}{\ignorespaces Dominance distributions by topology and dataset}}{62}{figure.19}%
-\contentsline {figure}{\numberline {20}{\ignorespaces Emergent dominance excess in fully-connected debates}}{63}{figure.20}%
-\contentsline {figure}{\numberline {21}{\ignorespaces Dominant-hub win rate and correctness}}{64}{figure.21}%
-\contentsline {figure}{\numberline {22}{\ignorespaces Accuracy by ground-truth presence at initialization}}{66}{figure.22}%
-\contentsline {figure}{\numberline {23}{\ignorespaces Accuracy and rounds by initial vote entropy}}{67}{figure.23}%
-\contentsline {figure}{\numberline {24}{\ignorespaces Accuracy versus rounds and vote flips}}{67}{figure.24}%
-\contentsline {figure}{\numberline {25}{\ignorespaces Causal effect of seeding the ground truth}}{69}{figure.25}%
-\contentsline {figure}{\numberline {26}{\ignorespaces De-novo recovery rate versus task difficulty}}{70}{figure.26}%
-\contentsline {figure}{\numberline {27}{\ignorespaces Convergence dynamics under seeding}}{71}{figure.27}%
-\contentsline {figure}{\numberline {28}{\ignorespaces Minority conversion mechanism and external validity}}{72}{figure.28}%
-\contentsline {figure}{\numberline {29}{\ignorespaces Accuracy versus rounds to consensus}}{V}{figure.29}%
-\contentsline {figure}{\numberline {30}{\ignorespaces Accuracy and efficiency by run-level feature}}{VI}{figure.30}%
-\contentsline {figure}{\numberline {31}{\ignorespaces Feature-outcome correlation matrix}}{VII}{figure.31}%
-\contentsline {figure}{\numberline {32}{\ignorespaces Feature distributions by outcome}}{VII}{figure.32}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Accuracy and rounds by memory window}}{41}{figure.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Round-count distributions by configuration}}{43}{figure.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Per-task self-reinforcement prevalence by configuration}}{45}{figure.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Mean self-reinforcement slope by memory window}}{46}{figure.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Slope distributions across structural subgroups}}{48}{figure.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Self-reinforcement slope versus rounds to consensus}}{49}{figure.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Self-reinforcement slope versus task accuracy}}{50}{figure.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Effective attractors and Cramér's V per stratum}}{51}{figure.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Dominance distributions by topology and dataset}}{54}{figure.10}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Emergent dominance excess in fully-connected debates}}{55}{figure.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Dominant-hub win rate and correctness}}{56}{figure.12}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Vote-sequence timelines for two limit cycles}}{58}{figure.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Recurrence matrices for two limit cycles}}{59}{figure.14}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Accuracy by ground-truth presence at initialization}}{61}{figure.15}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Accuracy versus rounds and vote flips}}{62}{figure.16}%
+\contentsline {figure}{\numberline {17}{\ignorespaces Causal effect of seeding the ground truth}}{63}{figure.17}%
+\contentsline {figure}{\numberline {18}{\ignorespaces De-novo recovery rate versus task difficulty}}{64}{figure.18}%
+\contentsline {figure}{\numberline {19}{\ignorespaces Convergence dynamics under seeding}}{65}{figure.19}%
+\contentsline {figure}{\numberline {20}{\ignorespaces Accuracy versus rounds to consensus}}{V}{figure.20}%
+\contentsline {figure}{\numberline {21}{\ignorespaces Bistability by configuration (heatmaps)}}{VI}{figure.21}%
+\contentsline {figure}{\numberline {22}{\ignorespaces $N_{\mathrm {eff}}$ versus task accuracy}}{VI}{figure.22}%
+\contentsline {figure}{\numberline {23}{\ignorespaces Accuracy and efficiency by run-level feature}}{VII}{figure.23}%
+\contentsline {figure}{\numberline {24}{\ignorespaces Feature-outcome correlation matrix}}{VII}{figure.24}%
+\contentsline {figure}{\numberline {25}{\ignorespaces Feature distributions by outcome}}{VIII}{figure.25}%
+\contentsline {figure}{\numberline {26}{\ignorespaces Accuracy and rounds by initial vote entropy}}{VIII}{figure.26}%
+\contentsline {figure}{\numberline {27}{\ignorespaces Runtime saved by early stopping threshold}}{XIV}{figure.27}%

@@ -1,0 +1,81 @@
+### CELL: import sys
+/Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+setup ok
+
+### CELL: # --- sec:method:sr worked example (05_detection.tex L246-255) ---
+--- sec:method:sr : vote-stable-segment OLS slopes (L246-255) ---
+  beta_seg [up   c=(5,6,6,8,9)]: computed=1  thesis_says=1  MATCH
+  beta_seg [down c=(7,7,6,6,5)]: computed=-0.5  thesis_says=-0.5  MATCH
+  beta_seg [flat c=(6,6,6,6,6)]: computed=0  thesis_says=0  MATCH
+
+### CELL: # --- sec:method:bistability worked example (05_detection.tex L370-386) ---
+--- sec:method:bistability : N_eff = 1/sum p^2 (inverse Simpson) (L370-386) ---
+  N_eff [monostable 28A/2B]: computed=1.142  thesis_says=1.14  MATCH
+  N_eff [bistable   15A/15B]: computed=2  thesis_says=2  MATCH
+  N_eff [tristable  10/10/10]: computed=3  thesis_says=3  MATCH
+  N_eff [stochastic 15A/15B]: computed=2  thesis_says=2  MATCH
+
+### CELL: # --- sec:method:dominance worked example (05_detection.tex L500-518) ---
+--- sec:method:dominance : staggered-convergence hub (L500-518) ---
+  sigma (out-strength) = [10.1667, 4.1667, 1.6667, 0.0]   thesis=[61/6, 25/6, 5/3, 0]=[10.1667, 4.1667, 1.6667, 0.0]
+  sigma_0 (=61/6): computed=10.17  thesis_says=10.17  MATCH
+  sigma_1 (=25/6): computed=4.167  thesis_says=4.167  MATCH
+  sigma_2 (=5/3) : computed=1.667  thesis_says=1.667  MATCH
+  sigma_3 (=0)   : computed=0  thesis_says=0  MATCH
+  shares p = [0.6354, 0.2604, 0.1042, 0.0]   thesis~(0.635, 0.260, 0.104, 0)
+  p_0: computed=0.6354  thesis_says=0.635  MATCH
+  p_1: computed=0.2604  thesis_says=0.26  MATCH
+  p_2: computed=0.1042  thesis_says=0.104  MATCH
+  sum p^2: computed=0.4824  thesis_says=0.482  MATCH
+  D (normalised Herfindahl): computed=0.3099  thesis_says=0.31  MATCH
+  hub influence share %%: computed=63.54  thesis_says=64  MATCH
+  hub agent index = 0 (thesis: agent 0)
+
+### CELL: # --- sec:method:dominance worked example: lone dissenter (05_detection.tex L518
+--- sec:method:dominance : lone-dissenter fold D = 1/9 (L518) ---
+  sigma = [1.6667, 1.6667, 1.6667, 0.0]   shares p = [0.3333, 0.3333, 0.3333, 0.0]
+  D lone-dissenter (=1/9): computed=0.1111  thesis_says=0.1111  MATCH
+
+### CELL: # --- sec:method:lc agent-level worked example (05_detection.tex L618-647) ---
+--- sec:method:lc : alternating cycle RQA, L=6 (L618-638) ---
+  trailing constant k = 1  (candidate needs k < u=3)  L = 6 (>=4 ok)
+  recurrence matrix R (main diag excluded):
+[[0 0 1 0 1 0]
+ [0 0 0 1 0 1]
+ [1 0 0 0 1 0]
+ [0 1 0 0 0 1]
+ [1 0 1 0 0 0]
+ [0 1 0 1 0 0]]
+  RR(1)=0.000  RR(2)=1.000  RR(3)=0.000   thesis: 0, 1, 0
+  DET (=1.0): computed=1  thesis_says=1  MATCH
+  P_hat (=2): computed=2  thesis_says=2  MATCH
+  period guard: 2 <= P_hat(2) <= floor(L/2)=3  -> True
+  distinct arrangements C(6,3) = 20 (=comb(6,3)=20); #DET>=obs = 2
+  combinatorial null p (=2/20=0.10): computed=0.1  thesis_says=0.1  MATCH
+    cross-check 2/C(6,3): computed=0.1  thesis_says=0.1  MATCH
+  add-one shuffle p (B=1000, seed=0) = 0.114  (~0.10; does NOT clear 0.05)
+
+### CELL: # --- sec:method:lc : full-length cycle L=16 and add-one floor (05_detection.tex
+--- sec:method:lc : full-length L~16 exact null and add-one floor (L639-644) ---
+  L=16 alternating: DET=1.000  P_hat=2
+  DET L=16 (=1.0): computed=1  thesis_says=1  MATCH
+  P_hat L=16 (=2): computed=2  thesis_says=2  MATCH
+  exact combinatorial null p = 2/C(16,8) = 2/12870 = 1.554e-04
+  exact null p (~2e-4): computed=0.0001554  thesis_says=0.0002  MATCH
+  add-one p-value floor 1/(B+1) at B=1000 = 9.990e-04
+  add-one floor (~1e-3): computed=0.000999  thesis_says=0.001  MATCH
+  interpretation: exact null (~2e-4) < shuffle floor (~1e-3), so a full-length
+  perfect cycle is flagged decisively at the 1/(B+1) floor.
+
+### CELL: # --- sec:method:lc : end-state guards (05_detection.tex L644-647) ---
+--- sec:method:lc : fixed-point exclusion and period guard (L644-647) ---
+  (A,B,A,B,B,B,B): trailing k = 4  -> fixed_point (k>=3)? True
+  trailing k fixed-point (>=3): computed=1  thesis_says=1  MATCH
+  (A,B,B,B,B,B,B): DET=0.933 (high)  P_hat=1  -> period guard rejects (P_hat<2)? True
+  near-constant P_hat (=1): computed=1  thesis_says=1  MATCH
+
+### CELL: # --- sec:method:lc:system / sec:method:vocab : macrostate count (05_detection.t
+--- sec:method:lc:system : macrostate count C(N+M-1, M-1) at N=4 (L686) ---
+  #macrostates M=3 (=C(6,2)): computed=15  thesis_says=15  MATCH
+  #macrostates M=4 (=C(7,3)): computed=35  thesis_says=35  MATCH

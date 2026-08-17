@@ -1,0 +1,246 @@
+### CELL: import sys
+/Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+setup ok
+
+### CELL: # ── Load and run dominance analysis ──────────────────────────────────────────
+Done in 672.9s  |  cells: 420  |  rep records: 17801
+Excluded (no conversions): 3199 / 21000
+Testable / valid         : 8769 / 17801  (49%)
+
+=== Accounting per (dataset, topology) ===
+  GPQA         fc   : valid=3977  excl=1273  testable=2844  (72%)
+  GPQA         star : valid=3966  excl=1284  testable=497  (13%)
+  HiddenBench  fc   : valid=4926  excl=324  testable=4073  (83%)
+  HiddenBench  star : valid=4932  excl=318  testable=1355  (27%)
+
+### CELL: print('=== Mean raw D by (dataset, topology, W) ===')
+=== Mean raw D by (dataset, topology, W) ===
+W                         1      2      5
+dataset     topology                     
+gpqa        fc        0.147  0.155  0.154
+            star      0.609  0.600  0.610
+hiddenbench fc        0.158  0.179  0.178
+            star      0.529  0.562  0.562
+
+=== TOPOLOGY effect: star vs fc (paired Wilcoxon, task-level) ===
+  GPQA         W=1: fc=0.143  star=0.625  (x4.4)  *** (p=5.8e-11)
+  GPQA         W=2: fc=0.154  star=0.617  (x4.0)  *** (p=5.8e-11)
+  GPQA         W=5: fc=0.147  star=0.639  (x4.3)  *** (p=5.8e-11)
+  HiddenBench  W=1: fc=0.158  star=0.532  (x3.4)  *** (p=5.8e-11)
+  HiddenBench  W=2: fc=0.180  star=0.564  (x3.1)  *** (p=5.8e-11)
+  HiddenBench  W=5: fc=0.177  star=0.565  (x3.2)  *** (p=5.8e-11)
+
+### CELL: # Fig 1 — D distribution by topology + dataset
+<Figure size 1560x1040 with 4 Axes>
+fig1 saved
+
+### CELL: print(f'=== Emergent excess in {Z_FLAG_TOPO.upper()}: z > 0? ===')
+=== Emergent excess in FC: z > 0? ===
+(star null degenerate for >80% reps -> FC only)
+
+  GPQA         W=1: mean_z=+0.528  median=+0.445  *** (p=1.2e-24)  n=934
+  GPQA         W=2: mean_z=+0.529  median=+0.317  *** (p=8.7e-27)  n=946
+  GPQA         W=5: mean_z=+0.547  median=+0.494  *** (p=1.8e-29)  n=964
+  HiddenBench  W=1: mean_z=+0.641  median=+0.579  *** (p=1.2e-45)  n=1349
+  HiddenBench  W=2: mean_z=+0.808  median=+0.992  *** (p=3.0e-71)  n=1375
+  HiddenBench  W=5: mean_z=+0.800  median=+1.100  *** (p=1.4e-69)  n=1349
+
+=== Flag rate vs 5% baseline (FC, testable) ===
+  GPQA        : flagged=208/2844=0.073  vs 5%  *** (p=6.2e-08)
+  HiddenBench : flagged=461/4073=0.113  vs 5%  *** (p=8.3e-58)
+
+### CELL: # Fig 2 — z violin FC + flag rate by W
+<Figure size 1560x650 with 2 Axes>
+fig2 saved
+
+### CELL: print('=== W effect: Spearman rho(W,D) task-level, one-sided greater ===')
+=== W effect: Spearman rho(W,D) task-level, one-sided greater ===
+  GPQA         fc   : rho=+0.052  ns (p1=0.301)
+  GPQA         star : rho=-0.009  ns (p1=0.537)
+  HiddenBench  fc   : rho=+0.187  * (p1=0.028)
+  HiddenBench  star : rho=+0.159  ns (p1=0.052)
+
+=== Paired Wilcoxon W1->W5 ===
+  GPQA         fc   : W1=0.143  W5=0.147  delta=+0.004  ns (p=0.1972)
+  GPQA         star : W1=0.625  W5=0.639  delta=+0.014  ns (p=0.2718)
+  HiddenBench  fc   : W1=0.158  W5=0.177  delta=+0.020  ** (p=0.0027)
+  HiddenBench  star : W1=0.532  W5=0.565  delta=+0.033  ** (p=0.0010)
+
+### CELL: print('=== Hub influence share p_hub ===')
+=== Hub influence share p_hub ===
+  GPQA         fc   : hub_p mean=0.419  p(hub>=50%)=0.264  hub_is_consensus=1.000  hub_capitulation=0.115
+  GPQA         star : hub_p mean=0.788  p(hub>=50%)=0.899  hub_is_consensus=0.998  hub_capitulation=0.175
+  HiddenBench  fc   : hub_p mean=0.451  p(hub>=50%)=0.300  hub_is_consensus=0.996  hub_capitulation=0.138
+  HiddenBench  star : hub_p mean=0.762  p(hub>=50%)=0.923  hub_is_consensus=0.989  hub_capitulation=0.201
+
+=== Group accuracy vs 1/M chance (rep-level; == hub final-vote correctness because hub_is_consensus~1.0 -> tautological relabel; task-level test in Part 9) ===
+  GPQA         fc   : hub_correct=0.422  (baseline=1/4=0.250)  *** (p=1.8e-124)
+  GPQA         star : hub_correct=0.423  (baseline=1/4=0.250)  *** (p=4.8e-125)
+  HiddenBench  fc   : hub_correct=0.317  (baseline=1/3=0.333)  ns (p=9.9e-01)
+  HiddenBench  star : hub_correct=0.299  (baseline=1/3=0.333)  ns (p=1.0e+00)
+
+### CELL: # Hub stability: for each (task, config), compute Herfindahl concentration of hu
+=== Hub stability (HHI over hub identities per cell) ===
+  HHI_norm=0 -> random; HHI_norm=1 -> same hub always
+  GPQA         fc   : hub_hhi_norm mean=0.158  dominant_frac mean=0.491
+  GPQA         star : hub_hhi_norm mean=0.042  dominant_frac mean=0.349
+  HiddenBench  fc   : hub_hhi_norm mean=0.143  dominant_frac mean=0.470
+  HiddenBench  star : hub_hhi_norm mean=0.021  dominant_frac mean=0.327
+
+=== Dominant hub holds correct answer fraction ===
+  GPQA         fc   : dom_hub_correct=0.405  (baseline=0.250)  t=5.05  p=0.0000
+  GPQA         star : dom_hub_correct=0.404  (baseline=0.250)  t=5.49  p=0.0000
+  HiddenBench  fc   : dom_hub_correct=0.314  (baseline=0.333)  t=-0.73  p=0.4693
+  HiddenBench  star : dom_hub_correct=0.291  (baseline=0.333)  t=-2.04  p=0.0440
+
+### CELL: # Fig 3 — hub stability violin + dominant hub correct fraction
+<Figure size 1560x650 with 2 Axes>
+fig3 saved
+
+### CELL: print('=== Spearman: D_mean vs task accuracy (cell-level) ===')
+=== Spearman: D_mean vs task accuracy (cell-level) ===
+  GPQA         fc   : rho=+0.043  ns (p=0.6619)  n=105
+  GPQA         star : rho=-0.015  ns (p=0.8821)  n=105
+  HiddenBench  fc   : rho=+0.367  *** (p=0.0001)  n=105
+  HiddenBench  star : rho=-0.004  ns (p=0.9651)  n=105
+
+=== Per-rep D: correct vs incorrect (MWU) ===
+  GPQA         fc   : D|correct=0.157  D|incorrect=0.148  (delta=+0.008)  ns (p=1.7e-01)
+  GPQA         star : D|correct=0.629  D|incorrect=0.590  (delta=+0.039)  *** (p=8.2e-04)
+  HiddenBench  fc   : D|correct=0.219  D|incorrect=0.150  (delta=+0.069)  *** (p=1.1e-30)
+  HiddenBench  star : D|correct=0.531  D|incorrect=0.559  (delta=-0.029)  ns (p=6.6e-02)
+
+=== hub_is_consensus vs hub_correct: does leadership predict correctness? ===
+  GPQA         fc   : hub_is_consensus->hub_correct=0.422  vs not=1.000  ns (p=0.8752)
+  GPQA         star : hub_is_consensus->hub_correct=0.423  vs not=0.667  ns (p=0.4266)
+  HiddenBench  fc   : hub_is_consensus->hub_correct=0.318  vs not=0.300  ns (p=1.0000)
+  HiddenBench  star : hub_is_consensus->hub_correct=0.301  vs not=0.148  * (p=0.0219)
+
+### CELL: # Fig 4 — D vs accuracy scatter + correct vs incorrect D
+<Figure size 1690x650 with 2 Axes>
+fig4 saved
+
+### CELL: from src.metrics.bistability import analyse_bistability
+=== Spearman: D_mean vs N_eff (per dataset) ===
+  GPQA        : rho=-0.070  ns (p=0.3140)  n=210
+  HiddenBench : rho=+0.012  ns (p=0.8617)  n=210
+
+=== D_mean by bistability label ===
+  monostable    : mean=0.411  n=90
+  multistable   : mean=0.375  n=176
+  stochastic    : mean=0.355  n=154
+
+  mono vs multi: ns (p=0.9416)
+  mono vs stoch: ns (p=0.4205)
+  multi vs stoch: ns (p=0.2023)
+
+### CELL: # For each rep, compute: n_conversions, total_weight, max_single_source_weight/t
+=== D vs max_source_frac (concentration of conversions on one source) ===
+  GPQA        : rho=+0.936  *** (p=0.0000)  n=7943
+  HiddenBench : rho=+0.953  *** (p=0.0000)  n=9858
+
+=== D vs total_conv_weight ===
+  GPQA         fc   : rho=-0.335  *** (p=0.0000)
+  GPQA         star : rho=-0.556  *** (p=0.0000)
+  HiddenBench  fc   : rho=-0.377  *** (p=0.0000)
+  HiddenBench  star : rho=-0.497  *** (p=0.0000)
+
+=== n_sources_active by topology (fewer in star?) ===
+  fc   : mean=3.34  median=3.0
+  star : mean=2.57  median=3.0
+
+### CELL: # Summary table
+=== DOMINANCE SUMMARY TABLE ===
+
+Total reps: 21,000  |  valid: 17,801  |  testable FC: 6,917
+
+Mean raw D:
+  GPQA         fc   : 0.152  (star/fc ratio: see star)
+  GPQA         star : 0.606  (star/fc ratio: 4.0x)
+  HiddenBench  fc   : 0.172  (star/fc ratio: see star)
+  HiddenBench  star : 0.551  (star/fc ratio: 3.2x)
+
+FC emergent excess z (pooled):
+  GPQA        : mean_z=+0.535  flagged=0.555  ***
+  HiddenBench : mean_z=+0.750  flagged=0.621  ***
+
+### CELL: fam = {}
+=== TASK-LEVEL (n~35): FC emergent excess z>0 (one-sample across tasks) ===
+  GPQA        : mean_task_z=+0.536  pos=35/35  sign p=2.91e-11  wilcoxon p=5.82e-11  n=35
+  HiddenBench : mean_task_z=+0.755  pos=35/35  sign p=2.91e-11  wilcoxon p=5.82e-11  n=35
+
+=== TASK-LEVEL (n~35): FC flagged fraction vs 5% [flag-rate family] ===
+  GPQA        : mean_task_flag=0.072  vs 0.05  p=6.07e-03  n=35
+  HiddenBench : mean_task_flag=0.114  vs 0.05  p=8.71e-06  n=35
+
+### CELL: print('=== TASK-LEVEL (n~35): group accuracy vs 1/M chance ===')
+=== TASK-LEVEL (n~35): group accuracy vs 1/M chance ===
+(relabels tautological hub-correctness; hub_is_consensus~1.0 -> hub-correct == group-correct)
+  GPQA         fc   : mean(acc-1/M)=+0.157  one-sided p=0.0035  two-sided p=0.0070  n=35
+  GPQA         star : mean(acc-1/M)=+0.157  one-sided p=0.0035  two-sided p=0.0070  n=35
+  HiddenBench  fc   : mean(acc-1/M)=-0.022  one-sided p=0.8546  two-sided p=0.2907  n=35
+  HiddenBench  star : mean(acc-1/M)=-0.038  one-sided p=0.9411  two-sided p=0.1177  n=35
+
+### CELL: print('=== TASK-LEVEL (n~35): dominant-hub-correct vs 1/M [dominant-hub-correct 
+=== TASK-LEVEL (n~35): dominant-hub-correct vs 1/M [dominant-hub-correct family] ===
+(non-tautological analogue: does the recurring dominant hub hold the correct answer?)
+  GPQA         fc   : dom_hub_correct=0.405  mean(diff)=+0.153  p=0.0122  n=35
+  GPQA         star : dom_hub_correct=0.404  mean(diff)=+0.152  p=0.0084  n=35
+  HiddenBench  fc   : dom_hub_correct=0.314  mean(diff)=-0.009  p=0.5436  n=35
+  HiddenBench  star : dom_hub_correct=0.291  mean(diff)=-0.032  p=0.1449  n=35
+
+### CELL: print('=== TASK-LEVEL (n~35): W1->W5 paired Wilcoxon (one-sided greater) [W-effe
+=== TASK-LEVEL (n~35): W1->W5 paired Wilcoxon (one-sided greater) [W-effect family] ===
+  GPQA         fc   : delta=+0.004  p=0.1972  n=35
+  GPQA         star : delta=+0.014  p=0.2718  n=35
+  HiddenBench  fc   : delta=+0.020  p=0.0027  n=35
+  HiddenBench  star : delta=+0.033  p=0.0010  n=35
+
+### CELL: print('=== TASK-LEVEL (n~35): D correct vs incorrect (task-paired Wilcoxon) [D-c
+=== TASK-LEVEL (n~35): D correct vs incorrect (task-paired Wilcoxon) [D-corr-vs-incorrect family] ===
+  GPQA         fc   : d=+0.025  median_diff=+0.017  p=0.0443  n=33
+  GPQA         star : d=+0.003  median_diff=+0.031  p=0.8132  n=34
+  HiddenBench  fc   : d=+0.059  median_diff=+0.053  p=0.0001  n=35
+  HiddenBench  star : d=-0.051  median_diff=-0.056  p=0.0101  n=35
+
+### CELL: print('=== TASK-LEVEL (n~35): D vs accuracy Spearman [D-accuracy family] ===')
+=== TASK-LEVEL (n~35): D vs accuracy Spearman [D-accuracy family] ===
+  GPQA         fc   : rho=+0.036  p=0.8392  n=35
+  GPQA         star : rho=-0.017  p=0.9211  n=35
+  HiddenBench  fc   : rho=+0.443  p=0.0077  n=35
+  HiddenBench  star : rho=+0.005  p=0.9783  n=35
+
+=== TASK-LEVEL (n~35): D vs max_source_frac Spearman (conversion structure) ===
+  GPQA        : rho=+0.852  p=0.0000  n=35
+  HiddenBench : rho=+0.838  p=0.0000  n=35
+
+=== FC hub influence share (~44%) ===
+  GPQA         fc: hub_p mean=0.419
+  HiddenBench  fc: hub_p mean=0.451
+
+### CELL: print('=== BH-FDR within families (q<0.05 survives) ===')
+=== BH-FDR within families (q<0.05 survives) ===
+-- flag_rate (n=2) --
+   GPQA                 p=6.07e-03  q=6.07e-03  SURVIVES
+   HiddenBench          p=8.71e-06  q=1.74e-05  SURVIVES
+-- W_effect (n=4) --
+   GPQA/fc              p=1.97e-01  q=2.63e-01  ns
+   GPQA/star            p=2.72e-01  q=2.72e-01  ns
+   HiddenBench/fc       p=2.67e-03  q=5.34e-03  SURVIVES
+   HiddenBench/star     p=1.04e-03  q=4.18e-03  SURVIVES
+-- dom_hub_correct (n=4) --
+   GPQA/fc              p=1.22e-02  q=2.44e-02  SURVIVES
+   GPQA/star            p=8.36e-03  q=2.44e-02  SURVIVES
+   HiddenBench/fc       p=5.44e-01  q=5.44e-01  ns
+   HiddenBench/star     p=1.45e-01  q=1.93e-01  ns
+-- D_accuracy (n=4) --
+   GPQA/fc              p=8.39e-01  q=9.78e-01  ns
+   GPQA/star            p=9.21e-01  q=9.78e-01  ns
+   HiddenBench/fc       p=7.72e-03  q=3.09e-02  SURVIVES
+   HiddenBench/star     p=9.78e-01  q=9.78e-01  ns
+-- D_corr_inc (n=4) --
+   GPQA/fc              p=4.43e-02  q=5.91e-02  ns
+   GPQA/star            p=8.13e-01  q=8.13e-01  ns
+   HiddenBench/fc       p=1.18e-04  q=4.72e-04  SURVIVES
+   HiddenBench/star     p=1.01e-02  q=2.03e-02  SURVIVES

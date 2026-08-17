@@ -1,0 +1,113 @@
+### CELL: import sys
+setup ok
+
+### CELL: def wilson_ci(k, n, z=1.96):
+init_0 tasks=35  init_1 tasks=34  common=34
+only in init_0: ['3']
+
+### CELL: def build_rows(dd, cond):
+rows: init_0=1700  init_1=1700
+final unanimity: init_0=1.000  init_1=1.000
+
+### CELL: k0, n0 = df0['correct'].sum(), len(df0)
+POOLED init_0 (GT absent) : 31/1700 = 0.0182  CI=(0.0129, 0.0258)
+POOLED init_1 (GT seeded) : 403/1700 = 0.2371  CI=(0.2174, 0.2579)
+pooled chi2=363.6  p=4.75e-81  lift factor=13.0x
+
+paired Wilcoxon (n=34 tasks): init_1 > init_0 in 34/34 tasks, W=0 p=3.62e-07
+median per-task lift = 0.180
+
+init_0 produced >=1 correct run in 15/34 tasks (de-novo recovery is possible but rare)
+
+### CELL: fig, axes = plt.subplots(1, 2, figsize=(15, 6),
+<Figure size 1950x780 with 2 Axes>
+saved fig4_seeded_causal.png
+
+### CELL: # init_1 seed fate
+init_1 seed fate (n=1700):
+  capitulated (GT share -> 0):    1297  (76.3%)
+  partial (survives as minority): 0 (0.0%)
+  converted (GT reaches >=50%):    403 (23.7%)
+
+init_1 WON runs: mean overtake round=1.65 median=1
+
+init_0 de-novo correct runs: 31
+  GT first-appearance round dist: {np.int64(1): 19, np.int64(2): 10, np.int64(3): 2}
+  mean first-appearance round: 1.45
+  spearman(n_correct_pool, init_0 acc)=0.505 p=2.319e-03
+
+### CELL: fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+<Figure size 1820x650 with 2 Axes>
+saved fig5_seeded_dynamics.png
+
+### CELL: # logistic model within init_1
+init_1 logistic: GT-win ~ standardised predictors
+  const            beta=-1.214  p=2.85e-93
+  opp_top_bloc     beta=-0.195  p=6.51e-04
+  conf_advantage   beta=+0.169  p=5.23e-03
+  n_correct_pool   beta=+0.299  p=2.23e-07
+  pseudo-R2=0.028
+
+unified opposition (3-0-0): acc=0.195 (n=788)
+divided opposition (<3):    acc=0.273 (n=912)
+chi2=13.6 p=2.21e-04
+
+### CELL: from src.metrics.stats_utils import task_paired_wilcoxon
+/Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+=== TASK-CLUSTERED (GEE, groups=qid) win predictors ===
+  const            beta=-1.217  p=4.22e-12
+  opp_top_bloc     beta=-0.162  p=9.51e-04
+  conf_advantage   beta=+0.162  p=3.10e-02
+  n_correct_pool   beta=+0.330  p=2.90e-02
+
+### CELL: print('=== 3-0-0 vs 1-1-1 (matches LaTeX 19.5% vs 32.3% proportions) ===')
+=== 3-0-0 vs 1-1-1 (matches LaTeX 19.5% vs 32.3% proportions) ===
+3-0-0 (unified): acc=0.1954 (n=788)
+1-1-1 (split):   acc=0.3232 (n=99)
+chi2=7.9 p=4.91e-03
+
+### CELL: print('=== TASK-LEVEL (n~31): unified vs divided opposition ===')
+=== TASK-LEVEL (n~31): unified vs divided opposition ===
+tasks with both bloc types: n=31
+paired Wilcoxon (divided vs unified): W=149.0 p=0.053 median per-task diff=+0.0629
+cluster bootstrap pooled diff (divided-unified): +0.0776 CI[-0.0033,0.1500] (includes 0: True)
+
+### CELL: # observational comparison for q84,q125,q144
+q84: observational(1-GT-minority)=0.187 (n=434)  seeded_init_1=0.160 (n=50)
+q125: observational(1-GT-minority)=0.250 (n=424)  seeded_init_1=0.120 (n=50)
+q144: observational(1-GT-minority)=0.365 (n=334)  seeded_init_1=0.280 (n=50)
+
+### CELL: fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+<Figure size 1820x650 with 2 Axes>
+saved fig6_seeded_mechanism.png
+
+### CELL: base = np.array([d0[q]['n_correct_pool'] / (d0[q]['n_correct_pool'] + d0[q]['n_w
+recovery vs single-agent accuracy: Spearman rho=0.505 p=0.0023  Pearson r=0.425 p=0.0122
+
+recovery by single-agent-accuracy quartile:
+  Q1 hardest  : base_acc=0.061  mean recovery=0.0000  recovered=0/400
+  Q2          : base_acc=0.261  mean recovery=0.0156  recovered=7/450
+  Q3          : base_acc=0.436  mean recovery=0.0275  recovered=11/400
+  Q4 easiest  : base_acc=0.714  mean recovery=0.0289  recovered=13/450
+
+### CELL: fig, ax = plt.subplots(figsize=(8, 6))
+<Figure size 1040x780 with 1 Axes>
+saved fig7_recovery_difficulty.png
+
+### CELL: print('=== headline numbers for LaTeX ===\n')
+=== headline numbers for LaTeX ===
+
+init_0 pooled acc = 1.8% (31/1700)
+init_1 pooled acc = 23.7% (403/1700)
+lift factor = 13.0x   chi2=364
+paired Wilcoxon: 34/34 tasks, p=3.6e-07
+seed converts group: 23.7%  capitulates: 76.3%  partial: 0
+init_1 mean overtake round: 1.65
+init_0 de-novo runs: 31  mean first-appearance round: 1.45
+init_0 tasks with >=1 recovery: 15/34
+unified vs divided opposition: 0.195 vs 0.273 (p=2.2e-04)
+spearman(pool, init_0 acc): rs=0.505 p=2.3e-03
+recovery vs difficulty: Spearman rho=0.505 p=0.0023  hardest-quartile recovery=0.0000 (0/400)
+
+mean rounds: init_0=3.36  init_1=4.15

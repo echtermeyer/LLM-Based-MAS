@@ -53,7 +53,7 @@ Against this largely optimistic backdrop, a critical literature has emerged that
 questions whether debate delivers what it promises. \citet{liu2025stopovervaluing}
 evaluate MAD across nine benchmarks and four base models and find that it
 frequently fails to outperform simple single-agent baselines such as
-chain-of-thought and self-consistency, despite consuming substantially more
+chain-of-thought \citep{wei2022chainofthought} and self-consistency \citep{wang2023selfconsistency}, despite consuming substantially more
 inference-time compute; they argue that model heterogeneity, rather than debate
 per se, is what reliably helps. \citet{zhang2025debateorvote} decompose MAD into
 its constituent mechanisms and show that majority voting alone accounts for most
@@ -158,7 +158,7 @@ trajectory, and two systems that reach the same accuracy through entirely
 different dynamics, one by genuine error correction, the other by a confident
 slide into a shared mistake, are indistinguishable under it. It can say
 \emph{whether} a configuration worked but not \emph{why}, and it provides no
-vocabulary for a run's failure mode.
+vocabulary for a repetition's failure mode.
 
 \paragraph{Mechanistic interpretability.}
 A second approach would open the models themselves, analysing weights, activations,
@@ -175,7 +175,7 @@ A third approach reads the debate transcripts directly, characterising the conte
 of arguments and the rhetoric of persuasion. This is rich and interpretable, and
 we draw on it informally when reading the mechanism behind the flagged
 limit-cycle cases (\autoref{sec:results:lc}). But on its own it is subjective, does not scale to tens
-of thousands of runs, and yields no falsifiable structure that can be tested
+of thousands of repetitions, and yields no falsifiable structure that can be tested
 against a null. It complements a quantitative lens rather than replacing it.
 
 \paragraph{The complex-systems / dynamical lens.}
@@ -225,10 +225,13 @@ bistability, and dominance, each grounded in the corresponding complex-systems o
 opinion-dynamics literature and equipped with a principled null model, rather than
 in ad hoc thresholds; (ii) characterise how these motifs appear or vanish under
 controlled variation of the two canonical structural axes of multi-agent design,
-communication topology and memory window; and (iii) relate motif presence to
-task outcomes across two deliberately contrasting regimes, a truth-verifiable
+communication topology and memory window; (iii) relate motif presence to task
+outcomes across two deliberately contrasting regimes, a truth-verifiable
 benchmark where agents start with reasonable priors (GPQA-Diamond) and a
 hidden-profile benchmark where they start systematically wrong
-(HiddenBench), so that the role of a reliable individual signal can be isolated.
+(HiddenBench), so that the role of a reliable individual signal can be isolated;
+and (iv) use the resulting motif characterisation as the empirical groundwork for
+evidence-graded design principles, with each detector providing an observable
+that a practitioner could use to monitor deliberative health.
 In doing so we also treat the \emph{absence} of a motif as an informative
 finding, a stance the outcome-centric literature has no natural place for.

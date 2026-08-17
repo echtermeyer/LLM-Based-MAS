@@ -83,7 +83,7 @@ while detecting cycles and attractors on the discrete channel (votes).
 \label{sec:bg:llm}
 
 A large language model (LLM) is a neural network, in current practice a
-Transformer, trained to predict the next token in a sequence and subsequently
+Transformer \citep{vaswani2017attention}, trained to predict the next token in a sequence and subsequently
 aligned to follow instructions through supervised fine-tuning and reinforcement
 learning from human feedback \citep{ouyang2022instructgpt}. The result is a model
 that maps a textual prompt to a distribution over continuations, from which text
@@ -102,7 +102,7 @@ temperature the model does not return a single deterministic answer but samples
 from its output distribution, so two agents given the identical prompt can
 produce different responses. This stochasticity is the source of the initial
 diversity that multi-agent debate relies on, and, as later chapters show, it is
-also what makes repeated runs of the \emph{same} task on the \emph{same}
+also what makes repeated repetitions of the \emph{same} task on the \emph{same}
 configuration land on different outcomes, the raw material for a bistability
 analysis. Because we use a single model family throughout, all four agents share
 the same priors and the same competence; any diversity in the group is a product
@@ -120,7 +120,7 @@ reasoning over multiple rounds before the group commits to a final decision
 \citep{du2024improving}. The motivating intuition is an error-correction argument:
 if agents make partially independent mistakes, deliberation gives the group a
 chance to surface and correct them, much as an ensemble of independent voters can
-outperform its average member. Reported gains on factual and mathematical
+outperform its average member \citep{grofman1983thirteen}. Reported gains on factual and mathematical
 reasoning \citep{du2024improving, liang2024encouraging, chen2024reconcile}, and
 the use of debate panels as more reliable evaluators \citep{chan2024chateval},
 follow from this idea.

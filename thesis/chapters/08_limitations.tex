@@ -8,7 +8,7 @@
 % ============================================================
 
 The claims in this thesis are bounded, and stating those bounds precisely is
-essential to not overstating them. This chapter groups the limitations into those
+essential to not overstating them. This section groups the limitations into those
 of \emph{scope} (what was varied) and those of \emph{method} (how the motifs were
 measured), and then maps them onto a prioritised research agenda.
 
@@ -32,6 +32,28 @@ as the reliable source of gains \citep{liu2025stopovervaluing, chen2024reconcile
 and capability asymmetry is what drives the accuracy-decreasing herding reported by
 \citet{wynn2025talk}. Our homogeneous design isolates the dynamics of a uniform
 collective by construction, but it cannot speak to heterogeneous ones.
+
+A related scope boundary concerns the memory window. We tested $W \in \{1, 2, 5\}$,
+a range that keeps the history short relative to the round cap. At sufficiently
+large $W$, every agent can see the complete history of every other agent's messages
+regardless of topology: a spoke in a star can reconstruct the full exchange through
+accumulated hub summaries, and the structural difference between fully-connected and
+star communication becomes negligible. This suggests that the topology effects we
+report---faster convergence under FC, hub-driven limit cycles under star---could
+diminish or vanish if $W$ were large enough to bridge the information gap between
+topologies. Our results characterise the low-to-moderate memory regime; whether
+the topology effect survives large memory windows is an open question.
+
+\paragraph{Task-selection bias from Tier-3 screening.}
+All quantitative results are conditioned on Tier-3 tasks, those where the outcome
+varies across repetitions under the screening configuration.
+By construction, this excludes tasks that are trivially easy (unanimous at $t=0$),
+nearly deterministic (the group always converges to the same answer), or too hard
+for any signal to emerge.
+The prevalence rates reported here, how often each motif appears, are therefore
+rates \emph{within the contested regime}, not across the full task distribution.
+Extrapolating them to the broader population of questions, or to operating
+conditions where most tasks fall outside Tier~3, would overstate motif frequency.
 
 \paragraph{The causal evidence is GPQA-only.}
 The seeded-initialisation experiment, our only intervention and the strongest
@@ -62,11 +84,11 @@ not run.
 \paragraph{Specific measurement caveats.}
 Four narrower caveats bound specific results. (i) The self-reinforcement null may
 be subject to survivorship bias: agents whose confidence drifts downward are more
-likely to flip their vote and terminate a vote-stable run, which can censor
+likely to flip their vote and terminate a vote-stable segment, which can censor
 negative slopes and inflate $p_{\mathrm{SR}}$ above the $0.5$ baseline; the
 prevalence result is therefore conservative in direction but not bias-free in
 magnitude. (ii) The diversity$\to$SR$\to$rounds mediation is partly mechanical,
-since longer runs afford more rounds over which a slope can accumulate; we report
+since longer segments afford more rounds over which a slope can accumulate; we report
 it as a decomposition, not as evidence that SR temporally precedes convergence.
 (iii) The bistability $N_{\mathrm{eff}}$ measure can in principle exceed the option
 count when split (non-unanimous) endpoints are admitted; because we restrict
@@ -76,6 +98,15 @@ $N_{\mathrm{eff}} \leq M$ in all $420$ cells.
 (iv) The linguistic scorer is an instance of the same model family as the agents,
 so it is not an independent rater; we use its scores only for relative, rank-based
 comparisons and never as ground-truth argument quality.
+(v) The dominance influence graph is built from vote adoptions during the
+\updatephase{} phase, which is precisely where the protocol instructs agents to
+update after reading peers' \arguephase{} drafts.
+Conversion edges therefore partly reflect the structural fact that agents are
+\emph{supposed} to be influenced in this phase; a high dominance score on a
+hub-to-spoke edge may indicate genuine persuasive leadership or simply that the
+protocol routes all information through the hub.
+We treat dominance as a concentration \emph{signature} and never as a certified
+causal influence for this reason.
 
 \paragraph{Statistical multiplicity.}
 This is an exploratory study reporting many tests across twelve configuration

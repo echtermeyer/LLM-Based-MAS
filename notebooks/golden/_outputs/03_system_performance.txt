@@ -1,0 +1,218 @@
+### CELL: import sys
+Repetitions: 21,000  |  Tasks: 35  |  R=50 (ledger M17: nb020 mis-prints R=30)  |  Configs: 12
+N total = 21,000  (thesis_says=21,000)
+
+                        accuracy  mean_rounds  p_cap
+dataset     topology W                              
+gpqa        fc       1     0.396        3.853  0.002
+                     2     0.420        3.638  0.002
+                     5     0.406        3.805  0.006
+            star     1     0.399        4.223  0.009
+                     2     0.411        4.158  0.008
+                     5     0.412        4.315  0.016
+hiddenbench fc       1     0.288        5.467  0.033
+                     2     0.321        4.908  0.012
+                     5     0.297        4.988  0.021
+            star     1     0.278        7.559  0.143
+                     2     0.294        6.782  0.119
+                     5     0.286        6.536  0.110
+
+### CELL: # --- sec:results:perf L55-56 tab:perf:baseline: per-agent / majority / debate /
+=== Accuracy decomposition per dataset (all configs pooled, N=10,500/ds) ===
+  GPQA  n=10,500
+    per-agent   computed=0.367  thesis_says=0.367  MATCH
+    majority r0 computed=0.394  thesis_says=0.394  MATCH
+    after debate computed=0.407  thesis_says=0.407  MATCH
+    oracle r0   computed=0.688  thesis_says=0.688  MATCH
+  HiddenBench  n=10,500
+    per-agent   computed=0.155  thesis_says=0.155  MATCH
+    majority r0 computed=0.083  thesis_says=0.083  MATCH
+    after debate computed=0.294  thesis_says=0.294  MATCH
+    oracle r0   computed=0.466  thesis_says=0.466  MATCH
+
+=== Debate gain (majority -> after debate) ===
+  GPQA          gain=+1.39 pp
+  HiddenBench   gain=+21.10 pp
+  GPQA gain: computed=+1.39pp  thesis_says=+1.3pp (ledger #17 corrects to +1.4pp)  MATCH-1.4
+  HiddenBench gain: computed=+21.10pp  thesis_says=+21.1pp
+
+### CELL: # --- sec:results:perf L108-109 HiddenBench recovered fraction ---
+HiddenBench recovered fraction (final-maj)/(oracle-maj) = 0.551  thesis_says~0.55
+
+=== HiddenBench accuracy split by option count M (chance = 1/M) ===
+  M=3  n_tasks=31  accuracy=0.303  chance=0.333
+  M=4  n_tasks=4  accuracy=0.227  chance=0.250
+  M=3: computed_acc=0.303 thesis_says=0.303  n_tasks computed=31 thesis_says=31  MATCH
+  M=4: computed_acc=0.227 thesis_says=0.227  n_tasks computed=4 thesis_says=4  MATCH
+  HiddenBench repetition-weighted chance level = 0.324  thesis_says~0.32
+
+### CELL: # --- sec:results:perf L122-136 correlated errors: independence prediction ---
+=== Independence prediction  1 - (1 - p_agent)^4  vs observed oracle ===
+  GPQA          p_agent=0.367  indep_pred=0.839 (thesis_says=0.839 MATCH)  observed_oracle=0.688 (thesis_says=0.688)
+  HiddenBench   p_agent=0.155  indep_pred=0.491 (thesis_says=0.490 MATCH)  observed_oracle=0.466 (thesis_says=0.466)
+
+### CELL: # Fig 1 — single vs multi (per-agent / majority / debate) with random line
+<Figure size 1560x624 with 2 Axes>
+fig1 saved -> ../../thesis/plots/general/fig1_single_vs_multi.png
+
+### CELL: from src.metrics.stats_utils import (task_paired_wilcoxon, task_friedman,
+/Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+=== tab:perf:topology  (pooled over W, n=5,250 reps/cell) ===
+  GPQA
+    acc    fc computed=0.407 thesis=0.407  star computed=0.407 thesis=0.407  delta(acc)=+0.0pp
+    rounds fc computed=3.765 thesis=3.77  star computed=4.232 thesis=4.23  delta(rounds fc-star)=-0.47
+  HiddenBench
+    acc    fc computed=0.302 thesis=0.302  star computed=0.286 thesis=0.286  delta(acc)=-1.6pp
+    rounds fc computed=5.121 thesis=5.12  star computed=6.959 thesis=6.96  delta(rounds fc-star)=-1.84
+
+=== Topology ACCURACY task-paired Wilcoxon (task = mean over W, n=35) ===
+  GPQA         fc=0.407 star=0.407 delta(fc-star)=-0.000 CI[-0.140,+0.145]
+    Wilcoxon p computed=0.9644  thesis_says=0.96  ledger#8_says=0.903  CHECK
+    bootstrap CI computed=[-0.140,+0.145]  thesis_says=[-0.14,+0.15]
+  HiddenBench  fc=0.302 star=0.286 delta(fc-star)=+0.016 CI[-0.074,+0.106]
+    Wilcoxon p computed=0.1558  thesis_says=0.16  ledger#8_says=0.151  MATCH
+    bootstrap CI computed=[-0.074,+0.106]  thesis_says=[-0.07,+0.11]
+
+=== Topology ROUNDS task-paired Wilcoxon (task = mean over W, n=35) ===
+  GPQA         fc=3.765 star=4.232 delta(fc-star)=-0.467  Wilcoxon p=3.82e-07  (thesis_says p<0.001)
+  HiddenBench  fc=5.121 star=6.959 delta(fc-star)=-1.838  Wilcoxon p=5.82e-11  (thesis_says p<0.001)
+
+### CELL: # Fig 2 — topology: accuracy + mean rounds, 2x2
+<Figure size 1560x1196 with 4 Axes>
+fig2 saved -> ../../thesis/plots/general/fig2_topology.png
+
+### CELL: # --- sec:results:perf L224-238 memory-window ACCURACY: task-blocked Friedman --
+=== Memory-window ACCURACY task-blocked Friedman (unit=task, n=35) ===
+  GPQA         fc     W1=0.396 W2=0.420 W5=0.406  Friedman p computed=0.1745 thesis_says=0.17  MATCH
+  GPQA         star   W1=0.399 W2=0.411 W5=0.412  Friedman p computed=0.2813 thesis_says=0.28  MATCH
+  HiddenBench  fc     W1=0.288 W2=0.321 W5=0.297  Friedman p computed=0.0189 thesis_says=0.019  MATCH
+  HiddenBench  star   W1=0.278 W2=0.294 W5=0.286  Friedman p computed=0.6790 thesis_says=0.68  MATCH
+
+  BH-FDR across the 4 accuracy cells (alpha=0.05):
+    GPQA/fc            p=0.1745  q=0.3491  ns  
+    GPQA/star          p=0.2813  q=0.3751  ns  
+    HiddenBench/fc     p=0.0189  q=0.0756  ns  HB/fc q thesis_says=0.076
+    HiddenBench/star   p=0.6790  q=0.6790  ns
+
+### CELL: # --- sec:results:perf L241-253 memory-window ROUNDS: task-blocked Friedman + W-
+=== Memory-window ROUNDS task-blocked Friedman (unit=task, n=35) ===
+  GPQA         fc     W1=3.853 W2=3.638 W5=3.805  Friedman p=0.0126  thesis_says~0.013
+  GPQA         star   W1=4.223 W2=4.158 W5=4.315  Friedman p=0.6823  thesis_says~0.68
+  HiddenBench  fc     W1=5.467 W2=4.908 W5=4.988  Friedman p=0.0000  thesis_says p<0.001
+  HiddenBench  star   W1=7.559 W2=6.782 W5=6.536  Friedman p=0.0000  thesis_says p<0.001
+
+=== Mean rounds per (dataset, topology, W) ===
+dataset      topology  W
+gpqa         fc        1    3.853
+                       2    3.638
+                       5    3.805
+             star      1    4.223
+                       2    4.158
+                       5    4.315
+hiddenbench  fc        1    5.467
+                       2    4.908
+                       5    4.988
+             star      1    7.559
+                       2    6.782
+                       5    6.536
+
+### CELL: # Fig 3 — memory window: accuracy + rounds, lines per topology, Friedman annotat
+<Figure size 1560x1196 with 4 Axes>
+fig3 saved -> ../../thesis/plots/general/fig3_memory_window.png
+
+### CELL: # --- sec:results:perf L282-300 cap-reach rates per config ---
+=== Fraction hitting hard cap T=15 per config ===
+  GPQA
+    fc    W=1  p_cap=0.2%
+    fc    W=2  p_cap=0.2%
+    fc    W=5  p_cap=0.6%
+    star  W=1  p_cap=0.9%
+    star  W=2  p_cap=0.8%
+    star  W=5  p_cap=1.6%
+    -> all configs: 0.2%-1.6%  fc: 0.2%-0.6%  star: 0.8%-1.6%
+  HiddenBench
+    fc    W=1  p_cap=3.3%
+    fc    W=2  p_cap=1.2%
+    fc    W=5  p_cap=2.1%
+    star  W=1  p_cap=14.3%
+    star  W=2  p_cap=11.9%
+    star  W=5  p_cap=11.0%
+    -> all configs: 1.2%-14.3%  fc: 1.2%-3.3%  star: 11.0%-14.3%
+  thesis_says: GPQA all <=1.6%; HiddenBench 1.2-14.3%; HB star 11.0-14.3%; HB fc 1.2-3.3%
+
+### CELL: # Fig 4 — round-count distributions, 2x2, one line per W
+<Figure size 1560x1196 with 4 Axes>
+fig4 saved -> ../../thesis/plots/general/fig4_round_distribution.png
+
+### CELL: # --- sec:results:perf L306-316 rounds-vs-accuracy buckets (min n=20, all config
+=== Accuracy by rounds-to-consensus bucket (min n=20 obs) ===
+  GPQA
+    rounds= 2  n=2555  acc=0.361
+    rounds= 3  n=2792  acc=0.471
+    rounds= 4  n=2205  acc=0.428
+    rounds= 5  n=1262  acc=0.389
+    rounds= 6  n= 640  acc=0.367
+    rounds= 7  n= 357  acc=0.361
+    rounds= 8  n= 224  acc=0.339
+    rounds= 9  n= 134  acc=0.403
+    rounds=10  n=  92  acc=0.315
+    rounds=11  n=  67  acc=0.403
+    rounds=12  n=  32  acc=0.438
+    rounds=13  n=  44  acc=0.432
+    rounds=14  n=  22  acc=0.227
+    rounds=15  n=  74  acc=0.270
+  HiddenBench
+    rounds= 2  n= 596  acc=0.064
+    rounds= 3  n=1722  acc=0.238
+    rounds= 4  n=2248  acc=0.317
+    rounds= 5  n=1723  acc=0.331
+    rounds= 6  n=1093  acc=0.339
+    rounds= 7  n= 722  acc=0.359
+    rounds= 8  n= 469  acc=0.292
+    rounds= 9  n= 317  acc=0.344
+    rounds=10  n= 263  acc=0.323
+    rounds=11  n= 195  acc=0.308
+    rounds=12  n= 156  acc=0.327
+    rounds=13  n= 118  acc=0.322
+    rounds=14  n= 111  acc=0.198
+    rounds=15  n= 767  acc=0.293
+
+  --- thesis-cited buckets ---
+  GPQA round2=0.361 (thesis 0.361)  rounds3-4 pooled=0.452 (thesis 0.471)
+  HiddenBench round2=0.064 (thesis 0.064)  round3=0.238 (thesis 0.238)  round4=0.317 (thesis 0.317)  round5=0.331 (thesis 0.331)
+
+### CELL: # Fig 5 — rounds vs accuracy, 1x2 (GPQA / HiddenBench), min n=20
+<Figure size 1560x624 with 2 Axes>
+fig5 saved -> ../../thesis/plots/general/fig5_rounds_vs_accuracy.png
+
+### CELL: # --- app:perf:configs tab:app:perf:configs: accuracy, mean rounds, p_cap, mean 
+=== tab:app:perf:configs (R=50, 35 tasks, n=1,750 reps/cell) ===
+                        accuracy  mean_rounds   p_cap  mean_flips
+dataset     topology W                                           
+gpqa        fc       1    0.3960       3.8526  0.0017      2.8720
+                     2    0.4200       3.6377  0.0017      2.7874
+                     5    0.4063       3.8051  0.0057      2.8674
+            star     1    0.3989       4.2229  0.0091      2.9817
+                     2    0.4114       4.1577  0.0080      3.5971
+                     5    0.4120       4.3149  0.0160      3.2703
+hiddenbench fc       1    0.2880       5.4674  0.0326      4.7246
+                     2    0.3206       4.9080  0.0120      4.4023
+                     5    0.2971       4.9880  0.0211      4.2886
+            star     1    0.2777       7.5594  0.1434      5.3320
+                     2    0.2943       6.7823  0.1189      5.8457
+                     5    0.2863       6.5360  0.1103      5.6366
+
+=== per-config computed vs thesis (tab:app:perf:configs) ===
+  GPQA         fc    W=1  acc=0.396/0.396  rounds=3.85/3.85  p_cap=0.002/0.002  flips=2.87/2.87  MATCH
+  GPQA         fc    W=2  acc=0.420/0.42  rounds=3.64/3.64  p_cap=0.002/0.002  flips=2.79/2.79  MATCH
+  GPQA         fc    W=5  acc=0.406/0.406  rounds=3.81/3.81  p_cap=0.006/0.006  flips=2.87/2.87  MATCH
+  GPQA         star  W=1  acc=0.399/0.399  rounds=4.22/4.22  p_cap=0.009/0.009  flips=2.98/2.98  MATCH
+  GPQA         star  W=2  acc=0.411/0.411  rounds=4.16/4.16  p_cap=0.008/0.008  flips=3.60/3.6  MATCH
+  GPQA         star  W=5  acc=0.412/0.412  rounds=4.31/4.32  p_cap=0.016/0.016  flips=3.27/3.27  MATCH
+  HiddenBench  fc    W=1  acc=0.288/0.288  rounds=5.47/5.47  p_cap=0.033/0.033  flips=4.72/4.73  MATCH
+  HiddenBench  fc    W=2  acc=0.321/0.321  rounds=4.91/4.91  p_cap=0.012/0.012  flips=4.40/4.4  MATCH
+  HiddenBench  fc    W=5  acc=0.297/0.297  rounds=4.99/4.99  p_cap=0.021/0.021  flips=4.29/4.29  MATCH
+  HiddenBench  star  W=1  acc=0.278/0.278  rounds=7.56/7.56  p_cap=0.143/0.143  flips=5.33/5.33  MATCH
+  HiddenBench  star  W=2  acc=0.294/0.294  rounds=6.78/6.78  p_cap=0.119/0.119  flips=5.85/5.85  MATCH
+  HiddenBench  star  W=5  acc=0.286/0.286  rounds=6.54/6.54  p_cap=0.110/0.11  flips=5.64/5.64  MATCH

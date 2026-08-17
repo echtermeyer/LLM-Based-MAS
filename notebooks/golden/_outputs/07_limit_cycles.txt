@@ -1,0 +1,327 @@
+### CELL: import sys
+/Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+setup ok
+
+### CELL: # Load and run LC detection
+Done in 47.4s
+Agent rows : 84,000
+System rows: 21,000
+
+### CELL: def funnel(df, label):
+AGENT-LEVEL
+  Total     :  84,000
+  Fixed pts :  83,529  (99.44%)
+  Candidates:     463  (0.55%)
+  Flagged   :      29  (p_LC=0.0626 among cands)
+
+SYSTEM-LEVEL
+  Total     :  21,000
+  Fixed pts :  20,707  (98.60%)
+  Candidates:     291  (1.39%)
+  Flagged   :      23  (p_LC=0.0790 among cands)
+
+### CELL: def config_table(df):
+=== AGENT-LEVEL ===
+    Dataset        Topology  W  n_total  n_fp  n_cand  n_flagged   p_LC
+       GPQA Fully connected  1     7000  6993       7          0 0.0000
+       GPQA Fully connected  2     7000  6998       2          0 0.0000
+       GPQA Fully connected  5     7000  6987       9          0 0.0000
+       GPQA            Star  1     7000  6990      10          0 0.0000
+       GPQA            Star  2     7000  6983      17          5 0.2941
+       GPQA            Star  5     7000  6989      11          0 0.0000
+HiddenBench Fully connected  1     7000  6946      50          1 0.0200
+HiddenBench Fully connected  2     7000  6984      16          0 0.0000
+HiddenBench Fully connected  5     7000  6972      28          1 0.0357
+HiddenBench            Star  1     7000  6860     140          2 0.0143
+HiddenBench            Star  2     7000  6907      93          6 0.0645
+HiddenBench            Star  5     7000  6920      80         14 0.1750
+
+=== SYSTEM-LEVEL ===
+    Dataset        Topology  W  n_total  n_fp  n_cand  n_flagged   p_LC
+       GPQA Fully connected  1     1750  1747       3          0 0.0000
+       GPQA Fully connected  2     1750  1749       1          0 0.0000
+       GPQA Fully connected  5     1750  1745       4          0 0.0000
+       GPQA            Star  1     1750  1742       8          1 0.1250
+       GPQA            Star  2     1750  1743       7          1 0.1429
+       GPQA            Star  5     1750  1741       9          0 0.0000
+HiddenBench Fully connected  1     1750  1715      34          3 0.0882
+HiddenBench Fully connected  2     1750  1736      14          1 0.0714
+HiddenBench Fully connected  5     1750  1738      12          1 0.0833
+HiddenBench            Star  1     1750  1646     104          5 0.0481
+HiddenBench            Star  2     1750  1697      53          7 0.1321
+HiddenBench            Star  5     1750  1708      42          4 0.0952
+
+### CELL: def classify_flag(row):
+=== AGENT-LEVEL flagged (n=29) ===
+kind
+genuine period-2 oscillation    20
+period-2 with long hold          4
+period-4 / stable-revisit        3
+period-3 / stable-revisit        1
+period-8 / stable-revisit        1
+>>> genuine period-2 (DET>=0.70): 20 of 29 (69%)
+
+kind                          topology
+genuine period-2 oscillation  star        20
+period-2 with long hold       star         4
+period-3 / stable-revisit     fc           1
+period-4 / stable-revisit     star         3
+period-8 / stable-revisit     fc           1
+
+    dataset topology  W qid  rep_idx  agent_idx  L      det  period                         kind
+       gpqa     star  2  90       43          0 16 0.979592     2.0 genuine period-2 oscillation
+       gpqa     star  2  90       43          1 16 1.000000     2.0 genuine period-2 oscillation
+       gpqa     star  2  90       43          2 16 0.857143     2.0 genuine period-2 oscillation
+       gpqa     star  2  90       43          3 16 1.000000     2.0 genuine period-2 oscillation
+       gpqa     star  2  98       42          0 16 0.979592     2.0 genuine period-2 oscillation
+hiddenbench     star  1  58        4          2 16 0.843137     2.0 genuine period-2 oscillation
+hiddenbench     star  2  11       35          0 16 0.700000     2.0 genuine period-2 oscillation
+hiddenbench     star  2  11       35          2 16 0.700000     2.0 genuine period-2 oscillation
+hiddenbench     star  2  46       16          3 16 0.948718     2.0 genuine period-2 oscillation
+hiddenbench     star  2  52       42          2 16 1.000000     2.0 genuine period-2 oscillation
+hiddenbench     star  5  20       24          0 16 0.725490     2.0 genuine period-2 oscillation
+hiddenbench     star  5  20       24          3 16 0.731707     2.0 genuine period-2 oscillation
+hiddenbench     star  5  20       45          0 16 0.795455     2.0 genuine period-2 oscillation
+hiddenbench     star  5  20       45          3 16 0.972222     2.0 genuine period-2 oscillation
+hiddenbench     star  5  22       12          1 16 0.976744     2.0 genuine period-2 oscillation
+hiddenbench     star  5  22       12          3 16 0.857143     2.0 genuine period-2 oscillation
+hiddenbench     star  5  25       25          0 16 1.000000     2.0 genuine period-2 oscillation
+hiddenbench     star  5  37       40          3 16 0.979592     2.0 genuine period-2 oscillation
+hiddenbench     star  5  57       37          0 16 0.840909     2.0 genuine period-2 oscillation
+hiddenbench     star  5  57       37          3 16 0.750000     2.0 genuine period-2 oscillation
+hiddenbench     star  2  28       31          0 16 0.974684     2.0      period-2 with long hold
+hiddenbench     star  2  46       16          2 16 0.666667     2.0      period-2 with long hold
+hiddenbench     star  5  20       14          1 16 0.911111     2.0      period-2 with long hold
+hiddenbench     star  5  20       45          2 16 0.682927     2.0      period-2 with long hold
+hiddenbench       fc  1   8       16          2 16 0.949367     3.0    period-3 / stable-revisit
+hiddenbench     star  1  48        0          0 16 0.888889     4.0    period-4 / stable-revisit
+hiddenbench     star  5  20       45          1 16 0.816327     4.0    period-4 / stable-revisit
+hiddenbench     star  5  25       25          1 16 0.857143     4.0    period-4 / stable-revisit
+hiddenbench       fc  5  31       19          2 16 0.702128     8.0    period-8 / stable-revisit
+
+=== SYSTEM-LEVEL flagged (n=23) ===
+kind
+period-2 with long hold         7
+genuine period-2 oscillation    7
+period-3 / stable-revisit       3
+period-5 / stable-revisit       3
+period-7 / stable-revisit       1
+period-8 / stable-revisit       1
+period-4 / stable-revisit       1
+>>> genuine period-2 (DET>=0.70): 7 of 23 (30%)
+
+kind                          topology
+genuine period-2 oscillation  star        7
+period-2 with long hold       fc          2
+                              star        5
+period-3 / stable-revisit     fc          2
+                              star        1
+period-4 / stable-revisit     star        1
+period-5 / stable-revisit     fc          1
+                              star        2
+period-7 / stable-revisit     star        1
+period-8 / stable-revisit     star        1
+
+    dataset topology  W qid  rep_idx  L      det  period                         kind
+       gpqa     star  2  90       43 16 1.000000     2.0 genuine period-2 oscillation
+hiddenbench     star  1   1        5 16 0.702703     2.0 genuine period-2 oscillation
+hiddenbench     star  2  11       35 16 0.850000     2.0 genuine period-2 oscillation
+hiddenbench     star  2  22       23 16 0.708333     2.0 genuine period-2 oscillation
+hiddenbench     star  5  10       24 16 0.750000     2.0 genuine period-2 oscillation
+hiddenbench     star  5  20       45 16 0.960000     2.0 genuine period-2 oscillation
+hiddenbench     star  5  57       37 16 0.769231     2.0 genuine period-2 oscillation
+hiddenbench       fc  1   8        2 16 0.681818     2.0      period-2 with long hold
+hiddenbench       fc  1  34       26 16 0.625000     2.0      period-2 with long hold
+hiddenbench     star  1   8       23 16 0.578947     2.0      period-2 with long hold
+hiddenbench     star  2   1       39 16 0.970149     2.0      period-2 with long hold
+hiddenbench     star  2  20       27 16 0.571429     2.0      period-2 with long hold
+hiddenbench     star  2  31       29 16 0.945946     2.0      period-2 with long hold
+hiddenbench     star  2  58       34 16 0.500000     2.0      period-2 with long hold
+hiddenbench       fc  1  20       31 16 0.560000     3.0    period-3 / stable-revisit
+hiddenbench       fc  2   6       15 16 0.949153     3.0    period-3 / stable-revisit
+hiddenbench     star  1  20       29 16 0.939394     3.0    period-3 / stable-revisit
+hiddenbench     star  5  22       12 16 0.923077     4.0    period-4 / stable-revisit
+       gpqa     star  1 109       33 16 0.571429     5.0    period-5 / stable-revisit
+hiddenbench       fc  5  15       26 16 0.913043     5.0    period-5 / stable-revisit
+hiddenbench     star  1  24       34 16 0.940299     5.0    period-5 / stable-revisit
+hiddenbench     star  1  14        4 16 0.913793     7.0    period-7 / stable-revisit
+hiddenbench     star  2  28       31 16 0.636364     8.0    period-8 / stable-revisit
+
+### CELL: agent_flag_keys = set(
+Reps with agent-level LC flag : 17
+Reps with system-level LC flag: 23
+Reps with BOTH flags          : 6
+
+=== CROSS-LEVEL CO-OCCURRENCE BREAKDOWN ===
+  GPQA         / Star            W=2  qid=90  rep=43
+  HiddenBench  / Star            W=2  qid=11  rep=35
+  HiddenBench  / Star            W=2  qid=28  rep=31
+  HiddenBench  / Star            W=5  qid=20  rep=45
+  HiddenBench  / Star            W=5  qid=22  rep=12
+  HiddenBench  / Star            W=5  qid=57  rep=37
+
+  breakdown by (dataset, topology):
+    HiddenBench / Star: 5
+    GPQA / Star: 1
+
+### CELL: from src.metrics.limit_cycles import _dominant_period as _dp
+Null-floor calibration (Monte-Carlo)...
+
+AGENT-level: flagged=29/463  null-floor=0.0073  expected=3.4  p=5.17e-18  --> REAL STRUCTURE
+
+SYSTEM-level: flagged=23/291  null-floor=0.0076  expected=2.2  p=1.97e-16  --> REAL STRUCTURE
+
+### CELL: rep_keys = ['dataset','topology','W','qid','rep_idx']
+=== REP-LEVEL NULL-FLOOR (M11) ===
+unit = rep; observed count = reps (star spokes slaved to hub, not double-counted);
+null = rep flags if any of its m candidate agents false-positives (agents iid under null)
+
+AGENT-level: flagged reps=17/302  (spanning 15 tasks)  rep-null-floor=0.0118  expected=3.56  p=1.74e-07  --> REAL STRUCTURE
+
+SYSTEM-level: flagged reps=23/291  (spanning 17 tasks)  rep-null-floor=0.0076  expected=2.22  p=1.97e-16  --> REAL STRUCTURE
+
+### CELL: rep_keys = ['dataset','topology','W','qid','rep_idx']
+=== REP-LEVEL PREVALENCE ===
+    Dataset        Topology  W  n_reps  agent_flag_reps  sys_flag_reps
+       GPQA Fully connected  1    1750                0              0
+       GPQA Fully connected  2    1750                0              0
+       GPQA Fully connected  5    1750                0              0
+       GPQA            Star  1    1750                0              1
+       GPQA            Star  2    1750                2              1
+       GPQA            Star  5    1750                0              0
+HiddenBench Fully connected  1    1750                1              3
+HiddenBench Fully connected  2    1750                0              1
+HiddenBench Fully connected  5    1750                1              1
+HiddenBench            Star  1    1750                2              5
+HiddenBench            Star  2    1750                4              7
+HiddenBench            Star  5    1750                7              4
+
+agent_flag_reps: total=17
+  by topology: {'Fully connected': 2, 'Star': 15}
+  by dataset:  {'GPQA': 2, 'HiddenBench': 15}
+
+sys_flag_reps: total=23
+  by topology: {'Fully connected': 5, 'Star': 18}
+  by dataset:  {'GPQA': 2, 'HiddenBench': 21}
+
+### CELL: # Non-convergence rate by task (does the same task consistently fail to converge
+=== Task-level non-convergence rate stats ===
+  GPQA        : mean=0.0032  max=0.0167  tasks with >5% non-conv: 0/35
+  HiddenBench : mean=0.0257  max=0.0800  tasks with >5% non-conv: 3/35
+
+=== Top non-converging tasks (all datasets) ===
+    dataset qid  any_cand
+hiddenbench   8  0.080000
+hiddenbench   9  0.056667
+hiddenbench  31  0.053333
+hiddenbench  37  0.050000
+hiddenbench  34  0.046667
+hiddenbench  24  0.040000
+hiddenbench  11  0.033333
+hiddenbench  45  0.033333
+hiddenbench  15  0.033333
+hiddenbench   1  0.033333
+hiddenbench  20  0.030000
+hiddenbench  41  0.030000
+hiddenbench  57  0.030000
+hiddenbench  28  0.026667
+hiddenbench  25  0.026667
+
+=== Cross-config Spearman of per-task non-conv rate ===
+  GPQA        : pairwise Spearman mean=0.053  min=-0.179  max=0.392
+  HiddenBench : pairwise Spearman mean=0.184  min=-0.058  max=0.448
+/var/folders/92/yglwvnmx2bsg0b42jym1s8lh0000gn/T/ipykernel_91984/2914822344.py:26: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  sub['config'] = sub['topology'] + '_W' + sub['W'].astype(str)
+/var/folders/92/yglwvnmx2bsg0b42jym1s8lh0000gn/T/ipykernel_91984/2914822344.py:26: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  sub['config'] = sub['topology'] + '_W' + sub['W'].astype(str)
+
+### CELL: def plot_recurrence(seq, title, ax_seq, ax_rec, ax_rr):
+AGENT-level flagged cases (29):
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+SYSTEM-level flagged cases (23):
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+<Figure size 1950x520 with 3 Axes>
+
+### CELL: print('=== SUMMARY ===')
+=== SUMMARY ===
+AGENT: total=84,000  fixed_pts=83,529 (99.4%)  candidates=463  flagged=29  p_LC=0.0626
+SYSTEM: total=21,000  fixed_pts=20,707 (98.6%)  candidates=291  flagged=23  p_LC=0.0790
+
+OLD dataset (R=30, no anti-conformity prompt): 14 agent, 16 system LCs
+NEW dataset (R=50, anti-conformity prompt):
+  agent:  29
+  system: 23
+
+  GPQA        : agent=5  system=2
+  HiddenBench : agent=24  system=21
+
+  fc   : agent=2  system=5
+  star : agent=27  system=18
+
+### CELL: import sys
+<Figure size 1690x585 with 2 Axes>
+Saved ../../thesis/plots/lc/lc_timelines_new.png
+<Figure size 1820x494 with 4 Axes>
+Saved ../../thesis/plots/lc/lc_rec_new.png
+<Figure size 1690x546 with 3 Axes>
+Saved ../../thesis/plots/lc/lc_onset_new.png
+
+All LC plots generated.

@@ -58,7 +58,7 @@ the positive feedback by which a state amplifies its own persistence
 \citep{arthur1989competing}; \emph{limit cycles}, self-sustained periodic
 oscillations that never settle \citep{strogatz2015nonlinear};
 \emph{bistability}, the coexistence of multiple stable outcomes selected by
-initial conditions; and \emph{dominance}, the concentration of influence onto a
+initial conditions \citep{feudel2008complex}; and \emph{dominance}, the concentration of influence onto a
 single node. Such patterns are studied as \emph{motifs}, recurring structural or
 dynamical building blocks whose presence in a system is both detectable and
 diagnostic of its behaviour \citep{milo2002network, alon2007network,
@@ -108,20 +108,6 @@ In one sentence, the objective of this thesis is to understand \emph{how} a
 cooperative LLM debate arrives at its answer, by measuring the self-organization
 patterns in its trajectory, and to turn that understanding into evidence-graded
 guidance for building such systems.
-
-The remainder of the thesis is organised as follows.
-\autoref{sec:infsub} introduces the necessary background on self-organization
-and multi-agent debate, and \autoref{sec:related} situates the work against the
-literature on debate, its failure modes, and the alternative ways of analysing such
-systems.
-\autoref{sec:exp} specifies the debate protocol and experimental grid, and
-\autoref{sec:method} defines the four motif detectors together with their null
-models.
-\autoref{sec:results} reports the empirical findings, including the causal
-seeded-initialisation experiment, and synthesises them into the single amplifier
-mechanism.
-\autoref{sec:discussion} interprets the findings, states their limitations, and
-derives the design principles, and \autoref{sec:conclusion} concludes.
 
 
 \subsection{Research Questions}
@@ -209,12 +195,11 @@ This thesis makes the following contributions.
   \item \textbf{A deflationary reframing of when debate helps.} By contrasting a
         refinement regime (GPQA-Diamond, where agents mostly start correct) with
         a correction regime (HiddenBench, where they start systematically wrong),
-        we show that self-reinforcement acts as an amplifier of initial
-        conditions rather than an inherently beneficial mechanism: it is
-        associated with higher accuracy where the initial disposition is reliable
-        and inert where it is not. This positions the detected motifs as
-        explanations for outcome variability rather than as guarantees of
-        improvement (Sections \ref{sec:results} and \ref{sec:discussion}).
+        we show that the relationship between motif strength and accuracy depends
+        on the reliability of the opening vote distribution, and that the
+        structural design axes we varied do not move accuracy. This positions the
+        detected motifs as explanations for outcome variability rather than as
+        guarantees of improvement (Sections \ref{sec:results} and \ref{sec:discussion}).
 
   \item \textbf{A causal test of the initial-condition effect.} Beyond the
         observational analyses, we run a controlled seeded-initialisation

@@ -1,0 +1,76 @@
+### CELL: import sys
+setup ok
+
+### CELL: def vote_entropy(votes, options):
+q84 (gt=C): acc=0.269  mean_rounds=4.52  gt_in_votes=0.743  gt_is_maj=0.213
+q125 (gt=C): acc=0.273  mean_rounds=4.65  gt_in_votes=0.707  gt_is_maj=0.250
+q144 (gt=C): acc=0.509  mean_rounds=4.22  gt_in_votes=0.856  gt_is_maj=0.403
+
+total rows: 3000
+
+### CELL: def wilson_ci(k, n, z=1.96):
+helpers ok
+
+### CELL: fig, axes = plt.subplots(2, 3, figsize=(16, 8))
+<Figure size 2080x1040 with 6 Axes>
+
+### CELL: from scipy.stats import chi2_contingency
+gt_in_init_votes effect:
+
+q84: present=0.361(n=743)  absent=0.0039(n=257)  chi2=122 p=2.5e-28
+       gt IS plurality=0.620(n=213)  gt NOT plurality=0.174(n=787)
+q125: present=0.373(n=707)  absent=0.0307(n=293)  chi2=121 p=4.1e-28
+       gt IS plurality=0.552(n=250)  gt NOT plurality=0.180(n=750)
+q144: present=0.583(n=856)  absent=0.0694(n=144)  chi2=128 p=1.1e-29
+       gt IS plurality=0.717(n=403)  gt NOT plurality=0.369(n=597)
+
+### CELL: fig, axes = plt.subplots(1, 3, figsize=(14, 5))
+<Figure size 1820x650 with 3 Axes>
+saved fig1_init_votes_split.png
+
+### CELL: H0_VALS  = [0.0, 0.8113, 1.0, 1.5, 2.0]
+<Figure size 1820x650 with 2 Axes>
+saved fig2_h0_accuracy_efficiency.png
+
+### CELL: fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+<Figure size 1820x650 with 2 Axes>
+saved fig3_rounds_accuracy_flips.png
+
+### CELL: flip_p97 = max(np.percentile(dfs[qid]['n_flips'], 97) for qid in TASKS)
+<Figure size 2340x1300 with 6 Axes>
+saved figA_full_feature_breakdown.png
+
+### CELL: features   = ['h0','majority_size_0','mean_conf_0','n_flips',
+<Figure size 1820x650 with 4 Axes>
+saved figA_correlation_heatmap.png
+
+### CELL: print('Summary statistics:\n')
+Summary statistics:
+
+q84:
+  R=1000  overall acc=0.269  mean rounds=4.52  std=1.57
+  gt present in init. votes: 743 runs (74.3%)  acc=0.361
+  gt absent from init. votes: 257 runs (25.7%)  acc=0.0039
+  gt IS init. plurality: 213 runs  acc=0.620
+  gt in votes but NOT plurality: 530 runs  acc=0.257
+  r(flips, rounds)=0.830
+
+q125:
+  R=1000  overall acc=0.273  mean rounds=4.65  std=1.59
+  gt present in init. votes: 707 runs (70.7%)  acc=0.373
+  gt absent from init. votes: 293 runs (29.3%)  acc=0.0307
+  gt IS init. plurality: 250 runs  acc=0.552
+  gt in votes but NOT plurality: 457 runs  acc=0.276
+  r(flips, rounds)=0.868
+
+q144:
+  R=1000  overall acc=0.509  mean rounds=4.22  std=1.46
+  gt present in init. votes: 856 runs (85.6%)  acc=0.583
+  gt absent from init. votes: 144 runs (14.4%)  acc=0.0694
+  gt IS init. plurality: 403 runs  acc=0.717
+  gt in votes but NOT plurality: 453 runs  acc=0.464
+  r(flips, rounds)=0.915
+
+### CELL: feats_cont = [
+<Figure size 2600x1300 with 15 Axes>
+saved figA_distributions_by_outcome.png

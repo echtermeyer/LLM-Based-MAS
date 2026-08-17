@@ -53,12 +53,37 @@ HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
   \label{fig:app:perf:rounds_acc}
 \end{figure}
 
+\subsection{Bistability: Supplementary Figures}
+\label{app:bistab}
+
+\paragraph{Bistability: configuration effects (supplementary figures).}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{plots/bistab/fig4_config_heatmaps.png}
+  \caption[Bistability by configuration (heatmaps)]{Mean $N_{\mathrm{eff}}$ (left) and Cramér's $V$ (right) across all 12
+           (dataset, topology, $W$) configurations. The absence of a consistent
+           gradient confirms that topology and memory window do not drive
+           bistability.}
+  \label{fig:app:bistab:heatmaps}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{plots/bistab/fig3_neff_accuracy.png}
+  \caption[$N_{\mathrm{eff}}$ versus task accuracy]{$N_{\mathrm{eff}}$ plotted against per-task accuracy for all (task,
+           config) cells, with cells coloured by bistability label. The
+           near-zero correlation confirms that the number of attractors does
+           not predict accuracy.}
+  \label{fig:app:bistab:accuracy}
+\end{figure}
+
 \subsection{High-Repetition Analysis: Additional Figures}
 \label{app:highrep}
 
 This appendix provides the full feature-by-outcome breakdown and correlation
 matrix for the high-repetition experiment described in
-\autoref{sec:results:highrep} ($R = 1{,}000$, three GPQA tasks,
+\autoref{sec:results:evid} ($R = 1{,}000$, three GPQA tasks,
 $W = 2$, fully-connected topology, $N = 4$ agents).
 
 \begin{figure}[H]
@@ -102,8 +127,22 @@ $W = 2$, fully-connected topology, $N = 4$ agents).
            confidence at the same rate regardless of whether the system reaches the
            correct answer.
            Vote flip and round distributions separate in task-dependent directions
-           (see \autoref{sec:results:highrep}).}
+           (see \autoref{sec:results:evid}).}
   \label{fig:app:highrep:distributions}
+\end{figure}
+
+\paragraph{High-repetition analysis: entropy effects.}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{plots/highrep/fig2_h0_accuracy_efficiency.png}
+  \caption[Accuracy and rounds by initial vote entropy]{Accuracy (left) and mean rounds to consensus (right) as a function of
+           initial vote entropy $H_0$, for the three high-repetition tasks
+           (q84, q125, q144). Accuracy is not monotone in $H_0$; the apparent
+           trend is largely a confound with the probability that the ground
+           truth is present in the initial votes. Entropy bins with fewer than
+           20 repetitions are omitted.}
+  \label{fig:app:highrep:h0}
 \end{figure}
 
 \subsection{System-Prompt Robustness Check}
@@ -122,7 +161,7 @@ counter.''
 
 The earlier run used $R = 30$ repetitions and the final run $R = 50$; we therefore
 pair by question within each configuration and test the paired difference
-(Wilcoxon signed-rank, Holm-corrected across the six configurations), so the
+(Wilcoxon signed-rank, Holm-corrected \citep{holm1979} across the six configurations), so the
 differing repetition counts affect only per-task precision, not the pairing.
 \autoref{tab:app:sysprompt} reports the pooled means and the number of the six
 configurations with a Holm-significant paired shift.
@@ -218,13 +257,13 @@ Phase B: Update your belief, private reasoning, and public message. If you chang
 your vote, cite the specific argument, from the current Phase A drafts or from the
 conversation history, that caused the update.
 \end{quote}
-\caption[Per-step agent instructions by phase]{Per-step instructions appended to the persona (round~0, Phase~A, and
-Phase~B), controlling what each agent is asked to produce at each step.}
+\caption[Per-step agent instructions by phase]{Per-step instructions appended to the persona (round~0, \arguephase{} phase, and
+\updatephase{} phase), controlling what each agent is asked to produce at each step.}
 \label{prompt:steps}
 \end{prompt}
 
-In Phase B each agent additionally receives its own Phase-A draft and its
-neighbours' Phase-A drafts in randomised order, truncated to the memory window $W$;
+In the \updatephase{} phase each agent additionally receives its own \arguephase{} draft and its
+neighbours' \arguephase{} drafts in randomised order, truncated to the memory window $W$;
 confidence is elicited as an integer from $1$ to $10$. The complete prompt-assembly
 code is in the electronic appendix.
 
@@ -285,7 +324,7 @@ decision, so there is no shared position space across agents.
   \item \textbf{PARTNR}~\citep{chang2024partnr}: embodied household tasks with
         hard-coded heterogeneous capabilities; dyadic by design, ruling out
         group-level motifs.
-  \item \textbf{Collab-Overcooked}: chef and assistant operate in distinct
+  \item \textbf{Collab-Overcooked}~\citep{sun2025collaboverco}: chef and assistant operate in distinct
         action spaces.
 \end{itemize}
 
@@ -356,9 +395,11 @@ defer decision.
 \paragraph{Memory window and contents (scan).}
 \citet{marandi2026protocols} systematically compare within-round, cross-round,
 and rank-adaptive protocols and find a real tradeoff between convergence speed,
-peer-referencing, and argument diversity. \citet{tian2025madm2} establish that
-MAD performance depends heavily on memory quality and that erroneous memories can
-propagate. The convergence-time control of \citet{du2024improving} is functionally
+peer-referencing, and argument diversity. \citet{wynn2025talk} document failure
+modes in which erroneous contributions persist and propagate across debate rounds,
+and language models are known to use long contexts unevenly \citep{liu2024lostmiddle},
+so the amount and content of retained memory is itself a design choice rather than
+neutral bookkeeping. The convergence-time control of \citet{du2024improving} is functionally
 memory-driven. We scan $W \in \{1, 2, 5\}$ with $W = 1$ as the near-Markov
 baseline.
 
@@ -370,12 +411,12 @@ substantially shifts performance, and \citet{chen2023consensus} observe emergent
 leader-follower structure in directed graphs, a dominance motif under another
 name. We scan $\{\textsc{fc}, \textsc{star}\}$.
 
-\paragraph{Number of agents (fix at $N = 4$).}
+\paragraph{Number of agents (fix, benchmark-dependent).}
 \citet{du2024improving} use $N = 3$ as the canonical baseline;
 \citet{liang2024encouraging} report only modest degradation up to $N = 4$. The
 joint answer-profile state space grows as $M^N$, so $N = 4$ is the smallest value
 at which the two canonical topologies are structurally distinct while the state
-space stays tractable for trajectory statistics.
+space stays tractable for trajectory statistics. $N = 4$ throughout both benchmarks.
 
 \paragraph{Number of rounds (fix at $T = 15$).}
 $T$ behaves as an observation budget rather than a structural perturbation, since
@@ -383,12 +424,23 @@ trajectories can be cropped post hoc but not extended. Accuracy-level convergenc
 is reported within a few rounds \citep{li2024sparsetopology}, but motif detection
 needs longer windows, since limit cycles in particular require $T \geq 2 \cdot
 \text{period}$ and the period is unknown a priori. We fix $T = 15$ as a hard cap
-with early stopping $u = 3$ to recover efficiency.
+with early stopping $u = 3$ to recover efficiency. \autoref{fig:time_savings}
+shows the efficiency--reliability trade-off across thresholds.
 
-\paragraph{Output structure (fix, full Phase A/B).}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/time_savings.png}
+    \caption[Runtime saved by early stopping threshold]{Mean fraction of runtime saved by early stopping as a function of
+    the threshold $u$. Solid line: all repetitions. Dashed line: only
+    repetitions that triggered stopping. At $u = 3$ the saving is roughly
+    $50\,\%$ per repetition.}
+    \label{fig:time_savings}
+\end{figure}
+
+\paragraph{Output structure (fix, full \arguephase{}/\updatephase{}).}
 The structured output is the measurement apparatus, not engineering taste.
 Private reasoning and confidence versus the public message enable the
-public/private dissociation; the Phase-A \texttt{question} field yields the
+public/private dissociation; the \arguephase{} \texttt{question} field yields the
 directed influence graph for dominance detection; \texttt{challenge} quoting peer
 claims provides attribution; and the vote-stability rule separates argumentation
 from belief update so they can be measured independently. Structured outputs are
@@ -398,7 +450,7 @@ the norm in serious MAD work \citep{liang2024encouraging, he2025dimo}.
 \citet{liang2024encouraging} identify the operational sweet spot: a modest level
 of tit-for-tat is required, with pure cooperation collapsing into
 Degeneration-of-Thought and pure adversarial framing preventing convergence. Our
-defense/challenge/question scaffold implements modest tit-for-tat while Phase-B
+defense/challenge/question scaffold implements modest tit-for-tat while \updatephase{} phase
 belief update leaves room for convergence.
 
 \paragraph{Synchrony (fix, parallel-synchronous).}
@@ -408,7 +460,7 @@ with randomised peer-message order also removes agent-order position effects tha
 would otherwise confound dominance detection.
 
 \paragraph{Model selection (fix, homogeneous mid-tier).}
-We fix a single homogeneous model, \texttt{mistral-medium}, to isolate topology
+We fix a single homogeneous model, \texttt{mistral-medium-instruct}, to isolate topology
 and memory effects from capability-asymmetry effects: \citet{wynn2025talk} document
 that models shift from correct to incorrect answers under peer pressure, producing
 dominance-like dynamics attributable to conformity. A homogeneous baseline ensures

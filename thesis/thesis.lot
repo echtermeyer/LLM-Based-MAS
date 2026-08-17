@@ -1,15 +1,14 @@
 \contentsline {table}{\numberline {1}{\ignorespaces Notation used throughout the thesis}}{15}{table.1}%
 \contentsline {table}{\numberline {2}{\ignorespaces Classification of tunable components}}{22}{table.2}%
-\contentsline {table}{\numberline {3}{\ignorespaces Baseline and debate accuracy by dataset}}{40}{table.3}%
-\contentsline {table}{\numberline {4}{\ignorespaces Accuracy and rounds by topology}}{42}{table.4}%
-\contentsline {table}{\numberline {5}{\ignorespaces Self-reinforcement prevalence and slope by configuration}}{46}{table.5}%
-\contentsline {table}{\numberline {6}{\ignorespaces Self-reinforcement slope by structural subgroup}}{48}{table.6}%
-\contentsline {table}{\numberline {7}{\ignorespaces Diversity-SR-rounds mediation analysis}}{50}{table.7}%
-\contentsline {table}{\numberline {8}{\ignorespaces Limit-cycle detection funnel}}{54}{table.8}%
-\contentsline {table}{\numberline {9}{\ignorespaces Bistability label distribution by dataset}}{58}{table.9}%
-\contentsline {table}{\numberline {10}{\ignorespaces Mean dominance by configuration}}{61}{table.10}%
-\contentsline {table}{\numberline {11}{\ignorespaces Accuracy by ground-truth presence per task}}{66}{table.11}%
-\contentsline {table}{\numberline {12}{\ignorespaces Stylistic diversity versus system outcomes}}{73}{table.12}%
-\contentsline {table}{\numberline {13}{\ignorespaces Design principles mapped to diagnostic measurements}}{79}{table.13}%
-\contentsline {table}{\numberline {14}{\ignorespaces System performance by configuration}}{V}{table.14}%
-\contentsline {table}{\numberline {15}{\ignorespaces System-prompt effect on motif measures}}{VIII}{table.15}%
+\contentsline {table}{\numberline {3}{\ignorespaces Baseline and debate accuracy by dataset}}{38}{table.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces Accuracy and rounds by topology}}{40}{table.4}%
+\contentsline {table}{\numberline {5}{\ignorespaces Self-reinforcement prevalence and slope by configuration}}{45}{table.5}%
+\contentsline {table}{\numberline {6}{\ignorespaces Self-reinforcement slope by structural subgroup}}{47}{table.6}%
+\contentsline {table}{\numberline {7}{\ignorespaces Bistability label distribution by dataset}}{51}{table.7}%
+\contentsline {table}{\numberline {8}{\ignorespaces Mean dominance by configuration}}{54}{table.8}%
+\contentsline {table}{\numberline {9}{\ignorespaces Limit-cycle detection funnel}}{57}{table.9}%
+\contentsline {table}{\numberline {10}{\ignorespaces Accuracy by ground-truth presence per task}}{61}{table.10}%
+\contentsline {table}{\numberline {11}{\ignorespaces Stylistic diversity versus system outcomes}}{67}{table.11}%
+\contentsline {table}{\numberline {12}{\ignorespaces Design principles mapped to diagnostic measurements}}{73}{table.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces System performance by configuration}}{V}{table.13}%
+\contentsline {table}{\numberline {14}{\ignorespaces System-prompt effect on motif measures}}{IX}{table.14}%

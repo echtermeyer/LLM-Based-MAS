@@ -3,9 +3,6 @@
 % Citations reuse verified entries in bibliography.bib only.
 % ============================================================
 
-\subsection{Summary of Findings}
-\label{sec:conclusion:summary}
-
 This thesis asked whether the dynamical vocabulary of complex systems can be
 applied empirically to LLM-based multi-agent debate, and what such a treatment
 reveals that outcome metrics cannot. We built a controlled cooperative debate
@@ -64,15 +61,18 @@ predictor of accuracy; causally, the seeded-initialisation experiment shows that
 placing one correct agent into an otherwise-wrong opening raises accuracy roughly
 thirteen-fold and in every task tested, while the system almost never manufactures
 a correct answer no agent initially held. The overarching finding, stated with its
-scope, is that \emph{within a homogeneous, cooperative, four-agent debate on one
+scope, is that \emph{within a homogeneous, cooperative, 4-agent debate on one
 model family across two benchmarks}, deliberation functions predominantly as a
 selective amplifier of its initial vote distribution rather than as a mechanism
 that reasons a new answer into existence.
 
 
 Multi-agent debate is often presented as a way to make language models reason
-better together. Our results suggest a more precise and more cautious picture: in
-the homogeneous cooperative setting we studied, the debate mostly amplifies what
-its members already believe, and the useful contribution of a complex-systems lens
-is that it makes this amplification, and the conditions under which it helps,
-stalls, or fails to terminate, something one can actually measure.
+better together \citep{du2024improving, liang2024encouraging}.
+Our results suggest a more precise and more cautious picture: in the homogeneous
+cooperative setting we studied, the debate mostly amplifies what its members
+already believe.
+The \suitename{} suite operationalises this insight into four measurable detectors,
+each computable from ordinary interaction logs; its broader value is as groundwork
+for a diagnostic instrument that would let a practitioner check, before trusting
+the group's output, which dynamical regime the deliberation is actually in.
