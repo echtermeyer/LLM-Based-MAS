@@ -1,0 +1,183 @@
+\documentclass[12pt]{article}
+
+\usepackage[]{graphicx}
+\usepackage[]{color}
+\usepackage{alltt}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{acronym}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit, calc, backgrounds}
+\usepackage{pifont}
+\usepackage{titlesec}
+\titlespacing*{\paragraph}{0pt}{0pt}{0.5em}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp}
+
+\newcommand{\mytitle}{Self-Organization Patterns in LLM-based Multi-Agent Systems}
+\newcommand{\myname}{Eric Echtermeyer}
+\newcommand{\mysupervisor}{Prof. Dr. Hinrich Schütze, Ali Modarressi}
+\newcommand{\suitename}{\textsc{soma}}
+\newcommand{\arguephase}{\textit{Argue}}
+\newcommand{\updatephase}{\textit{Update}}
+
+\usepackage[a4paper, width = 160mm, top = 35mm, bottom = 30mm,
+bindingoffset = 0mm]{geometry}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+\usepackage[round, comma]{natbib}
+\usepackage{fancyhdr}
+\newcommand{\changefont}{%
+    \fontsize{8}{11}\selectfont
+}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor = black,
+  urlcolor = black,
+  citecolor = black}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[R]{\changefont{\mytitle}}
+\fancyfoot{}
+\fancyfoot[R]{\thepage}
+\setlength{\headheight}{14.5pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
+\interfootnotelinepenalty = 10000
+
+\shortcites{du2024improving,chan2024chateval,liang2024encouraging,chen2024agentverse,
+  chuang2025debate,achiam2023gpt4,liu2025stopovervaluing,wei2022chainofthought,
+  rein2024gpqa,becker2025orchestration,ouyang2022instructgpt,li2024sparsetopology,
+  liu2024groupdebate,miehling2025agentic,zhou2024sotopia,chang2024partnr,
+  zhu2025multiagentbench,kenton2024debate,yang2025revisiting,zhang2024socialpsych,
+  choi2025groupconformity,hendrycks2021mmlu,hendrycks2021math,wang2023selfconsistency,
+  vaswani2017attention,zheng2023mtbench,zhu2026demystifying}
+
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Section}
+\renewcommand{\subsubsectionautorefname}{Section}
+
+\newfloat{prompt}{H}{lop}
+\floatname{prompt}{Prompt}
+\newcommand{\promptautorefname}{Prompt}
+
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+\begin{document}
+
+\pagenumbering{Roman}
+
+\begin{titlepage}
+\begin{center}
+
+\LARGE
+Master Thesis
+
+\vspace{0.5cm}
+
+\rule{\textwidth}{1.5pt}
+\LARGE
+\textbf{\mytitle}
+\rule{\textwidth}{1.5pt}
+
+\vspace{0.5cm}
+
+\large
+Department of Statistics \\
+Ludwig-Maximilians-Universität München
+
+\vfill
+
+\Large
+\textbf{\myname}
+
+\vfill
+
+\large
+Munich, September 30\textsuperscript{th}, 2026
+
+\vfill
+
+\includegraphics[width = 0.4\textwidth]{sigillum.png}
+
+\vfill
+
+\normalsize
+
+Supervised by \mysupervisor
+
+\end{center}
+\end{titlepage}
+
+\newpage
+
+\begin{abstract}
+
+Multi-agent debate is promoted as a way to make language models reason better
+together, but it is evaluated almost entirely by final accuracy, which reveals
+nothing about how a group arrives at its answer or whether it is deliberating
+soundly. We study cooperative LLM debate as a dynamical system and define
+\suitename{} (Self-Organization Motif Analysis), a suite of detectors for four
+self-organization motifs, self-reinforcement, limit cycles,
+bistability, and dominance, each measured from interaction logs against a
+principled null and applied to 21{,}000 debates across two benchmarks. Their
+prevalence varies sharply: self-reinforcement is universal, bistability common,
+dominance behaviourally present, and genuine limit cycles rare and confined to one
+topology, an informative pattern in itself.
+
+Our central result is that the four motifs are faces of one mechanism: the debate
+predominantly amplifies the vote distribution it starts with rather than reasoning
+a new answer into existence. Self-reinforcement is universal and drives
+convergence, yet is blind to correctness, strengthening whichever option leads at
+the outset. A causal seeding experiment on GPQA confirms the amplifier reading:
+inserting a single correct agent into an otherwise-wrong opening raises accuracy
+from $1.8\,\%$ to $23.7\,\%$, while the system almost never recovers a correct answer that
+no agent initially held. The structural design choices we varied, communication topology and
+memory window, change convergence speed, worst-case runtime, and influence
+concentration, but not accuracy, which is largely fixed before deliberation begins.
+The internal signals a user might trust are misleading: confidence rises regardless
+of correctness, and early unanimity on biased tasks predicts wrong answers.
+
+Beyond detecting the motifs, we show that each detector, computed from ordinary
+logs, can serve as a diagnostic of deliberative health, and we distil the findings
+into design principles graded by evidential strength, as groundwork for a diagnostic
+suite. All claims are bounded to the tested setting, a homogeneous, cooperative,
+3--4 agent debate on one model family, and the absence of a motif is treated as an
+informative result throughout.
+
+\end{abstract}
+
+\newpage
+
+\pagenumbering{arabic}
+
+\section{Introduction}
+\label{sec:introduction}
+\input{chapters/01_introduction}
+
+% Phantom section counters so \autoref{} in the introduction resolves correctly
+% instead of showing ??
+\newpage
+\refstepcounter{section}\label{sec:infsub}
+\refstepcounter{section}\label{sec:related}
+\refstepcounter{section}\label{sec:exp}
+\refstepcounter{section}\label{sec:method}
+\refstepcounter{section}\label{sec:results}
+\refstepcounter{section}\label{sec:discussion}
+\refstepcounter{section}\label{sec:limitations}
+\refstepcounter{section}\label{sec:conclusion}
+
+\newpage
+
+\RaggedRight
+\bibliography{bibliography}
+\bibliographystyle{dcu}
+
+\end{document}

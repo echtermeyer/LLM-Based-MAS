@@ -31,7 +31,7 @@ final answer (\autoref{sec:setup:protocol}). Second, the two structural axes mos
 often cited as design levers in the debate literature, communication topology and
 memory window (\autoref{sec:related:mad}), must be exposed as \emph{controlled
 perturbation axes} so that we can ask which dynamics they cause rather than merely
-observe. This chapter specifies that instrument: the system model and notation
+observe. This section specifies that instrument: the system model and notation
 (\autoref{sec:setup:notation}), the two-phase protocol and stopping rule, the two
 deliberately contrasting benchmarks, and the experimental grid that the results of
 \autoref{sec:results} are computed over.
@@ -105,13 +105,13 @@ two topologies:
 \begin{itemize}
   \item \textbf{Fully connected (fc):} $A_{ij} = 1 - \delta_{ij}$, so every agent
         observes all others each round. This maximises information flow and
-        serves as the baseline. With $N = 4$ agents (GPQA-Diamond), each round involves
+        serves as the baseline. With $N = 4$ agents, each round involves
         $N(N-1) = 12$ messages.
   \item \textbf{Star:} one hub agent is connected to all $N-1$ spokes, and the
         spokes are connected only to the hub. The hub is drawn uniformly at
         random per repetition, independently of agent indices, so that any
         observed hub effect is structural rather than an artefact of indexing.
-        Each round involves $2(N-1) = 6$ messages (GPQA-Diamond), half the fully-connected cost.
+        Each round involves $2(N-1) = 6$ messages, half the fully-connected cost.
         Star therefore trades per-round token cost for slower convergence: the hub
         is the sole information bottleneck, so agreement typically takes more rounds
         to propagate.
@@ -175,10 +175,9 @@ consisting of a \textbf{defense} (one concrete reason the current vote is
 correct), a \textbf{challenge} (a dispute of a specific peer claim, or a
 concession), and a \textbf{question} (a targeted query to a named peer). The
 draft is visible to neighbours at the start of the \updatephase{} phase but does not itself change
-any vote. The three structured fields are the measurement apparatus for the
-influence-based detectors of \autoref{sec:method}: the \texttt{question} field
-yields the directed influence graph, and the \texttt{challenge} field provides
-attribution for who is disputing whom.
+any vote. These fields structure the deliberation but are not themselves used
+quantitatively; the influence graph for dominance detection is built from vote
+adoptions during the \updatephase{} phase (\autoref{sec:method}), not from the draft text.
 
 \paragraph{Round structure.}
 Each round consists of two phases executed in parallel across all agents;
@@ -482,8 +481,8 @@ must come from social information transfer rather than from individual competenc
 Motifs that appear on both substrates are therefore robust to this confound,
 while motifs that appear on only one are themselves informative.
 
-Two structural details of HiddenBench matter for the analysis. First,
-$N = 4$ agents throughout; the number of answer options is task-dependent,
+One structural detail of HiddenBench matters for the analysis:
+$N = 4$ agents throughout, while the number of answer options is task-dependent,
 $M \in \{3, 4\}$. The agent count $N$ and the option count $M$ are therefore
 independent quantities and should not be conflated. This is why every
 option-indexed quantity in \autoref{sec:method} is defined over the task's actual
@@ -581,7 +580,7 @@ and assigns each task a difficulty tier from its observed dynamics:
 \end{itemize}
 
 Tier~3 tasks are precisely those where self-organization dynamics can be observed
-at all, so they are promoted to a deep \emph{characterization} pass on the full
+at all, so they are promoted to a deep \emph{characterisation} pass on the full
 six-configuration grid. This yields the final dataset used throughout
 \autoref{sec:results}: \textbf{35 tasks for each of the two benchmarks, six
 configurations each, $R = 50$ repetitions}, for a total of

@@ -90,7 +90,9 @@ vote composition
 \begin{equation}
   s_t = (n_1^t, n_2^t, \ldots, n_M^t), \qquad \textstyle\sum_{k=1}^{M} n_k^t = N,
 \end{equation}
-where $n_k^t$ is the number of agents on option $k$. Agents are exchangeable, so
+where $n_k^t$ is the number of agents voting for option $k$ at round $t$,
+$M$ is the number of answer options (4 for GPQA, 3 or 4 for HiddenBench),
+and $N = 4$ is the number of agents. Agents are exchangeable, so
 only their counts enter; the options stay labelled, since one is correct and they
 are not interchangeable. The composition retains what a plain set of options would
 discard: a $3$--$1$ split and a $2$--$2$ split are distinct macrostates. Every
@@ -169,8 +171,8 @@ that go beyond ``the line goes up.'' The measure is option-agnostic, reading
 confidence within a held position, so it does not depend on $M$.
 
 \paragraph{What we measure.}
-Self-reinforcement has three observable signatures. We measure the first and third
-and treat the second as only partially identified:
+Self-reinforcement has three observable signatures. We measure the first and second
+and treat the third as only partially identified:
 \begin{itemize}
   \item \textbf{Directional drift (measured).} While a position is held, confidence
         ratchets up more often than down.
@@ -184,11 +186,12 @@ and treat the second as only partially identified:
 
 \paragraph{Measurement primitive: the vote-stable segment.}
 The primitive is the \emph{vote-stable segment}. For agent $i$ in repetition $r$, this
-is a maximal block of consecutive rounds $[t_s, t_e]$ over which the vote is
+is a maximal block of consecutive rounds $[t_s, t_e]$ (where $t_s$ is the
+first round of the block and $t_e$ is the last) over which the vote is
 constant, $v_i^t = v_i^{t_s}$ for all $t \in \{t_s, \ldots, t_e\}$ (the vote
 differs, or the trajectory ends, immediately before $t_s$ and after $t_e$). A segment
-is retained only if its length $L = t_e - t_s + 1 \geq 3$, which guarantees at
-least two confidence steps. An agent may contribute several segments if it flips, or a
+is retained only if its length $L = t_e - t_s + 1 \geq 3$; the $+1$ counts both
+endpoints, so $L = 3$ means three rounds and yields at least two confidence steps. An agent may contribute several segments if it flips, or a
 single long segment if it locks in early. Agents are exchangeable, so segments are pooled
 within a config and never matched across repetitions.
 
@@ -199,8 +202,11 @@ round index,
   \qquad t \in \{t_s, \ldots, t_e\},
 \end{equation}
 and keep the slope $\beta_{\mathrm{seg}}$, in units of confidence per round, which
-is comparable across segments of different length without normalisation. Its sign and
-magnitude are the two outputs.
+is comparable across segments of different length without normalisation. Two things
+are read off it: its \emph{sign}, which feeds the prevalence test below, and its
+\emph{signed value}, which feeds the mean slope $\bar{\beta}$ used in the
+$W$-scaling comparison; the value is kept signed, not as $|\beta_{\mathrm{seg}}|$,
+because the direction of drift is what the test is about.
 
 \paragraph{Detection.}
 We read the segments in two complementary ways, both conditioned on the config.
@@ -209,16 +215,20 @@ The \textbf{presence} test measures directional drift. For each (config, task)
 pair, the prevalence of upward segments is
 \begin{equation}
   \hat{p}_{\mathrm{SR}}
-  = \frac{\bigl|\{\text{segments}: \beta_{\mathrm{seg}} > 0\}\bigr|}{\bigl|\{\text{segments}\}\bigr|},
+  = \frac{\bigl|\{\text{seg}: \beta_{\mathrm{seg}} > 0\}\bigr|}
+         {\bigl|\{\text{seg}: \beta_{\mathrm{seg}} > 0\}\bigr|
+        + \bigl|\{\text{seg}: \beta_{\mathrm{seg}} < 0\}\bigr|
+        + \bigl|\{\text{seg}: \beta_{\mathrm{seg}} = 0\}\bigr|},
 \end{equation}
-with flat segments ($\beta_{\mathrm{seg}} = 0$) retained in the denominator. Under the
+so flat segments ($\beta_{\mathrm{seg}} = 0$) enter the denominator but never the
+numerator. Under the
 no-feedback ``wobble'' null an upward and a downward segment are equally likely, so
 with a fraction $f$ of flat segments
 $P(\beta_{\mathrm{seg}} > 0) = \tfrac{1}{2}(1-f) \leq 0.5$, and $0.5$ is a
 conservative reference. Self-reinforcement is indicated when
 $\hat{p}_{\mathrm{SR}} > 0.5$, which is a sign test against a \emph{given} baseline.
 The confidence ceiling (a segment already at the top of the scale cannot drift further
-up) together with the retention of flat segments makes a positive result conservative.
+up) makes a positive result conservative.
 
 \paragraph{Identifying signature: $W$-scaling as a mechanism discriminator.}
 Letting $\bar{\beta}$ be the mean segment slope in a config, the direction of
@@ -301,8 +311,8 @@ the repetition has \emph{settled} if $k \geq u = 3$. A settled repetition is
 attractors are consensus states and there are at most $M$ of them. Repetitions that
 never settle, and those that settle on a stable non-unanimous split (a frozen
 disagreement, not a consensus answer), are excluded; bistability is measured on the
-unanimous-converged subset only. Scoring is per (task, config) cell over that
-cell's $n_c$ converged repetitions. The cell's \emph{dominant attractor} is the
+unanimous-converged subset only. Scoring is per (task, config) cell; let
+$n_c$ denote the number of converged repetitions in that cell. The cell's \emph{dominant attractor} is the
 most frequent endpoint option, and each repetition's start is summarised by
 \begin{equation}
   g(s_0) \in \{0, 1, \ldots, N\},
@@ -384,17 +394,6 @@ In our running scenario, take a cell with $n_c = 30$ converged repetitions; the 
         $V \approx 0$, $p \gg 0.05$: coexistence without basin selection, correctly
         \emph{not} labelled bistable.
 \end{itemize}
-
-\paragraph{Energy-landscape view (visual complement).}
-To display the attractors and the barrier between them, we pool the per-round
-macrostate visits across the cell and build the empirical potential over the
-composition simplex \citep{watanabe2014energy, ezaki2017energy},
-$U(s) = -\ln \hat{P}(s)$, with two compositions adjacent iff they differ by exactly
-one agent's vote. A local minimum of $U$ is an attractor, and a disconnectivity
-graph \citep{becker1997disconnectivity} over the minima shows their number, basin membership, and separating barrier
-heights: two valleys with a barrier is the bistable landscape, one valley is
-monostable. Because this pooling mixes transient early rounds with the endpoint,
-the landscape is a visual complement to Signatures 1--2, not the primary test.
 
 \paragraph{Limitations.}
 Two points beyond the shared phenomenological caveat. First, classical basin
@@ -518,7 +517,7 @@ staggered convergence never yields a pure hub. $D = 1$ needs all credit on one n
 dissenter folding into a strong majority is the opposite, $D = \tfrac{1}{9} \approx 0.11$.
 
 \paragraph{Limitations.}
-With four agents ($N = 4$, GPQA-Diamond) the four shares and a discrete null bound the minimum $p$, so
+With four agents ($N = 4$) the four shares and a discrete null bound the minimum $p$, so
 per-repetition power is low and the signal lives in the aggregate. A
 single-conversion repetition gives $D = 1$ trivially, which is controlled by
 aggregation and the topology null rather than by discarding. As with every

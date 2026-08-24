@@ -89,8 +89,9 @@ $W = 2$, fully-connected topology, $N = 4$ agents).
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{plots/highrep/figA_full_feature_breakdown.png}
-  \caption[Accuracy and efficiency by run-level feature]{Full breakdown of accuracy (top row) and efficiency (bottom row, where
-           applicable) as a function of six run-level features.
+  \caption[Accuracy and efficiency by run-level feature]{Full breakdown of accuracy and efficiency as a function of six
+           repetition-level features. The top row (a--c) reports accuracy; the
+           bottom row reports efficiency (d) and accuracy (e, f).
            (a) Accuracy by initial plurality size.
            (b) Accuracy by vote-flip count (binned, Wilson 95\,\% CI, $n \geq 10$).
            (c) Accuracy by mean initial confidence.
@@ -122,7 +123,7 @@ $W = 2$, fully-connected topology, $N = 4$ agents).
            Columns: vote flips, mean initial confidence, mean final confidence,
            confidence change (final minus initial), rounds to consensus.
            Histograms show empirical density; curves are kernel density estimates.
-           Confidence change distributions for correct and incorrect runs overlap
+           Confidence change distributions for correct and incorrect repetitions overlap
            almost perfectly in all three tasks, indicating that agents gain
            confidence at the same rate regardless of whether the system reaches the
            correct answer.
@@ -150,16 +151,16 @@ $W = 2$, fully-connected topology, $N = 4$ agents).
 
 The agent persona used throughout this thesis includes an explicit
 anti-conformity instruction. To check whether the motif structure is an artefact
-of that particular wording, we compare the final dataset against an earlier run
+of that particular wording, we compare the final dataset against an earlier experiment
 that used a milder persona, on the same 35 HiddenBench questions and six
-configurations (GPQA was not part of the earlier run, so this check is
+configurations (GPQA was not part of the earlier experiment, so this check is
 HiddenBench-only). The two personas differ in one appended sentence: the milder
 version ends at ``Be critical, your neighbours may be wrong, and so may you,''
 while the version used here adds ``Do not change your position simply because
 others disagree; only update if you encounter a specific argument you cannot
 counter.''
 
-The earlier run used $R = 30$ repetitions and the final run $R = 50$; we therefore
+The earlier experiment used $R = 30$ repetitions and the final one $R = 50$; we therefore
 pair by question within each configuration and test the paired difference
 (Wilcoxon signed-rank, Holm-corrected \citep{holm1979} across the six configurations), so the
 differing repetition counts affect only per-task precision, not the pairing.
@@ -202,7 +203,7 @@ faster fully-connected convergence (rounds down by roughly one to one and a half
 ceiling-hits roughly halved) and a higher unanimous-convergence rate, but leaves
 accuracy unchanged (0/6) and does not reduce self-reinforcement prevalence (0/6).
 The shift toward higher $N_{\mathrm{eff}}$ and more flagged limit cycles is a
-by-product of more runs converging (more unanimous endpoints to count) rather than
+by-product of more repetitions converging (more unanimous endpoints to count) rather than
 a reduction in multistability, and Cram\'er's $V$ if anything trends down. The
 amplifier mechanism therefore survives a deliberate attempt to make the agents
 less conformist, which is mild evidence that it reflects the interaction structure
@@ -285,8 +286,8 @@ On the dynamical side, further regimes of the joint trajectory:
 \begin{itemize}
   \item \textbf{Consensus / fixed point}: the baseline regime (a point attractor)
         against which the others are defined.
-  \item \textbf{Polarisation / stable split}: persistent within-run disagreement
-        into stable subgroups, distinct from across-run bistability.
+  \item \textbf{Polarisation / stable split}: persistent within-repetition disagreement
+        into stable subgroups, distinct from across-repetition bistability.
   \item \textbf{Negative autoregulation / self-correction}: the sign-flipped twin
         of self-reinforcement, an agent that damps its own confidence.
 \end{itemize}
@@ -440,9 +441,9 @@ shows the efficiency--reliability trade-off across thresholds.
 \paragraph{Output structure (fix, full \arguephase{}/\updatephase{}).}
 The structured output is the measurement apparatus, not engineering taste.
 Private reasoning and confidence versus the public message enable the
-public/private dissociation; the \arguephase{} \texttt{question} field yields the
-directed influence graph for dominance detection; \texttt{challenge} quoting peer
-claims provides attribution; and the vote-stability rule separates argumentation
+public/private dissociation; the \arguephase{} fields structure the deliberation
+(the influence graph for dominance detection is built from vote adoptions, not the
+draft text; \autoref{sec:method}); and the vote-stability rule separates argumentation
 from belief update so they can be measured independently. Structured outputs are
 the norm in serious MAD work \citep{liang2024encouraging, he2025dimo}.
 

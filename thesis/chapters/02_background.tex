@@ -5,7 +5,7 @@
 % review. No new references are introduced here.
 % ============================================================
 
-This chapter provides the minimum conceptual background needed to follow the
+This section provides the minimum conceptual background needed to follow the
 rest of the thesis. \autoref{sec:bg:complex} introduces self-organization
 and the notion of a dynamical motif, which supplies the analytical vocabulary
 used throughout. \autoref{sec:bg:llm} fixes what we mean by an LLM agent.
@@ -65,14 +65,15 @@ were chosen because each has a precise, testable signature and because each
 corresponds directly to a pathology already reported informally in the debate
 literature (\autoref{sec:related}).
 
-The influence side of this picture has its own formal home in
+The propagation and concentration of influence, the mechanism shared by
+self-reinforcement and dominance, has its own formal home in
 \emph{opinion dynamics}, which studies how agreement and social power propagate
 through a network of interacting agents. The classical DeGroot model treats each
 agent's opinion as a weighted average of its neighbours' opinions and asks when
 this process reaches consensus \citep{degroot1974consensus}; later work shows how
 the same dynamics let social power concentrate on particular nodes across
 repeated interactions \citep{jia2015opinion}. Our agents differ from the classical
-setting in one important respect: they hold a latent, continuous confidence but
+setting in one important respect: they hold a latent confidence, elicited as an integer from 1 to 10, but
 cast a discrete vote. This continuous-opinion, discrete-action structure is
 itself a studied variant of opinion dynamics \citep{martins2008coda}, and it is
 what lets us measure self-reinforcement on the continuous channel (confidence)

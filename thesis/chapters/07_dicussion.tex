@@ -121,10 +121,9 @@ qualitatively different operating regimes, why the structural null results are
 informative, and what the robustness check does and does not show.
 
 \paragraph{Self-reinforcement as an amplifier, not a benefit.}
-The single most robust behavioural finding is that self-reinforcement is
-universal and is the engine of convergence, yet is blind to correctness. It is
-present in every configuration ($p_{\mathrm{SR}} \in [0.74, 0.88]$) and predicts
-fewer rounds everywhere (task-level $\rho \in [-0.91, -0.77]$), but its relationship to
+The single most robust behavioural finding is that self-reinforcement is universal
+and is the engine of convergence, yet is blind to correctness: it is present in
+every configuration and predicts fewer rounds everywhere, but its relationship to
 accuracy reverses sign depending on whether the correct option is present in the
 opening votes. This is the empirical content of describing the system as an
 amplifier: reinforcement strengthens whatever plurality exists at the outset,
@@ -143,14 +142,10 @@ exposure to peer uncertainty, allowing confidence to ratchet more freely regardl
 of correctness.
 
 One comparison we deliberately do not make is against chain-of-thought or
-self-consistency, the baselines emphasised by \citet{liu2025stopovervaluing} and
-\citet{zhang2025debateorvote}. Our question is not whether debate is the best
-inference-time method but what \emph{happens inside} the debate, so the fair
-reference point is the round-0 majority vote of the same four agents: the outcome
-the group would reach with no interaction at all. Measuring debate against its own
-pre-deliberation vote isolates the contribution of the interaction itself, which is
-exactly the quantity the motif analysis is about, and it is why our ``gain'' figures
-are stated relative to that baseline rather than to an external single-agent method.
+self-consistency: our question is not whether debate is the best inference-time
+method but what \emph{happens inside} it, so the fair reference point is the round-0
+majority vote of the same four agents, and our ``gain'' figures are stated relative
+to that pre-deliberation baseline rather than to an external single-agent method.
 
 \paragraph{Two regimes: refinement and correction.}
 The two benchmarks are not merely easy and hard versions of one task; they place
