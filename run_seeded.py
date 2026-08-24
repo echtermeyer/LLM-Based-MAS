@@ -47,10 +47,10 @@ parser.add_argument(
 parser.add_argument(
     "--condition",
     type=int,
-    choices=[0, 1],
+    choices=[0, 1, 2, 3],
     nargs="+",
     required=True,
-    help="Correct votes in injected round 0 (0 or 1, or both)",
+    help="Correct votes in injected round 0 (0–3)",
 )
 parser.add_argument("--model", choices=Models.NAMES, default="mistral-medium")
 parser.add_argument("--t", type=int, default=15)
