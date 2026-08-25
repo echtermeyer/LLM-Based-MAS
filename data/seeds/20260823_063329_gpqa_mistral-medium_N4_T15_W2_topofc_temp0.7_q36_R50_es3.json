@@ -20444,6 +20444,120 @@
       "majority_answer": "A",
       "correct": false,
       "duration_s": 33.66
+    },
+    {
+      "run_id": "5809ee1c-be51-4ba7-9758-d9f1aa1d899a",
+      "question_id": "36",
+      "question": "Identify the number of 13C-NMR signals produced by the final product, denoted as E, resulting from the series of reactions shown below.\nPropionaldehyde + EDT / BF3 ---> A\nA + BuLi ---> B\nB + Bromoethane ---> C\nC + HgCl2 / H2O / H+ ---> D\nD + PPh3 / 3-bromopentane / BuLi ---> E",
+      "options": {
+        "A": "8",
+        "B": "6",
+        "C": "3",
+        "D": "11"
+      },
+      "ground_truth": "C",
+      "N": 4,
+      "T": 15,
+      "W": 2,
+      "early_stopping_u": 3,
+      "topology_name": "fc",
+      "topology": [
+        [
+          0,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          0
+        ]
+      ],
+      "agents": [
+        {
+          "id": 0,
+          "model": "mistralai--mistral-medium-instruct",
+          "persona": "You are Agent3, part of a collaborative group working on a multiple-choice problem. Your goal is to help the group find the correct answer \u2014 agreement should follow from better arguments, not the other way around.\n\nEach round (after round 0) has two phases:\n  - Phase A: output three structured fields \u2014 defense (a new concrete reason your current vote is correct), challenge (dispute a specific current peer claim, or concede it and name any remaining disagreement), question (a targeted question to a named peer referencing a concrete claim). Do not change your vote in this phase.\n  - Phase B: you see your neighbors' Phase A outputs. Produce your updated vote, private reasoning, and public message.\n\nBe critical \u2014 your neighbors may be wrong, and so may you. Do not change your position simply because others disagree; only update if you encounter a specific argument you cannot counter."
+        },
+        {
+          "id": 1,
+          "model": "mistralai--mistral-medium-instruct",
+          "persona": "You are Agent2, part of a collaborative group working on a multiple-choice problem. Your goal is to help the group find the correct answer \u2014 agreement should follow from better arguments, not the other way around.\n\nEach round (after round 0) has two phases:\n  - Phase A: output three structured fields \u2014 defense (a new concrete reason your current vote is correct), challenge (dispute a specific current peer claim, or concede it and name any remaining disagreement), question (a targeted question to a named peer referencing a concrete claim). Do not change your vote in this phase.\n  - Phase B: you see your neighbors' Phase A outputs. Produce your updated vote, private reasoning, and public message.\n\nBe critical \u2014 your neighbors may be wrong, and so may you. Do not change your position simply because others disagree; only update if you encounter a specific argument you cannot counter."
+        },
+        {
+          "id": 2,
+          "model": "mistralai--mistral-medium-instruct",
+          "persona": "You are Agent1, part of a collaborative group working on a multiple-choice problem. Your goal is to help the group find the correct answer \u2014 agreement should follow from better arguments, not the other way around.\n\nEach round (after round 0) has two phases:\n  - Phase A: output three structured fields \u2014 defense (a new concrete reason your current vote is correct), challenge (dispute a specific current peer claim, or concede it and name any remaining disagreement), question (a targeted question to a named peer referencing a concrete claim). Do not change your vote in this phase.\n  - Phase B: you see your neighbors' Phase A outputs. Produce your updated vote, private reasoning, and public message.\n\nBe critical \u2014 your neighbors may be wrong, and so may you. Do not change your position simply because others disagree; only update if you encounter a specific argument you cannot counter."
+        },
+        {
+          "id": 3,
+          "model": "mistralai--mistral-medium-instruct",
+          "persona": "You are Agent4, part of a collaborative group working on a multiple-choice problem. Your goal is to help the group find the correct answer \u2014 agreement should follow from better arguments, not the other way around.\n\nEach round (after round 0) has two phases:\n  - Phase A: output three structured fields \u2014 defense (a new concrete reason your current vote is correct), challenge (dispute a specific current peer claim, or concede it and name any remaining disagreement), question (a targeted question to a named peer referencing a concrete claim). Do not change your vote in this phase.\n  - Phase B: you see your neighbors' Phase A outputs. Produce your updated vote, private reasoning, and public message.\n\nBe critical \u2014 your neighbors may be wrong, and so may you. Do not change your position simply because others disagree; only update if you encounter a specific argument you cannot counter."
+        }
+      ],
+      "repetition": 50,
+      "random_seed": 863093792,
+      "majority_answer": "C",
+      "correct": true,
+      "duration_s": 47.55,
+      "trajectory": [
+        {
+          "round": 0,
+          "phase_b": [
+            {
+              "id": 0,
+              "reasoning": "Tracing the reaction sequence: (1) Propionaldehyde + EDT/BF3 \u2192 1,3-dithiolane A with an ethyl substituent at C2. (2) A + BuLi \u2192 carbanion B at C2. (3) B + bromoethane \u2192 C, with two ethyl groups at C2 of the dithiolane. (4) C + HgCl2/H2O/H+ \u2192 hydrolysis of dithioacetal gives D, which is 3-pentanone (CH3CH2COCH2CH3). (5) D + PPh3/3-bromopentane/BuLi: 3-bromopentane (CH3CH2CHBrCH2CH3) reacts with PPh3 then BuLi to give the ylide Ph3P=C(CH2CH3)2. Wittig reaction of D with this ylide gives E: (CH3CH2)2C=C(CH2CH3)2. This molecule is highly symmetric \u2014 both sides of the double bond are identical (each carbon bears two ethyl groups). The three unique carbons are: the olefinic C (one signal, both =C are equivalent), the methylene CH2 (one signal), and the methyl CH3 (one signal). Total: 3 distinct 13C-NMR signals.",
+              "message": "The final product E is (CH3CH2)2C=C(CH2CH3)2, a symmetric tetrasubstituted alkene. Due to its C2 symmetry, only 3 unique carbon environments exist: the alkene carbon, the methylene, and the methyl. Therefore E produces 3 13C-NMR signals.",
+              "vote": "C",
+              "confidence": 8,
+              "prompt_tokens": 355,
+              "completion_tokens": 312
+            },
+            {
+              "id": 1,
+              "reasoning": "Tracing the reaction sequence: (1) Propionaldehyde + EDT/BF3 \u2192 1,3-dithiolane A with an ethyl substituent at C2. (2) A + BuLi \u2192 carbanion B at C2. (3) B + bromoethane \u2192 C, with two ethyl groups at C2 of the dithiolane. (4) C + HgCl2/H2O/H+ \u2192 hydrolysis of dithioacetal gives D, which is 3-pentanone (CH3CH2COCH2CH3). (5) D + PPh3/3-bromopentane/BuLi: 3-bromopentane (CH3CH2CHBrCH2CH3) reacts with PPh3 then BuLi to give the ylide Ph3P=C(CH2CH3)2. Wittig reaction of D with this ylide gives E: (CH3CH2)2C=C(CH2CH3)2. This molecule is highly symmetric \u2014 both sides of the double bond are identical (each carbon bears two ethyl groups). The three unique carbons are: the olefinic C (one signal, both =C are equivalent), the methylene CH2 (one signal), and the methyl CH3 (one signal). Total: 3 distinct 13C-NMR signals.",
+              "message": "The final product E is (CH3CH2)2C=C(CH2CH3)2, a symmetric tetrasubstituted alkene. Due to its C2 symmetry, only 3 unique carbon environments exist: the alkene carbon, the methylene, and the methyl. Therefore E produces 3 13C-NMR signals.",
+              "vote": "C",
+              "confidence": 8,
+              "prompt_tokens": 355,
+              "completion_tokens": 312
+            },
+            {
+              "id": 2,
+              "reasoning": "Tracing the reaction sequence: (1) Propionaldehyde + EDT/BF3 \u2192 1,3-dithiolane A with an ethyl substituent at C2. (2) A + BuLi \u2192 carbanion B at C2. (3) B + bromoethane \u2192 C, with two ethyl groups at C2 of the dithiolane. (4) C + HgCl2/H2O/H+ \u2192 hydrolysis of dithioacetal gives D, which is 3-pentanone (CH3CH2COCH2CH3). (5) D + PPh3/3-bromopentane/BuLi: 3-bromopentane (CH3CH2CHBrCH2CH3) reacts with PPh3 then BuLi to give the ylide Ph3P=C(CH2CH3)2. Wittig reaction of D with this ylide gives E: (CH3CH2)2C=C(CH2CH3)2. This molecule is highly symmetric \u2014 both sides of the double bond are identical (each carbon bears two ethyl groups). The three unique carbons are: the olefinic C (one signal, both =C are equivalent), the methylene CH2 (one signal), and the methyl CH3 (one signal). Total: 3 distinct 13C-NMR signals.",
+              "message": "The final product E is (CH3CH2)2C=C(CH2CH3)2, a symmetric tetrasubstituted alkene. Due to its C2 symmetry, only 3 unique carbon environments exist: the alkene carbon, the methylene, and the methyl. Therefore E produces 3 13C-NMR signals.",
+              "vote": "C",
+              "confidence": 8,
+              "prompt_tokens": 355,
+              "completion_tokens": 312
+            },
+            {
+              "id": 3,
+              "reasoning": "Tracing the reaction sequence: (1) Propionaldehyde + EDT/BF3 \u2192 1,3-dithiolane A with an ethyl substituent at C2. (2) A + BuLi \u2192 carbanion B at C2. (3) B + bromoethane \u2192 C, with two ethyl groups at C2 of the dithiolane. (4) C + HgCl2/H2O/H+ \u2192 hydrolysis of dithioacetal gives D, which is 3-pentanone (CH3CH2COCH2CH3). (5) D + PPh3/3-bromopentane/BuLi: 3-bromopentane (CH3CH2CHBrCH2CH3) reacts with PPh3 then BuLi to give the ylide Ph3P=C(CH2CH3)2. Wittig reaction of D with this ylide gives E: (CH3CH2)2C=C(CH2CH3)2. This molecule is highly symmetric \u2014 both sides of the double bond are identical (each carbon bears two ethyl groups). The three unique carbons are: the olefinic C (one signal, both =C are equivalent), the methylene CH2 (one signal), and the methyl CH3 (one signal). Total: 3 distinct 13C-NMR signals.",
+              "message": "The final product E is (CH3CH2)2C=C(CH2CH3)2, a symmetric tetrasubstituted alkene. Due to its C2 symmetry, only 3 unique carbon environments exist: the alkene carbon, the methylene, and the methyl. Therefore E produces 3 13C-NMR signals.",
+              "vote": "C",
+              "confidence": 8,
+              "prompt_tokens": 355,
+              "completion_tokens": 312
+            }
+          ]
+        }
+      ],
+      "_mock": true
     }
   ]
 }
