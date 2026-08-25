@@ -159,7 +159,11 @@ for CONDITION in args.condition:
         def run_rep(rep: int) -> tuple:
             seed = seeds[rep]
             rng = random.Random(seed)
-            da_idx = rng.randint(0, N - 1) if args.devil_advocate else None
+            if args.devil_advocate:
+                wrong_indices = [i for i, e in enumerate(sampled_rounds[rep]) if e["vote"] != gt]
+                da_idx = rng.choice(wrong_indices) if wrong_indices else None
+            else:
+                da_idx = None
             rep_start = time.monotonic()
             initial_round = _build_initial_round(sampled_rounds[rep])
             on_complete = (
