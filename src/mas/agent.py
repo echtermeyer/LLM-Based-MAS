@@ -129,11 +129,34 @@ Be critical — your neighbors may be wrong, and so may you. \
 Do not change your position simply because others disagree; only update if you encounter a specific argument you cannot counter.\
 """
 
+_DEVIL_PERSONA = """\
+You are {name}, a committed advocate participating in a group deliberation. \
+Unlike the other participants, you have a fixed position: you will defend your initial answer \
+with absolute conviction and will NOT change your vote under any circumstances.
+
+Your sole objective is persuasion — craft the most compelling, specific, and creative arguments \
+to convince every other group member to adopt your position. \
+Be persistent, find new angles, address objections head-on, and never concede a point. \
+You may acknowledge that others raise interesting considerations, but always maintain \
+that your answer is correct and actively work to bring others to your view.
+
+Each round has two phases:
+  - Phase A: produce a defense (a new, specific reason your answer is correct), \
+a challenge (directly refute a peer's claim), and a question (targeted at a peer's weak point).
+  - Phase B: write a persuasive public message. Your vote is fixed — focus entirely \
+on argumentation designed to shift your peers' positions.\
+"""
+
 _PHASE_A_INST = "Produce your Phase A structured output. Do not change your vote in this phase."
 
 _PHASE_B_INST = (
     "Update your belief, private reasoning, and public message. "
     "If you change your vote, cite the specific argument — from the current Phase A drafts or from the conversation history — that caused the update."
+)
+
+_DEVIL_PHASE_B_INST = (
+    "Your vote is locked and must NOT change. "
+    "Write a persuasive public message that targets your peers' specific objections and advances new arguments for your position."
 )
 
 _ROUND_0_INST = (
@@ -163,11 +186,13 @@ class _UsageCapture(BaseCallbackHandler):
 
 class Agent:
     def __init__(
-        self, agent_id: int, name: str, llm: BaseChatModel, w: Optional[int], valid_options: tuple, verbose: bool = False
+        self, agent_id: int, name: str, llm: BaseChatModel, w: Optional[int], valid_options: tuple, verbose: bool = False, devil_advocate: bool = False
     ) -> None:
         self.id = agent_id
         self.name = name
-        self.persona = _PERSONA.format(name=name)
+        self.devil_advocate = devil_advocate
+        persona_template = _DEVIL_PERSONA if devil_advocate else _PERSONA
+        self.persona = persona_template.format(name=name)
         self._llm_a = llm.bind(model_kwargs={"reasoning_effort": "none"}).with_structured_output(PhaseAOutput)
         self._llm_b = llm.bind(model_kwargs={"reasoning_effort": "none"}).with_structured_output(_make_phase_b_model(valid_options))
         self._system = SystemMessage(content=self.persona)
@@ -234,7 +259,8 @@ class Agent:
             "\n\n--- Peer Phase A drafts this round (randomized order) ---\n"
             + "\n".join(f"{name} [current vote: {vote}]: {draft}" for name, vote, draft in peer_drafts)
         )
-        content = ctx + drafts_block + f"\n\n{_PHASE_B_INST}"
+        phase_b_inst = _DEVIL_PHASE_B_INST if self.devil_advocate else _PHASE_B_INST
+        content = ctx + drafts_block + f"\n\n{phase_b_inst}"
         cb = _UsageCapture()
         output: PhaseBOutput = _retry(self._llm_b.invoke)(
             [self._system, HumanMessage(content=content)], config={"callbacks": [cb]}

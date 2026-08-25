@@ -59,6 +59,7 @@ parser.add_argument("--workers", type=int, default=4)
 parser.add_argument("--early-stopping", action="store_true")
 parser.add_argument("--u", type=int, default=3)
 parser.add_argument("--skip-existing", action="store_true")
+parser.add_argument("--devil-advocate", action="store_true", help="One randomly chosen agent is locked to its initial vote and purely tries to persuade others")
 parser.add_argument("--verbose", action="store_true")
 args = parser.parse_args()
 
@@ -95,7 +96,8 @@ def _sample_init(correct_pool: list, wrong_pool: list, condition: int, rng: rand
 
 
 for CONDITION in args.condition:
-    output_dir = args.results_dir / f"seeded_init_{CONDITION}"
+    da_suffix = "_da" if args.devil_advocate else ""
+    output_dir = args.results_dir / f"seeded_init_{CONDITION}{da_suffix}"
     output_dir.mkdir(parents=True, exist_ok=True)
     print(f"\n=== Condition {CONDITION} ===")
 
@@ -157,6 +159,7 @@ for CONDITION in args.condition:
         def run_rep(rep: int) -> tuple:
             seed = seeds[rep]
             rng = random.Random(seed)
+            da_idx = rng.randint(0, N - 1) if args.devil_advocate else None
             rep_start = time.monotonic()
             initial_round = _build_initial_round(sampled_rounds[rep])
             on_complete = (
@@ -173,6 +176,7 @@ for CONDITION in args.condition:
                 rng=rng,
                 verbose=args.verbose,
                 early_stopping_u=args.u if args.early_stopping else None,
+                devil_advocate_idx=da_idx,
             )
             result = mas.run(
                 question=question,
@@ -198,6 +202,7 @@ for CONDITION in args.condition:
             rep_dict["majority_answer"] = majority_answer
             rep_dict["correct"] = majority_correct
             rep_dict["duration_s"] = round(time.monotonic() - rep_start, 2)
+            rep_dict["devil_advocate_idx"] = da_idx
             line = f"  rep {rep + 1:>3}: {mark} {majority_answer}  t0=[{init_str}] → tf=[{votes_str}]"
             return rep, rep_dict, line
 

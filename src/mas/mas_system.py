@@ -26,6 +26,7 @@ class MultiAgentSystem:
         rng: Optional[random.Random] = None,
         verbose: bool = False,
         early_stopping_u: Optional[int] = None,
+        devil_advocate_idx: Optional[int] = None,
     ) -> None:
         if n < 1:
             raise ValueError(f"n must be >= 1, got {n}")
@@ -45,6 +46,7 @@ class MultiAgentSystem:
         self._llm = llm
         self._topology_name = topology_name
         self._early_stopping_u = early_stopping_u
+        self._devil_advocate_idx = devil_advocate_idx
         self._rng = rng if rng is not None else random.Random()
         hub = self._rng.randint(0, n - 1) if topology_name == "star" else 0
         self._adjacency = _TOPOLOGY_FACTORIES[topology_name](n, hub)
@@ -63,7 +65,8 @@ class MultiAgentSystem:
         self._rng.shuffle(names)
         valid_options = tuple(options.keys())
         agents = [
-            Agent(agent_id=i, name=names[i], llm=self._llm, w=self._w, valid_options=valid_options, verbose=self._verbose)
+            Agent(agent_id=i, name=names[i], llm=self._llm, w=self._w, valid_options=valid_options, verbose=self._verbose,
+                  devil_advocate=(i == self._devil_advocate_idx))
             for i in range(self._n)
         ]
 
