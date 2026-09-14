@@ -4,13 +4,13 @@
 % moved here to keep the main text reader-friendly.
 % ============================================================
 
-\subsection{System Performance: Full Configuration Table}
+\subsection{Accuracy and Efficiency: Full Configuration Table}
 \label{app:perf:configs}
 
 \autoref{tab:app:perf:configs} reports accuracy, mean rounds to consensus,
 fraction of repetitions hitting the hard cap $T = 15$, and mean vote flips
 for all 12 (dataset, topology, $W$) configurations
-($R = 50$ repetitions per task, $n = 1{,}750$ repetitions per cell).
+($R = 50$ repetitions per task, $n = 2{,}500$ repetitions per cell).
 
 \begin{table}[H]
 \centering
@@ -19,27 +19,27 @@ for all 12 (dataset, topology, $W$) configurations
 \toprule
 Dataset & Config & Accuracy & Mean rounds & $p_{\mathrm{cap}}$ & Mean flips \\
 \midrule
-GPQA & fc / $W=1$ & $39.6\,\%$ & $3.85$ & $0.2\,\%$ & $2.87$ \\
-     & fc / $W=2$ & $42.0\,\%$ & $3.64$ & $0.2\,\%$ & $2.79$ \\
-     & fc / $W=5$ & $40.6\,\%$ & $3.81$ & $0.6\,\%$ & $2.87$ \\
-     & star / $W=1$ & $39.9\,\%$ & $4.22$ & $0.9\,\%$ & $2.98$ \\
-     & star / $W=2$ & $41.1\,\%$ & $4.16$ & $0.8\,\%$ & $3.60$ \\
-     & star / $W=5$ & $41.2\,\%$ & $4.32$ & $1.6\,\%$ & $3.27$ \\
+GPQA & fc / $W=1$ & $41.4\,\%$ & $3.87$ & $0.2\,\%$ & $2.98$ \\
+     & fc / $W=2$ & $43.1\,\%$ & $3.68$ & $0.2\,\%$ & $2.90$ \\
+     & fc / $W=5$ & $42.4\,\%$ & $3.83$ & $0.4\,\%$ & $2.91$ \\
+     & star / $W=1$ & $41.8\,\%$ & $4.29$ & $1.0\,\%$ & $3.11$ \\
+     & star / $W=2$ & $42.5\,\%$ & $4.23$ & $1.0\,\%$ & $3.77$ \\
+     & star / $W=5$ & $42.2\,\%$ & $4.36$ & $1.6\,\%$ & $3.43$ \\
 \addlinespace
-HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
-            & fc / $W=2$ & $32.1\,\%$ & $4.91$ & $1.2\,\%$ & $4.40$ \\
-            & fc / $W=5$ & $29.7\,\%$ & $4.99$ & $2.1\,\%$ & $4.29$ \\
-            & star / $W=1$ & $27.8\,\%$ & $7.56$ & $14.3\,\%$ & $5.33$ \\
-            & star / $W=2$ & $29.4\,\%$ & $6.78$ & $11.9\,\%$ & $5.85$ \\
-            & star / $W=5$ & $28.6\,\%$ & $6.54$ & $11.0\,\%$ & $5.64$ \\
+HiddenBench & fc / $W=1$ & $25.2\,\%$ & $5.18$ & $2.5\,\%$ & $4.27$ \\
+            & fc / $W=2$ & $28.2\,\%$ & $4.71$ & $1.0\,\%$ & $3.92$ \\
+            & fc / $W=5$ & $25.8\,\%$ & $4.79$ & $2.0\,\%$ & $3.86$ \\
+            & star / $W=1$ & $24.5\,\%$ & $7.13$ & $13.3\,\%$ & $4.82$ \\
+            & star / $W=2$ & $26.6\,\%$ & $6.48$ & $11.2\,\%$ & $5.22$ \\
+            & star / $W=5$ & $26.4\,\%$ & $6.27$ & $10.7\,\%$ & $5.12$ \\
 \bottomrule
 \end{tabular}
-\caption[System performance by configuration]{Full system performance per configuration
-         ($R = 50$, $35$ tasks, $n = 1{,}750$ repetitions per cell).}
+\caption[Accuracy and efficiency by configuration]{Full system performance per configuration
+         ($R = 50$, $50$ tasks, $n = 2{,}500$ repetitions per cell).}
 \label{tab:app:perf:configs}
 \end{table}
 
-\subsection{System Performance: Rounds vs.\ Accuracy}
+\subsection{Accuracy and Efficiency: Rounds vs.\ Accuracy}
 \label{app:perf:rounds_acc}
 
 \begin{figure}[H]
@@ -49,14 +49,152 @@ HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
            for GPQA (left) and HiddenBench (right).
            Points show means over repetitions reaching each round count
            (minimum $n = 20$).
-           All configurations pooled ($N = 10{,}500$ per dataset).}
+           All configurations pooled ($N = 15{,}000$ per dataset).}
   \label{fig:app:perf:rounds_acc}
 \end{figure}
 
-\subsection{Bistability: Supplementary Figures}
+\subsection{Self-Reinforcement: Supplementary Tables and Figure}
+\label{app:sr:supp}
+
+\autoref{tab:sr:overview} reports $p_{\mathrm{SR}}$ and mean slope $\bar\beta$ for
+all 12 (dataset, topology, $W$) cells; \autoref{tab:sr:subgroups} breaks the
+segment-level slope down by structural condition; \autoref{fig:sr:accuracy} shows
+the marginal (pooled) relationship between $\bar\beta$ and task accuracy, whose
+near-zero correlation is discussed in \autoref{sec:results:sr}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{llcc}
+\toprule
+Dataset & Topology & $p_{\mathrm{SR}}$ (range over $W$) & $\bar{\beta}$ (range over $W$) \\
+\midrule
+GPQA        & fc   & 0.763--0.825 & 0.441--0.515 \\
+GPQA        & star & 0.733--0.809 & 0.390--0.463 \\
+HiddenBench & fc   & 0.839--0.881 & 0.415--0.467 \\
+HiddenBench & star & 0.804--0.844 & 0.350--0.373 \\
+\bottomrule
+\end{tabular}
+\caption[Self-reinforcement prevalence and slope by configuration]{$p_{\mathrm{SR}}$ and mean segment slope $\bar\beta$
+         (confidence gain / round) per (dataset, topology) configuration,
+         range reported over $W \in \{1,2,5\}$.
+         $N_{\mathrm{tasks}} = 50$, $R = 50$.}
+\label{tab:sr:overview}
+\end{table}
+
+\begin{table}[H]
+\centering
+
+\small
+\begin{tabular}{llrrl}
+\toprule
+Condition & Group & $n_{\mathrm{segs}}$ & $\bar\beta$ & $p_{\mathrm{SR}}$ \\
+\midrule
+\multirow{2}{*}{Ceiling}
+  & No ceiling   & 115{,}137 & 0.404 & 0.798 \\
+  & Ceiling hit  &  18{,}559 & 0.564 & 0.910 \\
+\midrule
+\multirow{2}{*}{Terminality}
+  & Non-terminal &  14{,}341 & 0.262 & 0.682 \\
+  & Terminal     & 119{,}355 & 0.445 & 0.829 \\
+\midrule
+\multirow{2}{*}{Initial correctness}
+  & Init wrong majority   & 116{,}400 & 0.410 & 0.809 \\
+  & Init correct majority &  17{,}296 & 0.535 & 0.840 \\
+\midrule
+\multirow{2}{*}{Vote stability}
+  & Some agent flipped    & 113{,}660 & 0.380 & 0.796 \\
+  & Fully static rep.     &  20{,}036 & 0.685 & 0.908 \\
+\midrule
+\multirow{5}{*}{Init vote dist.}
+  & 4-0-0-0 & 21{,}435 & 0.663 & 0.897 \\
+  & 3-1-0-0 & 50{,}286 & 0.412 & 0.824 \\
+  & 2-2-0-0 & 26{,}629 & 0.370 & 0.791 \\
+  & 2-1-1-0 & 34{,}035 & 0.345 & 0.767 \\
+  & 1-1-1-1 &   1{,}311 & 0.308 & 0.656 \\
+\bottomrule
+\end{tabular}
+\caption[Self-reinforcement slope by structural subgroup]{Mean segment slope $\bar\beta$ and $p_{\mathrm{SR}}$ by subgroup
+         (all segments pooled across configs, $N = 133{,}696$).
+         Pooled segment counts are descriptive; the subgroup orderings are
+         confirmed at the task level.}
+\label{tab:sr:subgroups}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{plots/sr/fig5_sr_accuracy.png}
+  \caption[Self-reinforcement slope versus task accuracy]{Mean segment slope $\bar\beta$ vs.\ task accuracy at the task level
+           (pooled $W$).  Dashed line: pooled OLS fit.
+           Pearson $r$ shown in each panel.  The near-zero marginal correlations
+           reflect a cancellation between opposite effects in the GT-present
+           and GT-absent subpopulations (see \autoref{sec:results:sr}).}
+  \label{fig:sr:accuracy}
+\end{figure}
+
+\subsection{Dominance: Full Configuration Table}
+\label{app:dom:supp}
+
+\autoref{tab:dom:overview} reports mean raw $D$ per (dataset, topology, $W$) cell.
+Star $D$ is $3.3$--$4.3\times$ higher than fully-connected across all cells, but this
+gap is largely mechanical: the star centre is the sole eligible conversion source for
+every leaf, so its influence share is structurally inflated and its surrogate null
+degenerate. Emergent excess ($z > 0$, flagged fraction) is therefore identified only
+for the fully-connected topology, as discussed in \autoref{sec:results:dominance}.
+
+\begin{table}[H]
+\centering
+
+\small
+\begin{tabular}{llccccc}
+\toprule
+ & & \multicolumn{3}{c}{Mean $D$} & \multicolumn{2}{c}{fc excess (pooled $W$)} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-7}
+Dataset & Topology & $W=1$ & $W=2$ & $W=5$ & $\bar{z}$ & Flagged \\
+\midrule
+GPQA        & fc   & 0.154 & 0.154 & 0.155 & $+0.53$ & 7.7\,\% \\
+GPQA        & star & 0.601 & 0.601 & 0.610 & \multicolumn{2}{c}{---} \\
+HiddenBench & fc   & 0.157 & 0.178 & 0.179 & $+0.73$ & 10.9\,\% \\
+HiddenBench & star & 0.540 & 0.574 & 0.578 & \multicolumn{2}{c}{---} \\
+\bottomrule
+\end{tabular}
+\caption[Mean dominance by configuration]{Mean raw $D$ per (dataset, topology, $W$) cell.
+         fc emergent excess ($z > 0$) reported as mean $z$ and flagged
+         fraction (star null degenerate, not reported there).
+         $N_{\mathrm{tasks}} = 50$, $R = 50$.}
+\label{tab:dom:overview}
+\end{table}
+
+\subsection{Bistability: Label Distribution and Supplementary Figures}
 \label{app:bistab}
 
-\paragraph{Bistability: configuration effects (supplementary figures).}
+\autoref{tab:bistab:overview} gives the per-dataset breakdown of the three
+bistability classes referenced in \autoref{sec:results:bistability}. Of the 600
+cells, $23.7\,\%$ are monostable, $41.5\,\%$ multistable, and $34.8\,\%$ stochastic;
+HiddenBench is far more stochastic than GPQA.
+
+\begin{table}[H]
+\centering
+
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Dataset & Monostable & Multistable & Stochastic &
+  $N_{\mathrm{eff}}$ mean & $V$ mean \\
+\midrule
+GPQA ($M=4$)          & 86 & 151 & 63 & 1.97 & 0.45 \\
+HiddenBench ($M \in \{3,4\}$) & 56 &  98 & 146 & 2.06 & 0.35 \\
+\bottomrule
+\end{tabular}
+\caption[Bistability label distribution by dataset]{Bistability label distribution across all 600 (task, config) cells
+         ($N_{\mathrm{tasks}} = 50$, $R = 50$).
+         The label counts pool all tasks per benchmark; HiddenBench mixes $46$
+         three-option and $4$ four-option tasks. The $N_{\mathrm{eff}}$ column is
+         a within-benchmark mean and should be read per option-count stratum, since
+         $N_{\mathrm{eff}}$ is bounded by $M$ and is not directly comparable across
+         option counts.}
+\label{tab:bistab:overview}
+\end{table}
 
 \begin{figure}[H]
   \centering
@@ -76,6 +214,54 @@ HiddenBench & fc / $W=1$ & $28.8\,\%$ & $5.47$ & $3.3\,\%$ & $4.73$ \\
            near-zero correlation confirms that the number of attractors does
            not predict accuracy.}
   \label{fig:app:bistab:accuracy}
+\end{figure}
+
+\subsection{Limit Cycles: Detection Funnel and Recurrence Matrices}
+\label{app:lc:supp}
+
+\autoref{tab:lc:funnel} gives the full limit-cycle detection funnel referenced in
+\autoref{sec:results:lc}. Assessed at the repetition level (the unit that is
+independent under the null, since star spokes driven by a common hub are not
+independent successes), both the agent-level and system-level flagged counts fall
+far above the shuffle-null floor, confirming that the flagged cases are genuine
+periodic structure rather than test artefacts.
+
+\begin{table}[H]
+\centering
+
+\small
+\begin{tabular}{lrrrcc}
+\toprule
+Level & Total & Fixed points & Candidates & Flagged & $p_{\mathrm{LC}}$ (cond.) \\
+\midrule
+Agent-level  & 120{,}000 & 119{,}355~(99.5\,\%) &  633~(0.5\,\%) & 47 & 0.074 \\
+System-level &  30{,}000 &  29{,}609~(98.7\,\%) &  388~(1.3\,\%) & 32 & 0.083 \\
+\bottomrule
+\end{tabular}
+\caption[Limit-cycle detection funnel]{Limit-cycle detection funnel. \emph{Fixed points}: trailing constant
+         segment $k \geq 3$, excluded from the test.
+         \emph{Candidates}: non-converged sequences with $L \geq 4$.
+         \emph{Flagged}: DET above the 95th percentile of 1{,}000 shuffle
+         surrogates and dominant period $2 \leq \hat{P} \leq \lfloor L/2 \rfloor$,
+         $p < 0.05$.
+         The fixed-point and candidate counts do not sum exactly to the total
+         because a small residue of sequences are non-converged yet too short to
+         test ($L < 4$): 12 at the agent level ($119{,}355 + 633 + 12 = 120{,}000$)
+         and 3 at the system level ($29{,}609 + 388 + 3 = 30{,}000$). These are
+         excluded as untestable.}
+\label{tab:lc:funnel}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/lc/lc_rec_new.png}
+  \caption[Recurrence matrices for two limit cycles]{Recurrence matrices for two agents from each of the cases in
+           \autoref{fig:lc:timelines}.
+           The alternating checkerboard diagonal stripe pattern (spacing~2)
+           is the characteristic RQA signature of a period-2 orbit.
+           DET (determinism) and dominant period $\hat{P}$ are shown above
+           each matrix.}
+  \label{fig:lc:rec}
 \end{figure}
 
 \subsection{High-Repetition Analysis: Additional Figures}
@@ -175,18 +361,18 @@ configurations with a Holm-significant paired shift.
 \toprule
 Measure & Milder & Critical & Sig.\ configs \\
 \midrule
-Accuracy               & 0.316 & 0.294 & 0/6 \\
-Mean rounds            & 6.85  & 6.04  & 3/6 ($-$) \\
-Ceiling-hit fraction   & 0.146 & 0.073 & 3/6 ($-$) \\
-Convergence rate       & 0.862 & 0.935 & 3/6 ($+$) \\
-Dominance $D$          & 0.375 & 0.363 & 0/6 \\
-Hub capitulation       & 0.146 & 0.169 & 4/6 ($+$) \\
-Self-reinf.\ $p_{\mathrm{SR}}$ & 0.830 & 0.832 & 0/6 \\
-Self-reinf.\ slope     & 0.372 & 0.392 & 1/6 ($+$) \\
-Limit cycle (agent)    & 0.019 & 0.042 & 0/6 \\
-Limit cycle (system)   & 0.040 & 0.084 & 0/6 \\
-Bistability $N_{\mathrm{eff}}$ & 2.04 & 2.20 & 1/6 ($+$) \\
-Bistability Cram\'er's $V$ & 0.394 & 0.350 & 0/6 \\
+Accuracy               & 0.316 & 0.261 & 0/6 \\
+Mean rounds            & 6.85  & 5.76  & 3/6 ($-$) \\
+Ceiling-hit fraction   & 0.146 & 0.068 & 3/6 ($-$) \\
+Convergence rate       & 0.862 & 0.940 & 3/6 ($+$) \\
+Dominance $D$          & 0.375 & 0.371 & 0/6 \\
+Hub capitulation       & 0.146 & 0.157 & 4/6 ($+$) \\
+Self-reinf.\ $p_{\mathrm{SR}}$ & 0.830 & 0.844 & 0/6 \\
+Self-reinf.\ slope     & 0.372 & 0.409 & 1/6 ($+$) \\
+Limit cycle (agent)    & 0.019 & 0.043 & 0/6 \\
+Limit cycle (system)   & 0.040 & 0.096 & 0/6 \\
+Bistability $N_{\mathrm{eff}}$ & 2.04 & 2.06 & 1/6 ($+$) \\
+Bistability Cram\'er's $V$ & 0.394 & 0.346 & 0/6 \\
 \bottomrule
 \end{tabular}
 \caption[System-prompt effect on motif measures]{Effect of the anti-conformity system prompt on each motif measure,
@@ -202,8 +388,7 @@ The pattern is consistent: the more critical prompt changes the \emph{dynamics},
 faster fully-connected convergence (rounds down by roughly one to one and a half,
 ceiling-hits roughly halved) and a higher unanimous-convergence rate, but leaves
 accuracy unchanged (0/6) and does not reduce self-reinforcement prevalence (0/6).
-The shift toward higher $N_{\mathrm{eff}}$ and more flagged limit cycles is a
-by-product of more repetitions converging (more unanimous endpoints to count) rather than
+The near-flat $N_{\mathrm{eff}}$ (2.04 vs 2.06) and more flagged limit cycles are consistent with more repetitions converging (more unanimous endpoints to count) rather than
 a reduction in multistability, and Cram\'er's $V$ if anything trends down. The
 amplifier mechanism therefore survives a deliberate attempt to make the agents
 less conformist, which is mild evidence that it reflects the interaction structure
@@ -402,7 +587,10 @@ and language models are known to use long contexts unevenly \citep{liu2024lostmi
 so the amount and content of retained memory is itself a design choice rather than
 neutral bookkeeping. The convergence-time control of \citet{du2024improving} is functionally
 memory-driven. We scan $W \in \{1, 2, 5\}$ with $W = 1$ as the near-Markov
-baseline.
+baseline. A factorial memory$\times$topology study finds memory window is the
+dominant main effect on both accuracy and convergence rate, outweighing topology in
+that design \citep{mehdizadeh2026topologymemory}, which provides further motivation
+for treating $W$ as a first-class scan axis.
 
 \paragraph{Communication topology (scan).}
 Topology is the canonical lever for network-motif analysis and an established
@@ -466,13 +654,21 @@ and memory effects from capability-asymmetry effects: \citet{wynn2025talk} docum
 that models shift from correct to incorrect answers under peer pressure, producing
 dominance-like dynamics attributable to conformity. A homogeneous baseline ensures
 any observed dominance is structural rather than capability-driven; heterogeneous
-setups are reserved as an ablation.
+setups are reserved as an ablation. This choice is further supported by evidence
+that mixed-model teams within the same capability tier do not systematically
+outperform the best homogeneous member and exhibit comparable modal sycophancy
+rates, suggesting heterogeneity alone does not dissolve the dynamics under study
+\citep{bertalanic2026costofconsensus}.
 
 \paragraph{Sampling temperature (fix at $0.7$, reasoning disabled).}
 Deterministic decoding collapses MAD into voting among identical samples, and
 \citet{zhu2026demystifying} show the homogeneous deterministic case cannot improve
 over a single agent. We use temperature $0.7$ with reasoning disabled to obtain
-diverse yet focused outputs without chain-of-thought token overhead.
+diverse yet focused outputs without chain-of-thought token overhead. An ablation
+comparing $T = 0.4$ against $T = 0.7$ in a comparable debate protocol found that
+the lower temperature increased the modal sycophancy rate by $6.2$ percentage
+points \citep{bertalanic2026costofconsensus}, providing external support for
+the higher-temperature choice.
 
 \paragraph{Tool access (defer).}
 For GPQA-Diamond, tools would push single-agent accuracy toward the ceiling and

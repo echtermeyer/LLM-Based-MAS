@@ -1,38 +1,46 @@
-### CELL: import sys
 setup ok
-MAS_DIR   : ../../results/mas/final_dataset_new_system -> 420 files
+MAS_DIR   : ../../results/mas/final_dataset_new_system -> 600 files
 LING_DIR  : ../../results/linguistic_mistral/message -> 420 files
 LING_NLI  : ../../results/linguistic_nli/message -> 221 files
 
-### CELL: ling_rows = []
 --- sec:method:linguistic / sec:results:linguistic : cell count ---
   Linguistic message rows (reps 0-9) : 61,584
   Linguistic cells (dataset,topo,W,qid)     : 420   thesis_says=420   MATCH
 
-### CELL: mas_files = list(MAS_DIR.glob('**/*.json'))
-  50/420
-  100/420
-  150/420
-  200/420
-  250/420
-  300/420
-  350/420
-  400/420
-Done. 420 MAS cells
+  50/600
 
-### CELL: merged = ling_cell.merge(metrics_df, on=['dataset', 'topology', 'W', 'qid'], how
+  100/600
+
+  150/600
+
+  200/600
+
+  250/600
+
+  300/600
+
+  350/600
+
+  400/600
+
+  450/600
+
+  500/600
+
+  550/600
+
+  600/600
+Done. 600 MAS cells
+
 Merged cells: 420   (expected 420)
 
-### CELL: metric_cols   = [m for m, _ in MAS_METRICS]
 Spearman rho (mean dimension score x MAS metric), cell-level:
             Accuracy  Rounds (efficiency)  Self-reinforcement (p_sr)  SR slope  Dominance (D)  Dominance flagged frac  Bistability (n_eff)  Limit-cycle frac
 conviction     0.101               -0.358                     -0.220     0.074          0.106                  -0.090               -0.180            -0.028
 anchoring      0.094               -0.387                     -0.270     0.091         -0.038                   0.046               -0.094            -0.010
 dialogic       0.079               -0.263                     -0.263     0.041          0.216                  -0.114               -0.060             0.043
 
-<Figure size 1430x390 with 2 Axes>
 
-### CELL: print('--- sec:results:linguistic L~1400 : accuracy level effects |rho|<=0.11 --
 --- sec:results:linguistic L~1400 : accuracy level effects |rho|<=0.11 ---
   conviction  rho(mean,accuracy)=+0.101
   anchoring   rho(mean,accuracy)=+0.094
@@ -43,7 +51,6 @@ dialogic       0.079               -0.263                     -0.263     0.041  
   conviction x mean_rounds  rho=-0.358  p=4.06e-14   thesis_says=-0.30 (p<1e-3)   MISMATCH
   overall strongest mean-score correlation: anchoring x Rounds (efficiency)  rho=-0.387  p=1.88e-16
 
-### CELL: # agent-level: mean per (cell, rep, agent) over rounds
 std_merged cells: 420
 
 --- sec:results:linguistic : within-run between-agent diversity descriptives ---
@@ -51,7 +58,6 @@ std_merged cells: 420
   anchoring  _std  mean=0.750  median=0.720  frac>0.5=68.8%
   dialogic   _std  mean=0.947  median=0.944  frac>0.5=79.0%
 
-### CELL: def _sig(p):
 === tab:ling:diversity — Spearman rho at cell level (n=420) ===
 
   Conviction diversity:
@@ -69,7 +75,7 @@ std_merged cells: 420
     Acc (GPQA)   rho=+0.04    (p=5.4e-01)  thesis_says=+0.08  MISMATCH
     Acc (HB)     rho=-0.06    (p=3.5e-01)  thesis_says=+0.00  MISMATCH
 
-### CELL: print('--- sec:results:linguistic L~1415 : pooled diversity vs mean rounds (all 
+
 --- sec:results:linguistic L~1415 : pooled diversity vs mean rounds (all p<1e-10) ---
   conviction  diversity vs mean_rounds  rho=-0.392  p=6.99e-17
   anchoring   diversity vs mean_rounds  rho=-0.369  p=5.54e-15
@@ -89,10 +95,6 @@ std_merged cells: 420
 --- sec:results:linguistic L~1425 : conviction diversity vs n_eff rho=-0.19 (p=1e-4) ---
   conviction_std vs n_eff  rho=-0.164  p=7.66e-04   thesis_says=-0.19 (p=1e-4)   MATCH
 
-### CELL: # Fig (inline only) — within-run std distributions, as in nb 028
-<Figure size 1690x520 with 3 Axes>
-
-### CELL: # Score / agent / system-level means by dataset
 --- sec:results:linguistic L~1407 : system-level means, GPQA vs HiddenBench ---
   thesis_says: conviction 3.55 vs 3.30 ; dialogic 3.01 vs 2.51
   conviction  system-level  GPQA=3.55  HiddenBench=3.30
@@ -101,22 +103,20 @@ std_merged cells: 420
   conviction GPQA=3.55 (thesis 3.55) MATCH  HB=3.30 (thesis 3.30) MATCH
   dialogic   GPQA=3.01 (thesis 3.01) MATCH  HB=2.51 (thesis 2.51) MATCH
 
-### CELL: # Hub vs leaf (star topology): agent 0 is hub, agents 1-3 leaves
 --- sec:results:linguistic L~1409 : hub vs leaf (star), MWU per dimension ---
   thesis_says: conviction 3.44 vs 3.44 p=0.99 ; anchoring & dialogic small but significant |delta|<0.05
   conviction  hub=3.44  leaf=3.44  |delta|=0.000  p=0.9861
   anchoring   hub=2.36  leaf=2.33  |delta|=0.032  p=0.0224
   dialogic    hub=2.89  leaf=2.84  |delta|=0.049  p=0.0034
 
-### CELL: labels_order = ['monostable', 'multistable', 'stochastic', 'insufficient']
 --- sec:results:linguistic : linguistic dimensions by bistability label (Kruskal-Wallis) ---
   labels present: ['monostable', 'multistable', 'stochastic']
   conviction   H=12.29  p=0.0021  (sig)
   anchoring    H=4.60  p=0.1000  (ns)
   dialogic     H=3.05  p=0.2174  (ns)
 
-### CELL: print('=== MISTRAL scorer (nb 027) — reps 0-4 ===')
 === MISTRAL scorer (nb 027) — reps 0-4 ===
+
   rows (reps 0-4): 30,760  | topologies: {'star': 17256, 'fc': 13504}  | W: [np.int64(1), np.int64(2), np.int64(5)]
 
   --- describe() ---
@@ -156,8 +156,9 @@ dialogic
 4         12198  39.7
 5          1723   5.6
 
-### CELL: print('=== NLI DeBERTa scorer (nb 026v2) ===')
+
 === NLI DeBERTa scorer (nb 026v2) ===
+
   files: 221   thesis_says=221   MATCH
   rows: 119,464  | topologies: {'fc': 70772, 'star': 48692}
 
@@ -198,3 +199,4 @@ dialogic
 3          7317   6.1
 4         23399  19.6
 5         75054  62.8
+

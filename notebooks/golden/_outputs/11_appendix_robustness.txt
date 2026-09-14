@@ -1,35 +1,32 @@
-### CELL: import sys
 /Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
+
 setup ok  OLD_AVAILABLE = True   OLD_BASE = ../../results/mas/final_dataset_depricated
 
-### CELL: def iter_files(base):
-files: old=210  new=210
+files: old=210  new=300
 
 per-dataset provenance:
      files  n_reps_mean  conf_min  conf_max  n_conf_zero
 ds                                                      
-new    210         50.0         1        10            0
+new    300         50.0         1        10            0
 old    210         30.0         0        10         1183
 
-### CELL: # --- assert the two datasets are a clean paired design (guarded) --------
-PAIRED design confirmed: 210 (config,qid) cells, 35 qids x 6 configs.
+INFO: 90 (config,qid) cells in new only (added tasks) — restricting to shared qids for paired analysis
+PAIRED design: 210 (config,qid) cells, 35 qids x 6 configs.
 shared qids: ['1', '10', '11', '13', '14', '15', '16', '18', '2', '20', '22', '24', '25', '28', '31', '34', '35', '37', '40', '41', '42', '43', '44', '45', '46', '48', '51', '52', '56', '57', '58', '6', '64', '8', '9']
 
 stray out-of-option votes (cells, rounds, votes):
+
   old: (1, 1, 1)   new: (0, 0, 0)
 
-### CELL: def _boot_ci(delta, B=5000, seed=SEED):
 helpers ok
 
-### CELL: def load_taskvals(base, ds_tag):
 overall (pooled across configs):
      accuracy  mean_rounds  ceil_frac
 ds                                   
-new    0.2940       6.0402     0.0730
+new    0.2610       5.7597     0.0679
 old    0.3163       6.8517     0.1462
 
-### CELL: acc_res = paired_wilcoxon(taskvals, 'accuracy')
 === Accuracy — paired new vs old, Wilcoxon (Holm across configs) ===
   config  n_pairs old_mean new_mean   delta   ci_lo   ci_hi p_holm sig
   fc/W=1       35  +0.2990  +0.2880 -0.0110 -0.0613 +0.0394      1  ns
@@ -39,7 +36,6 @@ star/W=1       35  +0.3038  +0.2777 -0.0261 -0.0724 +0.0164      1  ns
 star/W=2       35  +0.3248  +0.2943 -0.0305 -0.0836 +0.0217      1  ns
 star/W=5       35  +0.3286  +0.2863 -0.0423 -0.1015 +0.0131      1  ns
 
-### CELL: rnd_res = paired_wilcoxon(taskvals, 'mean_rounds')
 === Mean rounds-to-consensus — paired new vs old, Wilcoxon (Holm across configs) ===
   config  n_pairs old_mean new_mean  delta  ci_lo  ci_hi   p_holm sig
   fc/W=1       35   +6.486   +5.467 -1.018 -1.723 -0.457  0.00514  **
@@ -58,18 +54,14 @@ star/W=1       35  +0.1638  +0.1434 -0.0204 -0.0693 +0.0225    0.692  ns
 star/W=2       35  +0.1695  +0.1189 -0.0507 -0.1084 +0.0000    0.692  ns
 star/W=5       35  +0.1800  +0.1103 -0.0697 -0.1227 -0.0227   0.0601  ns
 
-### CELL: fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-<Figure size 1950x520 with 3 Axes>
+computing dominance (B=200) ... this is the slow step (~10 min total)
 
-### CELL: def load_dominance(base, ds_tag):
-computing dominance (B=1000) ... this is the slow step (~10 min total)
 done. overall D_mean by ds:
      D_mean  hub_capitulation
 ds                           
-new  0.3628            0.1685
+new  0.3705            0.1568
 old  0.3753            0.1463
 
-### CELL: dom_res = paired_wilcoxon(dom, 'D_mean')
 === Dominance D (mean per cell) — paired new vs old, Wilcoxon (Holm across configs) ===
   config  n_pairs old_mean new_mean   delta   ci_lo   ci_hi p_holm sig
   fc/W=1       35  +0.1716  +0.1577 -0.0139 -0.0421 +0.0087      1  ns
@@ -88,27 +80,24 @@ star/W=1       35  +0.1741  +0.1775 +0.0034 -0.0095 +0.0164   0.994  ns
 star/W=2       35  +0.1698  +0.2074 +0.0376 +0.0147 +0.0614 0.00761  **
 star/W=5       35  +0.1854  +0.2148 +0.0294 +0.0083 +0.0499  0.0234   *
 
-### CELL: fc_dom = dom[dom.topology=='fc']
 === Emergent excess z (fc only) — paired new vs old, Wilcoxon (Holm across configs) ===
 config  n_pairs old_mean new_mean  delta  ci_lo  ci_hi p_holm sig
-fc/W=1       35   +0.534   +0.635 +0.102 -0.025 +0.236  0.326  ns
-fc/W=2       35   +0.653   +0.835 +0.182 +0.039 +0.327  0.069  ns
-fc/W=5       35   +0.629   +0.792 +0.163 +0.001 +0.324 0.0743  ns
+fc/W=1       35   +0.528   +0.635 +0.107 -0.021 +0.241  0.259  ns
+fc/W=2       35   +0.647   +0.829 +0.182 +0.038 +0.330   0.09  ns
+fc/W=5       35   +0.623   +0.781 +0.158 -0.002 +0.315  0.095  ns
 
 === Flagged fraction — reps with significant emergent concentration (fc only) — paired new vs old, Wilcoxon (Holm across configs) ===
 config  n_pairs old_mean new_mean   delta   ci_lo   ci_hi p_holm sig
-fc/W=1       35  +0.0923  +0.1083 +0.0160 -0.0156 +0.0481  0.688  ns
-fc/W=2       35  +0.0998  +0.1168 +0.0171 -0.0065 +0.0380  0.272  ns
-fc/W=5       35  +0.0875  +0.1144 +0.0269 -0.0007 +0.0551  0.272  ns
+fc/W=1       35  +0.0897  +0.0956 +0.0059 -0.0222 +0.0333  0.964  ns
+fc/W=2       35  +0.0959  +0.1128 +0.0169 -0.0047 +0.0370  0.272  ns
+fc/W=5       35  +0.0783  +0.1019 +0.0236 -0.0001 +0.0487  0.343  ns
 
-### CELL: def load_selfreinf(base, ds_tag):
 overall by ds:
        p_sr  mean_slope  p_sr_terminal    n_runs
 ds                                              
-new  0.8323      0.3920         0.8560  234.5952
+new  0.8444      0.4089         0.8662  231.7200
 old  0.8298      0.3718         0.8517  144.3143
 
-### CELL: psr_res = paired_wilcoxon(sr, 'p_sr')
 === Self-reinforcement prevalence p_sr (fraction of runs slope>0; 0.5=none) — paired new vs old, Wilcoxon (Holm across configs) ===
   config  n_pairs old_mean new_mean   delta   ci_lo   ci_hi p_holm sig
   fc/W=1       35  +0.8397  +0.8512 +0.0115 -0.0037 +0.0269      1  ns
@@ -127,15 +116,14 @@ star/W=1       35  +0.3622  +0.3580 -0.0043 -0.0255 +0.0169   0.84  ns
 star/W=2       35  +0.3675  +0.3555 -0.0119 -0.0356 +0.0117   0.84  ns
 star/W=5       35  +0.3249  +0.3368 +0.0119 -0.0100 +0.0345   0.84  ns
 
-### CELL: from src.metrics.limit_cycles import (
 computing limit cycles (B=1000) ...
+
 done. overall candidate-weighted flag rates + candidate counts by ds:
      p_lc_agent  n_cand_agent  p_lc_system  n_cand_system
 ds                                                       
-new      0.0416           407       0.0837            259
+new      0.0435           542       0.0961            340
 old      0.0192           422       0.0402            257
 
-### CELL: lca_res = paired_wilcoxon(lc, 'p_lc_agent')
 === Agent-level limit-cycle rate p_lc — paired new vs old, Wilcoxon (Holm across configs) ===
   config  n_pairs old_mean new_mean   delta   ci_lo   ci_hi p_holm sig
   fc/W=1       14  +0.0000  +0.0179 +0.0179 +0.0000 +0.0536      1  ns
@@ -144,6 +132,7 @@ old      0.0192           422       0.0402            257
 star/W=1       24  +0.0026  +0.0083 +0.0057 -0.0078 +0.0250      1  ns
 star/W=2       18  +0.0139  +0.0389 +0.0250 -0.0278 +0.0944      1  ns
 star/W=5       16  +0.0833  +0.0625 -0.0208 -0.1875 +0.1250      1  ns
+
 
 === System-level limit-cycle rate p_lc — paired new vs old, Wilcoxon (Holm across configs) ===
   config  n_pairs old_mean new_mean   delta   ci_lo   ci_hi p_holm sig
@@ -154,22 +143,21 @@ star/W=1       24  +0.0156  +0.0154 -0.0002 -0.0318 +0.0284      1  ns
 star/W=2       18  +0.0139  +0.1759 +0.1620 +0.0185 +0.3287  0.271  ns
 star/W=5       16  +0.1562  +0.1250 -0.0312 -0.2812 +0.1875      1  ns
 
-### CELL: def load_bistability(base, ds_tag):
 computing bistability (B=1000) ...
+
 label mix by ds:
 label  monostable  multistable  stochastic
 ds                                        
-new            18           74         118
+new            56           98         146
 old            32           45         133
 
 convergence: mean converged reps per cell and mean convergence RATE by ds:
   (rate is R-independent; raw count is inflated for new by R50 vs old R30)
      n_converged  conv_frac
 ds                         
-new       46.757      0.935
+new       47.017      0.940
 old       25.857      0.862
 
-### CELL: neff_res = paired_wilcoxon(bist, 'n_eff')
 === N_eff (distinct consensus attractors; lower = more consistent) — paired new vs old, Wilcoxon (Holm across configs) ===
   config  n_pairs old_mean new_mean   delta   ci_lo   ci_hi   p_holm sig
   fc/W=1       35  +1.9352  +2.1600 +0.2247 +0.0688 +0.3968    0.137  ns
@@ -197,25 +185,20 @@ star/W=1       35  +0.8505  +0.8731 +0.0227 -0.0190 +0.0716    0.729  ns
 star/W=2       35  +0.8400  +0.8937 +0.0537 +0.0038 +0.1095    0.533  ns
 star/W=5       35  +0.8343  +0.9023 +0.0680 +0.0217 +0.1202   0.0997  ns
 
-### CELL: fig, axes = plt.subplots(1, 2, figsize=(13, 4))
-<Figure size 1690x520 with 2 Axes>
-
-### CELL: def pooled_delta(res):
                 metric old_mean new_mean mean_delta sig_configs
-              Accuracy  +0.3163  +0.2940    -0.0223         0/6
-           Mean rounds  +6.8517  +6.0402    -0.8116     3/6 (-)
-      Ceiling-hit frac  +0.1462  +0.0730    -0.0731     3/6 (-)
-      Convergence rate  +0.8619  +0.9351    +0.0732     3/6 (+)
-           Dominance D  +0.3753  +0.3628    -0.0125         0/6
-      Hub capitulation  +0.1463  +0.1685    +0.0222     4/6 (+)
-       Self-reinf p_sr  +0.8298  +0.8323    +0.0026         0/6
-      Self-reinf slope  +0.3718  +0.3920    +0.0202     1/6 (+)
-   Limit cycle (agent)  +0.0192  +0.0416    +0.0116         0/6
-  Limit cycle (system)  +0.0402  +0.0837    +0.0250         0/6
-     Bistability N_eff  +2.0398  +2.2020    +0.1621     1/6 (+)
-Bistability Cramer's V  +0.3936  +0.3501    -0.0434         0/6
+              Accuracy  +0.3163  +0.2610    -0.0223         0/6
+           Mean rounds  +6.8517  +5.7597    -0.8116     3/6 (-)
+      Ceiling-hit frac  +0.1462  +0.0679    -0.0731     3/6 (-)
+      Convergence rate  +0.8619  +0.9403    +0.0732     3/6 (+)
+           Dominance D  +0.3753  +0.3705    -0.0125         0/6
+      Hub capitulation  +0.1463  +0.1568    +0.0222     4/6 (+)
+       Self-reinf p_sr  +0.8298  +0.8444    +0.0026         0/6
+      Self-reinf slope  +0.3718  +0.4089    +0.0202     1/6 (+)
+   Limit cycle (agent)  +0.0192  +0.0435    +0.0116         0/6
+  Limit cycle (system)  +0.0402  +0.0961    +0.0250         0/6
+     Bistability N_eff  +2.0398  +2.0613    +0.1621     1/6 (+)
+Bistability Cramer's V  +0.3936  +0.3464    -0.0434         0/6
 
-### CELL: # --- app:sysprompt  tab:app:sysprompt (thesis/chapters/appendix.tex ~L165-190) 
 --- tab:app:sysprompt : milder(old) column ---
   Accuracy                 computed=0.316  thesis_says=0.316  MATCH
   Mean rounds              computed=6.852  thesis_says=6.85  MATCH
@@ -231,18 +214,18 @@ Bistability Cramer's V  +0.3936  +0.3501    -0.0434         0/6
   Bistability Cramer's V   computed=0.394  thesis_says=0.394  MATCH
 
 --- tab:app:sysprompt : critical(new) column ---
-  Accuracy                 computed=0.294  thesis_says=0.294  MATCH
-  Mean rounds              computed=6.040  thesis_says=6.04  MATCH
-  Ceiling-hit frac         computed=0.073  thesis_says=0.073  MATCH
-  Convergence rate         computed=0.935  thesis_says=0.935  MATCH
-  Dominance D              computed=0.363  thesis_says=0.363  MATCH
-  Hub capitulation         computed=0.168  thesis_says=0.169  MATCH
-  Self-reinf p_sr          computed=0.832  thesis_says=0.832  MATCH
-  Self-reinf slope         computed=0.392  thesis_says=0.392  MATCH
-  Limit cycle (agent)      computed=0.042  thesis_says=0.042  MATCH
-  Limit cycle (system)     computed=0.084  thesis_says=0.084  MATCH
-  Bistability N_eff        computed=2.202  thesis_says=2.2  MATCH
-  Bistability Cramer's V   computed=0.350  thesis_says=0.35  MATCH
+  Accuracy                 computed=0.261  thesis_says=0.261  MATCH
+  Mean rounds              computed=5.760  thesis_says=5.76  MATCH
+  Ceiling-hit frac         computed=0.068  thesis_says=0.068  MATCH
+  Convergence rate         computed=0.940  thesis_says=0.94  MATCH
+  Dominance D              computed=0.371  thesis_says=0.371  MATCH
+  Hub capitulation         computed=0.157  thesis_says=0.157  MATCH
+  Self-reinf p_sr          computed=0.844  thesis_says=0.844  MATCH
+  Self-reinf slope         computed=0.409  thesis_says=0.409  MATCH
+  Limit cycle (agent)      computed=0.043  thesis_says=0.043  MATCH
+  Limit cycle (system)     computed=0.096  thesis_says=0.096  MATCH
+  Bistability N_eff        computed=2.061  thesis_says=2.06  MATCH
+  Bistability Cramer's V   computed=0.346  thesis_says=0.346  MATCH
 
 --- tab:app:sysprompt : Sig. configs column ---
   Accuracy                 computed=0/6       thesis_says=0/6  MATCH

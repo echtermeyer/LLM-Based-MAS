@@ -1,7 +1,5 @@
-### CELL: import sys
 setup ok
 
-### CELL: # ── sec:setup ARITHMETIC VERIFICATION (design constants — pure arithmetic) ──
 ============================================================
 ARITHMETIC VERIFICATION of Chapter 4 design constants
 ============================================================
@@ -13,19 +11,19 @@ ARITHMETIC VERIFICATION of Chapter 4 design constants
 --- sec:setup:design L518 configs ---
   |W| x |topo| = 3*2 = 6   thesis_says=6   MATCH
 --- sec:setup:design L586-588 total repetitions ---
-  35 x 2 x 6 x 50 = 35*2*6*50 = 21,000   thesis_says=21,000   MATCH
+  50 x 2 x 6 x 50 = 50*2*6*50 = 30,000   thesis_says=30,000   MATCH
 --- sec:setup:design L570-571 screening config (fc, W=1, R=3) ---
   documented as design choice: topology=fc, W=1, R=3
 
-### CELL: # ── sec:setup:design CORPUS CONFIRMATION (frozen 21,000-rep dataset) ──
 ============================================================
 CORPUS CONFIRMATION: results/mas/final_dataset_new_system
 ============================================================
---- file count (35 tasks x 2 datasets x 6 configs) ---
-  files=420   expected=420   MATCH
+
+--- file count (50 tasks x 2 datasets x 6 configs) ---
+  files=600   expected=600   MATCH
 --- reps per file (expected 50) ---
   distinct rep-counts across files = [50]   MATCH (all 50)
-  total repetitions = sum(reps) = 21,000   thesis_says=21,000   MATCH
+  total repetitions = sum(reps) = 30,000   thesis_says=30,000   MATCH
 --- axes present ---
   datasets   = ['gpqa', 'hiddenbench']   expected ['gpqa', 'hiddenbench']
   topologies = ['fc', 'star']   expected ['fc', 'star']
@@ -36,7 +34,6 @@ CORPUS CONFIRMATION: results/mas/final_dataset_new_system
   temperature= [np.float64(0.7)]   expected [0.7]
   model      = ['mistral-medium']   expected [mistral-medium]
 
-### CELL: # ── sec:setup:datasets M (option-count) confirmation ──
 ============================================================
 OPTION-COUNT (M) CONFIRMATION per dataset
 ============================================================
@@ -44,26 +41,24 @@ OPTION-COUNT (M) CONFIRMATION per dataset
   GPQA M values = [np.int64(4)]   thesis_says M=4   MATCH
 --- sec:setup:datasets:hiddenbench L487 HiddenBench option count ---
   HiddenBench M values = [np.int64(3), np.int64(4)]   thesis_says M in {3,4}   MATCH
-  HiddenBench M distribution (W1/fc, 35 tasks): {3: 31, 4: 4}
+  HiddenBench M distribution (W1/fc, 50 tasks): {3: 46, 4: 4}
 --- configs per task (expected 6 for every task) ---
   distinct config-counts per task = [np.int64(6)]   MATCH (all 6)
-  tasks per dataset: gpqa=35, hiddenbench=35   expected 35 each
+  tasks per dataset: gpqa=50, hiddenbench=50   expected 50 each
 
-### CELL: # ── sec:setup:design ACTUAL TASK-ID SET per dataset (the frozen selection) ──
 ============================================================
 FROZEN TASK-ID SET (final_dataset_new_system) — 35 GPQA + 35 HiddenBench
 ============================================================
---- GPQA (35 tasks) ---
-  [np.int64(3), np.int64(5), np.int64(12), np.int64(23), np.int64(24), np.int64(26), np.int64(33), np.int64(35), np.int64(50), np.int64(73), np.int64(79), np.int64(80), np.int64(84), np.int64(86), np.int64(90), np.int64(91), np.int64(95), np.int64(98), np.int64(99), np.int64(109), np.int64(111), np.int64(117), np.int64(125), np.int64(132), np.int64(136), np.int64(144), np.int64(146), np.int64(149), np.int64(152), np.int64(157), np.int64(164), np.int64(166), np.int64(173), np.int64(179), np.int64(182)]
+--- GPQA (50 tasks) ---
+  [np.int64(3), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(12), np.int64(17), np.int64(21), np.int64(23), np.int64(24), np.int64(26), np.int64(32), np.int64(33), np.int64(35), np.int64(36), np.int64(42), np.int64(47), np.int64(50), np.int64(51), np.int64(52), np.int64(53), np.int64(55), np.int64(56), np.int64(61), np.int64(73), np.int64(79), np.int64(80), np.int64(84), np.int64(86), np.int64(90), np.int64(91), np.int64(95), np.int64(98), np.int64(99), np.int64(109), np.int64(111), np.int64(117), np.int64(125), np.int64(132), np.int64(136), np.int64(144), np.int64(146), np.int64(149), np.int64(152), np.int64(157), np.int64(164), np.int64(166), np.int64(173), np.int64(179), np.int64(182)]
 
---- HiddenBench (35 tasks) ---
-  [np.int64(1), np.int64(2), np.int64(6), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(18), np.int64(20), np.int64(22), np.int64(24), np.int64(25), np.int64(28), np.int64(31), np.int64(34), np.int64(35), np.int64(37), np.int64(40), np.int64(41), np.int64(42), np.int64(43), np.int64(44), np.int64(45), np.int64(46), np.int64(48), np.int64(51), np.int64(52), np.int64(56), np.int64(57), np.int64(58), np.int64(64)]
+--- HiddenBench (50 tasks) ---
+  [np.int64(0), np.int64(1), np.int64(2), np.int64(4), np.int64(6), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(12), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(18), np.int64(19), np.int64(20), np.int64(21), np.int64(22), np.int64(23), np.int64(24), np.int64(25), np.int64(26), np.int64(28), np.int64(30), np.int64(31), np.int64(34), np.int64(35), np.int64(36), np.int64(37), np.int64(38), np.int64(40), np.int64(41), np.int64(42), np.int64(43), np.int64(44), np.int64(45), np.int64(46), np.int64(48), np.int64(50), np.int64(51), np.int64(52), np.int64(53), np.int64(54), np.int64(55), np.int64(56), np.int64(57), np.int64(58), np.int64(59), np.int64(64)]
 
 Per-config qid-set consistency (all 6 configs must share the same 35 qids):
-  GPQA         all-6-configs-identical=True  n_qids=35
-  HiddenBench  all-6-configs-identical=True  n_qids=35
+  GPQA         all-6-configs-identical=True  n_qids=50
+  HiddenBench  all-6-configs-identical=True  n_qids=50
 
-### CELL: # ── sec:setup:design TIER-3 SCREENING (ported assign_tier from 008v2) ──
 --- GPQA screening: 58 questions in gpqa_subset_scan_nothink_small ---
   screening model = ['mistral-small']   config (topo,W,R) = [('fc', 1, 3)]
     Tier 0 (Trivial): 3  (5.2%)
@@ -74,23 +69,18 @@ Per-config qid-set consistency (all 6 configs must share the same 35 qids):
 --- HiddenBench screening: 0 questions in hiddenbench_subset_scan_nothink_small ---
   EMPTY / MISSING -> tiers not reproducible for HiddenBench (see frozen-artifact note)
 
-### CELL: # ── Reconcile screening Tier-3 set with the FROZEN final-dataset selection ──
 ============================================================
 FROZEN-ARTIFACT RECONCILIATION
 ============================================================
 --- GPQA ---
-  final_dataset qids (n=35): [np.int64(3), np.int64(5), np.int64(12), np.int64(23), np.int64(24), np.int64(26), np.int64(33), np.int64(35), np.int64(50), np.int64(73), np.int64(79), np.int64(80), np.int64(84), np.int64(86), np.int64(90), np.int64(91), np.int64(95), np.int64(98), np.int64(99), np.int64(109), np.int64(111), np.int64(117), np.int64(125), np.int64(132), np.int64(136), np.int64(144), np.int64(146), np.int64(149), np.int64(152), np.int64(157), np.int64(164), np.int64(166), np.int64(173), np.int64(179), np.int64(182)]
+  final_dataset qids (n=50): [np.int64(3), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(12), np.int64(17), np.int64(21), np.int64(23), np.int64(24), np.int64(26), np.int64(32), np.int64(33), np.int64(35), np.int64(36), np.int64(42), np.int64(47), np.int64(50), np.int64(51), np.int64(52), np.int64(53), np.int64(55), np.int64(56), np.int64(61), np.int64(73), np.int64(79), np.int64(80), np.int64(84), np.int64(86), np.int64(90), np.int64(91), np.int64(95), np.int64(98), np.int64(99), np.int64(109), np.int64(111), np.int64(117), np.int64(125), np.int64(132), np.int64(136), np.int64(144), np.int64(146), np.int64(149), np.int64(152), np.int64(157), np.int64(164), np.int64(166), np.int64(173), np.int64(179), np.int64(182)]
   screening Tier-3 qids (n=33): [1, 2, 5, 8, 9, 10, 11, 13, 15, 17, 22, 23, 24, 25, 27, 28, 30, 32, 33, 34, 35, 36, 37, 38, 41, 42, 44, 47, 48, 50, 52, 54, 56]
-  final ∩ screening-Tier3 = 6 / 35 final tasks
-  final \ screening-Tier3 = [np.int64(3), np.int64(12), np.int64(26), np.int64(73), np.int64(79), np.int64(80), np.int64(84), np.int64(86), np.int64(90), np.int64(91), np.int64(95), np.int64(98), np.int64(99), np.int64(109), np.int64(111), np.int64(117), np.int64(125), np.int64(132), np.int64(136), np.int64(144), np.int64(146), np.int64(149), np.int64(152), np.int64(157), np.int64(164), np.int64(166), np.int64(173), np.int64(179), np.int64(182)]  (present in final but not Tier-3 under repointed screening)
+  final ∩ screening-Tier3 = 14 / 50 final tasks
+  final \ screening-Tier3 = [np.int64(3), np.int64(6), np.int64(7), np.int64(12), np.int64(21), np.int64(26), np.int64(51), np.int64(53), np.int64(55), np.int64(61), np.int64(73), np.int64(79), np.int64(80), np.int64(84), np.int64(86), np.int64(90), np.int64(91), np.int64(95), np.int64(98), np.int64(99), np.int64(109), np.int64(111), np.int64(117), np.int64(125), np.int64(132), np.int64(136), np.int64(144), np.int64(146), np.int64(149), np.int64(152), np.int64(157), np.int64(164), np.int64(166), np.int64(173), np.int64(179), np.int64(182)]  (present in final but not Tier-3 under repointed screening)
 --- HiddenBench ---
-  final_dataset qids (n=35): [np.int64(1), np.int64(2), np.int64(6), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(18), np.int64(20), np.int64(22), np.int64(24), np.int64(25), np.int64(28), np.int64(31), np.int64(34), np.int64(35), np.int64(37), np.int64(40), np.int64(41), np.int64(42), np.int64(43), np.int64(44), np.int64(45), np.int64(46), np.int64(48), np.int64(51), np.int64(52), np.int64(56), np.int64(57), np.int64(58), np.int64(64)]
+  final_dataset qids (n=50): [np.int64(0), np.int64(1), np.int64(2), np.int64(4), np.int64(6), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(12), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(18), np.int64(19), np.int64(20), np.int64(21), np.int64(22), np.int64(23), np.int64(24), np.int64(25), np.int64(26), np.int64(28), np.int64(30), np.int64(31), np.int64(34), np.int64(35), np.int64(36), np.int64(37), np.int64(38), np.int64(40), np.int64(41), np.int64(42), np.int64(43), np.int64(44), np.int64(45), np.int64(46), np.int64(48), np.int64(50), np.int64(51), np.int64(52), np.int64(53), np.int64(54), np.int64(55), np.int64(56), np.int64(57), np.int64(58), np.int64(59), np.int64(64)]
   screening data unavailable -> cannot reproduce selection; final set is frozen.
 
-### CELL: # Diagnostic figure (NOT a thesis figure — Chapter 4 has no \includegraphics).
-<Figure size 780x520 with 1 Axes>
-
-### CELL: # ── SUMMARY: Chapter 4 number ledger (design constants + corpus facts) ──
 ============================================================
 CHAPTER 4 NUMBER LEDGER (copy-paste)
 ============================================================
@@ -102,8 +92,8 @@ CHAPTER 4 NUMBER LEDGER (copy-paste)
   [verified] fc messages N(N-1)         computed=12         thesis_says=12       MATCH
   [verified] star messages 2(N-1)       computed=6          thesis_says=6        MATCH
   [verified] configs |W|x|topo|         computed=6          thesis_says=6        MATCH
-  [verified] total reps 35x2x6x50       computed=21000      thesis_says=21000    MATCH
-  [corpus  ] corpus file count          computed=420        thesis_says=420      MATCH
-  [corpus  ] corpus total reps          computed=21000      thesis_says=21000    MATCH
-  [corpus  ] GPQA tasks                 computed=35         thesis_says=35       MATCH
-  [corpus  ] HiddenBench tasks          computed=35         thesis_says=35       MATCH
+  [verified] total reps 50x2x6x50       computed=30000      thesis_says=30000    MATCH
+  [corpus  ] corpus file count          computed=600        thesis_says=600      MATCH
+  [corpus  ] corpus total reps          computed=30000      thesis_says=30000    MATCH
+  [corpus  ] GPQA tasks                 computed=50         thesis_says=50       MATCH
+  [corpus  ] HiddenBench tasks          computed=50         thesis_says=50       MATCH

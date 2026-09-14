@@ -5,7 +5,7 @@ was reproduced from the build-script code AND independently recomputed from the 
 task-clustered corrected values. This is the working checklist for the statistical revision.
 
 Conventions being applied (simplest defensible, see thesis methods paragraph):
-1. Pseudo-replication -> TASK-LEVEL aggregation (unit = task, n~35), then ordinary test.
+1. Pseudo-replication -> TASK-LEVEL aggregation (unit = task, n~50), then ordinary test.
 2. Multiplicity -> Benjamini-Hochberg FDR within each family.
 3. "Doesn't matter" negatives -> effect size + task-level CI, no formal TOST.
 
@@ -62,8 +62,8 @@ Conventions being applied (simplest defensible, see thesis methods paragraph):
 30. Efficiency rho -0.65..-0.81 p<1e-10 (`06_results.tex:560-561`) -> task -0.75..-0.89 p<1e-6 (STRONGER).
 31. Mediation CI [0.194,0.214] 51% (`06_results.tex:508-538`) -> point est ok; CI too tight, needs task-stratified bootstrap.
 32. Subgroup MWU all p<0.0001 (`06_results.tex:446`) -> pseudoreplicated; direction robust.
-33. Correct-basin HB V 0.430 vs 0.325 "fixed dim" (`06_results.tex:1355`) -> mixes M=3+M=4. M=3-only 0.435 vs 0.333; bootstrap diff 0.102 CI[0.026,0.177] p=0.005. SURVIVES.
-34. Emergent-excess z>0 p<1e-22 (`06_results.tex:1460-1461`) -> task 35/35 p=2.9e-11. SURVIVES.
+33. Correct-basin HB V 0.430 vs 0.325 "fixed dim" (`06_results.tex:1355`) -> mixes M=3+M=4. M=3-only 0.424 vs 0.334; bootstrap diff 0.090 CI[0.025,0.155] p=0.005. SURVIVES.
+34. Emergent-excess z>0 p<1e-22 (`06_results.tex:1460-1461`) -> task GPQA 49/50 p=4.5e-14, HB 50/50 p=8.9e-16 (50-task dataset). SURVIVES.
 35. Flag fraction GPQA p<1e-6 / HB p<0.001 (`06_results.tex:1462-1464`) -> task GPQA p=0.009, HB p=1.6e-5.
 36. Hub final-vote correct 42.2% vs 25% p<0.001 (`06_results.tex:1504-1507`) -> TAUTOLOGY (hub=consensus). Relabel as group accuracy (task p=0.003).
 37. HB/fc D correct 0.219 vs 0.150 p<1e-30 (`06_results.tex:1539-1541`) -> task d=+0.059 p=1e-4. SURVIVES.

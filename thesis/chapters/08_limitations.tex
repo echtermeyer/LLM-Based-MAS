@@ -32,6 +32,15 @@ as the reliable source of gains \citep{liu2025stopovervaluing, chen2024reconcile
 and capability asymmetry is what drives the accuracy-decreasing herding reported by
 \citet{wynn2025talk}. Our homogeneous design isolates the dynamics of a uniform
 collective by construction, but it cannot speak to heterogeneous ones.
+Recent evidence tempers this expectation in one direction. In a controlled
+comparison of mixed against single-model teams within the 7-8B class,
+heterogeneous compositions underperformed their best homogeneous member in six of
+eight condition-task pairs, and modal sycophancy in mixed teams remained
+comparable to homogeneous teams \citep{bertalanic2026costofconsensus}. Model
+diversity therefore does not appear to be sufficient on its own to dissolve the
+dynamics we characterise, which strengthens rather than weakens the case for
+first characterising the homogeneous baseline. Whether the same holds across
+capability tiers rather than within one remains untested.
 
 A related scope boundary concerns the memory window. We tested $W \in \{1, 2, 5\}$,
 a range that keeps the history short relative to the round cap. At sufficiently
@@ -43,6 +52,25 @@ report---faster convergence under FC, hub-driven limit cycles under star---could
 diminish or vanish if $W$ were large enough to bridge the information gap between
 topologies. Our results characterise the low-to-moderate memory regime; whether
 the topology effect survives large memory windows is an open question.
+
+\paragraph{Decoding stochasticity.}
+Every result in this thesis is conditioned on a single decoding temperature
+($T = 0.4$). Temperature controls the entropy of the output distribution: lower
+temperatures concentrate probability mass on the model's modal completion, higher
+temperatures spread it across alternatives. In the context of debate dynamics
+this is a first-order parameter: at high temperature agents start with more
+diverse positions and are harder to lock into a fixed point; at low temperature
+they converge faster but may become overconfident. A recent physics-inspired
+account models the biased consensus problem as a Potts spin system and shows
+analytically that the system undergoes a phase transition as temperature increases
+from a consensus phase to a disordered phase \citep{okawa2026biasedconsensus}.
+Empirically, ablating temperature from $T = 0.4$ to $T = 0.7$ in a comparable
+protocol reduced the modal sycophancy rate by $6.2$ percentage points
+\citep{bertalanic2026costofconsensus}, suggesting that our findings may be
+conservative: the self-reinforcement and convergence rates we report are likely
+higher than they would be at typical deployment temperatures. Replicating the
+main analyses at higher temperatures is a natural sensitivity check we did not
+perform.
 
 \paragraph{Task-selection bias from Tier-3 screening.}
 All quantitative results are conditioned on Tier-3 tasks, those where the outcome
@@ -67,6 +95,41 @@ expectation, not a measurement. The causal statement should therefore be read as
 established for GPQA and as a well-supported but observational hypothesis for
 HiddenBench; a seeded HiddenBench arm is the most valuable single extension of this
 work.
+
+\paragraph{Adversarial agents and deployment risk.}
+The experiments in this thesis use cooperative, homogeneous agents: every agent is
+instructed to reason honestly and update in good faith.
+A devil's advocate probe (\autoref{sec:results:seeded}) suggests this is a
+consequential assumption.
+A single agent instructed to advocate persistently for a wrong answer reduces
+system accuracy from $63.7\,\%$ to $10.0\,\%$ even when two of four agents start
+correct, falling below the $26.2\,\%$ obtained with a natural $1/4$-correct
+minority and no adversary.
+This is a deployment risk: a consistently biased agent---whether from a
+misconfigured prompt, a compromised model, or adversarial injection---exploits the
+same front-loaded update dynamics that allow a lone correct minority to occasionally
+flip the group.
+Because the protocol has no mechanism for distinguishing persistent conviction from
+persistent misinformation, the amplifier can be hijacked asymmetrically: truth-seeding
+produces a $13.0\times$ lift relative to no ground truth; adversarial persistence
+erases that lift and then some.
+Quantifying this vulnerability across group sizes and topologies, and evaluating
+structural defences---outlier detection via vote entropy, trust discounting for
+non-updating agents---is an important direction that this thesis leaves open.
+
+\paragraph{Effective topology analysis is FC-only and threshold-based.}
+The effective influence topology is extracted only from FC runs; the star topology's
+influence graph is structurally prescribed and the classification is not
+meaningful there.
+Within FC runs, the four-type taxonomy (flat, hub, two-hub, star) is defined by
+threshold rules on the share of total influence captured by the top one or two
+agents.
+The star boundary ($\geq$75\,\% for a single agent) and the sample sizes for the
+rare types, 2.3\,\% and 5.8\,\% star rates, mean that type-level estimates carry
+substantial uncertainty.
+The design-guideline claim (diverse init raises P(star)) is observational: we
+measure that P(star) co-varies with initial vote diversity across naturally-occurring
+runs but do not directly manipulate diversity.
 
 \paragraph{Method: signatures, not certified mechanisms.}
 All four \suitename{} detectors identify \emph{signatures}, not certified dynamical
@@ -95,9 +158,6 @@ count when split (non-unanimous) endpoints are admitted; because we restrict
 attractors to unanimous endpoints (a $2.1\,\%$ loss of repetitions),
 $N_{\mathrm{eff}}$ is bounded by the option count by construction, and we verified
 $N_{\mathrm{eff}} \leq M$ in all $420$ cells.
-(iv) The linguistic scorer is an instance of the same model family as the agents,
-so it is not an independent rater; we use its scores only for relative, rank-based
-comparisons and never as ground-truth argument quality.
 (v) The dominance influence graph is built from vote adoptions during the
 \updatephase{} phase, which is precisely where the protocol instructs agents to
 update after reading peers' \arguephase{} drafts.
@@ -135,6 +195,16 @@ The limitations above map directly onto a prioritised research agenda.
         proxy, and an asynchronous protocol variant to isolate synchrony-induced
         cycles, would upgrade the remaining associations toward causal claims.
 
+  \item \textbf{Effective topology under heterogeneity and adversarial conditions.}
+        The effective topology analysis is confined to FC runs with homogeneous
+        agents. Whether effective star formation rates change under model
+        heterogeneity, capability asymmetry, or partial non-cooperation is
+        unknown; the devil's advocate result suggests the formation mechanism is
+        exploitable, so characterising it under adversarial conditions is a
+        high-priority extension. A targeted diverse-initialisation intervention
+        that deliberately seeds each agent with a distinct starting answer would
+        also test the P(star) lever causally rather than observationally.
+
   \item \textbf{Heterogeneity and scale.} The most consequential untested axes are
         model heterogeneity and group size. The critical literature identifies
         heterogeneity as the reliable source of debate gains
@@ -148,13 +218,27 @@ The limitations above map directly onto a prioritised research agenda.
         flips) should be addressed with a matched null that models the flip hazard,
         to establish how much of the above-baseline $p_{\mathrm{SR}}$ is genuine.
 
-  \item \textbf{An independent linguistic scorer.} Replacing the same-family judge
-        with an independent model would remove the shared-prior confound and test
-        whether the stylistic-diversity-to-convergence association survives.
-
   \item \textbf{Toward the diagnostic suite.} Finally, the \suitename{} instruments
         in \autoref{tab:design:instruments} could be packaged into an online monitor
         and the Tier-2 recommendations validated across models, group sizes, and
         task domains beyond the two studied here. This is the step that would turn
         the groundwork of this thesis into the practical tool it points toward.
+
+  \item \textbf{A generative model of debate dynamics.} The motif taxonomy is
+        descriptive. A forward model of how agents update---whether as Fictitious
+        Play, gradient-based reinforcement, or a social-learning rule---would make
+        testable predictions about which motifs arise under which conditions and
+        would connect the empirical patterns to game-theoretic equilibrium concepts
+        \citep{mehdizadeh2026topologymemory}. This is the missing link between the
+        diagnostic layer and a prescriptive theory of multi-agent deliberation.
+
+  \item \textbf{Removal-based influence attribution.} The dominance metric
+        identifies concentration by tallying vote adoptions, a phenomenological
+        measure. Complementing it with removal-based attribution---estimating each
+        agent's marginal causal contribution to the final outcome by masking or
+        ablating their messages---would give a sharper, interventional measure of
+        leadership \citep{agentsthatmatter2026, cui2025introspecloo, infodynamics2026}.
+        Applied to hub agents, this would test whether structural dominance translates
+        to causal influence or whether dominance nodes are proxies for
+        question-specific expertise.
 \end{enumerate}

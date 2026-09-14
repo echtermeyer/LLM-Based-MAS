@@ -7,7 +7,6 @@
 %   5.3  Bistability
 %   5.4  Dominance
 %   5.5  Limit Cycles   (5.5.1 agent-level, 5.5.2 system-level)
-%   5.6  Linguistic Scoring   (5.6.1 dimensions, 5.6.2 procedure)
 %
 % Notation is unified with Chapter 4:
 %   t = round index, r = repetition, N = agents (=4), M = options
@@ -22,7 +21,7 @@
 % ============================================================
 
 
-Each of the four motifs introduced in \autoref{sec:bg:complex} is a hypothesis
+Each of the four motifs introduced in \autoref{sec:bg:motifs} is a hypothesis
 about the debate dynamics: if the system self-organizes in the way a
 complex-systems reading predicts, then confidence should reinforce within a held
 position, repeated repetitions should settle into a small number of initial-condition-selected attractors, influence should concentrate on particular agents, and in some topologies vote sequences may oscillate persistently without converging. This section turns each hypothesis into a
@@ -688,62 +687,6 @@ the system level, but there is only one sequence per repetition rather than per
 agent, so candidates are far fewer; as at the agent level, a sparse or near-null
 result is expected and reported honestly.
 
-
-% ------------------------------------------------------------
-% 5.6 LINGUISTIC SCORING
-% ------------------------------------------------------------
-\subsection{Linguistic Scoring}
-\label{sec:method:linguistic}
-
-The four motifs above are read from the discrete vote and continuous confidence.
-The public messages carry a further, complementary signal: \emph{how} an agent
-argues, independently of \emph{what} it votes. We score each message on three
-orthogonal linguistic dimensions and later correlate them with the motif measures
-(\autoref{sec:results}). This is a descriptive instrument, not a motif detector.
-
-\paragraph{Dimensions.}
-Each public message is scored on three dimensions, each a bipolar ordinal scale
-from $1$ to $5$:
-\begin{itemize}
-  \item \textbf{Conviction}, how certain the message sounds, from $1$ (very
-        hedged and uncertain) to $5$ (completely categorical). This is the
-        linguistic counterpart of the numeric confidence and is defined at every
-        round, including round $0$.
-  \item \textbf{Anchoring}, the stated \emph{source} of the belief, from $1$
-        (purely the agent's own reasoning) to $5$ (purely deference to peers).
-  \item \textbf{Dialogic orientation}, the degree of \emph{engagement} with a
-        named peer, from $1$ (no reference to any other agent) to $5$ (directly
-        quoting or paraphrasing a specific agent).
-\end{itemize}
-Anchoring and dialogic orientation are deliberately distinct and must not be
-conflated: engagement with a peer's content is not the same as deference to it. An
-agent that refutes a peer's specific claim scores high on dialogic orientation (it
-directly addresses a named agent) but low on anchoring (it holds its own line
-against that agent). Because both dimensions describe the relation to peer content,
-they are undefined at round $0$, where no peer content yet exists; only conviction
-is scored there.
-
-\paragraph{Scoring procedure and limitations.}
-
-Scores are assigned by a lightweight LLM judge \citep{zheng2023mtbench} that reads a single public message,
-together with the minimal context needed to resolve peer references, and returns an
-integer $1$--$5$ for each dimension. The judge is prompted with the definitions
-above and one worked example per dimension. We score every public message across
-all repetitions of the final dataset, yielding one $(\text{conviction},
-\text{anchoring}, \text{dialogic})$ triple per (agent, round, repetition), which is
-then aggregated to the repetition and cell levels for correlation with the
-motif measures.
-
-Two limitations bound the interpretation. First, the scores are \emph{ordinal}:
-the levels are ranked but not equally spaced, so we treat them as ranks and rely on
-rank-based statistics rather than on interval arithmetic. Second, and more
-importantly, the judge is an instance of the \emph{same} model family used for the
-debate agents. This makes the scorer not fully independent of the system it
-measures: it may share stylistic priors with the agents, which can inflate apparent
-consistency and could bias absolute levels. We therefore use the linguistic scores
-only for \emph{relative} comparisons (across conditions, and in correlation with
-motif measures) and never as an absolute ground truth of argument quality. An
-independent-scorer replication is left to future work.
 
 
 % ============================================================

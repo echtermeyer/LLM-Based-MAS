@@ -382,6 +382,19 @@ correct answer, stays negligible while coverage remains high, and we set $u = 3$
 with a hard cap of $T = 15$. Terminating debate at consensus is standard practice
 in the MAD literature \citep{yin2023eot, yang2025revisiting, kaesberg2025voting}.
 
+\paragraph{Final answer.}
+The system's answer for a repetition is the \emph{plurality} of the agents' votes
+at the final round, the option held by the most agents. Because a repetition stops
+only after $u = 3$ consecutive unanimous rounds, every converged repetition ends
+with all $N$ agents on one option, so the plurality is unambiguous and equals that
+option. A tie can therefore arise only in the rare repetitions that reach the hard
+cap $T = 15$ without converging (for instance the two-way $2$--$2$ split of a limit
+cycle); such ties are broken deterministically towards the first option in
+canonical order. The resulting label is a low-confidence artefact of wherever the
+unresolved run happened to land rather than a genuine group decision, and
+\autoref{sec:results:lc} recommends flagging these repetitions as unresolved
+instead of trusting the reported majority.
+
 % ------------------------------------------------------------
 % Commented out but retained in case it is needed later.
 % ------------------------------------------------------------
@@ -582,12 +595,12 @@ and assigns each task a difficulty tier from its observed dynamics:
 Tier~3 tasks are precisely those where self-organization dynamics can be observed
 at all, so they are promoted to a deep \emph{characterisation} pass on the full
 six-configuration grid. This yields the final dataset used throughout
-\autoref{sec:results}: \textbf{35 tasks for each of the two benchmarks, six
+\autoref{sec:results}: \textbf{50 tasks for each of the two benchmarks, six
 configurations each, $R = 50$ repetitions}, for a total of
-$35 \times 2 \times 6 \times 50 = 21{,}000$ repetitions.
-GPQA-Diamond yields more than $35$ Tier-3 tasks in the screening pass, so we
-retain $35$ of them to match the number of eligible HiddenBench tasks, giving a
-balanced design with equal task counts per benchmark; the $35$ are drawn
+$50 \times 2 \times 6 \times 50 = 30{,}000$ repetitions.
+GPQA-Diamond yields more than $50$ Tier-3 tasks in the screening pass, so we
+retain $50$ of them to match the number of eligible HiddenBench tasks, giving a
+balanced design with equal task counts per benchmark; the $50$ are drawn
 uniformly at random from the eligible Tier-3 GPQA tasks, so that no further
 selection is made on any outcome-derived quantity within the tier. Because $R = 3$ in the
 screening pass introduces some noise, tier assignments near a boundary are

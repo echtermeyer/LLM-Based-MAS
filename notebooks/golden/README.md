@@ -45,7 +45,7 @@ heavy ones — 06 dominance, 07 LC, 11 robustness, 10 linguistic — take severa
 
 ## Data sources
 
-- `results/mas/final_dataset_new_system` — main corpus (420 JSON = 35 tasks × 2 datasets × 6
+- `results/mas/final_dataset_new_system` — main corpus (600 JSON = 50 tasks × 2 datasets × 6
   configs, R=50). Used by 03, 04, 05, 06, 07, 10.
 - `results/mas/high_repetition` — R=1000 (q84/q125/q144). Used by 08.
 - `results/mas/seeded_init_0`, `seeded_init_1` — causal seeding. Used by 09.

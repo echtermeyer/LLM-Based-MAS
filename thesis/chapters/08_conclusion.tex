@@ -7,55 +7,45 @@ This thesis asked whether the dynamical vocabulary of complex systems can be
 applied empirically to LLM-based multi-agent debate, and what such a treatment
 reveals that outcome metrics cannot. We built a controlled cooperative debate
 system, developed four literature-grounded motif detectors, and ran the full grid
-on two deliberately contrasting benchmarks, comprising 21{,}000 debates. We
-answer the four research questions in turn.
+on two deliberately contrasting benchmarks, comprising 30{,}000 debates. We
+answer the three research questions in turn.
 
-\paragraph{RQ1: detectability.}
+\paragraph{RQ1: measurement.}
 The motifs are detectable, at very different prevalences, and each detector
 distinguishes genuine structure from a principled null. Self-reinforcement is
 \emph{universal}: positive confidence trends dominate in every configuration
-($p_{\mathrm{SR}} \in [0.74, 0.88]$, all cluster-bootstrap intervals excluding the
+($p_{\mathrm{SR}} \in [0.73, 0.88]$, all cluster-bootstrap intervals excluding the
 $0.5$ baseline). Bistability is \emph{common and task-intrinsic}: most task--config
 cells show genuine multi-attractor coexistence ($N_{\mathrm{eff}} \geq 1.5$ in
-$78.6\,\%$), and this is a stable property of the task rather than the
+$76.3\,\%$), and this is a stable property of the task rather than the
 configuration. Dominance appears as \emph{behavioural influence concentration}
 above the topology-keyed null even in fully-connected debate. Limit cycles are
 \emph{rare but real}: $99\,\%$ of sequences converge, and the small residue that
-does not yields $29$ agent-level and $23$ system-level statistically flagged cases,
-of which $20$ and $7$ respectively are genuine period-2 oscillations on manual
+does not yields $47$ agent-level and $32$ system-level statistically flagged cases,
+of which $33$ and $7$ respectively are genuine period-2 oscillations on manual
 inspection, arising almost exclusively under the star
 topology through a hub-driven mechanism. The absence of genuine cycles in
 fully-connected debate is itself a clean result rather than a measurement failure.
 
-\paragraph{RQ2: conditions of emergence.}
-The two structural axes we varied shape the \emph{dynamics} but not the
-\emph{correctness} of debate. Topology is the dominant structural lever: the star
-is slower, concentrates influence roughly threefold, and is the sole source of
-genuine limit cycles, while the fully-connected topology produces stronger
-self-reinforcement and faster convergence. The memory window has only secondary,
-mostly HiddenBench-specific effects on convergence speed and none on accuracy, and
-bistability is invariant to both axes. Task difficulty and, above all, the
-\emph{composition of the opening votes} are the conditions that matter most: they
-determine which regime, refinement or correction, the system operates in.
+\paragraph{RQ2: characterisation.}
+The two structural axes shape the \emph{dynamics} but not the \emph{correctness}
+of debate. Topology is the dominant structural lever: the star is slower,
+concentrates influence roughly threefold, and is the sole source of genuine limit
+cycles, while the fully-connected topology produces stronger self-reinforcement and
+faster convergence. The memory window has only secondary effects on convergence
+speed and none on accuracy, and bistability is invariant to both axes.
+What governs outcomes is the \emph{composition of the opening votes}: motifs are
+informative as diagnostics of a dynamical process, not as guarantees of quality.
+Self-reinforcement is the convergence mechanism everywhere (task-level
+$\rho(\bar\beta,\text{rounds}) \in [-0.89, -0.73]$), yet it amplifies the initial
+vote distribution rather than selecting for the correct answer. Dominance is
+helpful when every agent sees every other but harmful when influence is forced
+through a single hub. Bistability marks the tasks where convergence is least
+reliable, and limit cycles mark pure efficiency failures. The motifs thus form an
+explanatory layer beneath accuracy, and are the basis for the tiered,
+empirically-grounded design principles of \autoref{sec:discussion:design}.
 
-\paragraph{RQ3: relation to outcomes.}
-The motifs are informative about outcomes, but as diagnostics of a dynamical
-process rather than as guarantees of quality. Self-reinforcement is the
-convergence mechanism everywhere (task-level $\rho(\bar\beta,\text{rounds}) \in
-[-0.91, -0.77]$), yet it amplifies the initial vote distribution rather than
-selecting for the correct answer: it helps accuracy when the correct option is
-initially present and hurts when it is absent. Dominance is helpful when every
-agent sees every other but harmful when influence is forced through a single hub
-(on HiddenBench it lowers accuracy in the star topology),
-bistability marks the tasks where convergence is least reliable, and limit cycles
-mark pure efficiency failures. The motifs thus form an explanatory layer beneath
-accuracy rather than competing with it, and are the basis for the tiered,
-empirically-grounded design principles of \autoref{sec:discussion:design}: the
-groundwork for a diagnostic suite that reads the health of a deliberation from its
-dynamics, which we offer as principles and instruments rather than as a finished
-tool.
-
-\paragraph{RQ4: the role of initial conditions.}
+\paragraph{RQ3: causation.}
 The outcome is largely determined before deliberation begins. Observationally,
 whether the ground-truth option is present in the opening votes is the strongest
 predictor of accuracy; causally, the seeded-initialisation experiment shows that

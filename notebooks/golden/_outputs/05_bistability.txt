@@ -1,341 +1,339 @@
-### CELL: import sys
 /Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
+
 setup ok
 
-### CELL: # ── Load and run bistability analysis ────────────────────────────────────────
-Done in 19.6s  |  cells: 420
+Done in 27.6s  |  cells: 600
 
 label
-multistable    176
-stochastic     154
-monostable      90
+multistable    249
+stochastic     209
+monostable     142
 
 M distribution:
 dataset      M
-gpqa         4    210
-hiddenbench  3    186
+gpqa         4    300
+hiddenbench  3    276
              4     24
 
-### CELL: # ── Accounting funnel ─────────────────────────────────────────────────────────
 === CONVERGENCE ACCOUNTING ===
-Total repetitions      : 21,000
-Settled (k>=3)         : 20,707  (98.60%)
-  -> unanimous (kept)  : 20,261  (96.48%)
-  -> split (excluded)  : 446  (2.12%)
-Never settled (excl.)  : 293  (1.40%)
+Total repetitions      : 30,000
+Settled (k>=3)         : 29,609  (98.70%)
+  -> unanimous (kept)  : 29,017  (96.72%)
+  -> split (excluded)  : 592  (1.97%)
+Never settled (excl.)  : 391  (1.30%)
 Cells with n_c<2       : 0
 
 label        monostable  multistable  stochastic  insufficient
 dataset                                                       
-gpqa                 72          102          36             0
-hiddenbench          18           74         118             0
+gpqa                 86          151          63             0
+hiddenbench          56           98         146             0
 
     dataset topology  W  monostable  multistable  stochastic
-       gpqa       fc  1          11           22           2
-       gpqa       fc  2          12           16           7
-       gpqa       fc  5          11           19           5
-       gpqa     star  1          13           17           5
-       gpqa     star  2          11           13          11
-       gpqa     star  5          14           15           6
-hiddenbench       fc  1           4            9          22
-hiddenbench       fc  2           3           12          20
-hiddenbench       fc  5           4           12          19
-hiddenbench     star  1           3            9          23
-hiddenbench     star  2           3           15          17
-hiddenbench     star  5           1           17          17
+       gpqa       fc  1          13           31           6
+       gpqa       fc  2          14           24          12
+       gpqa       fc  5          14           27           9
+       gpqa     star  1          15           26           9
+       gpqa     star  2          14           22          14
+       gpqa     star  5          16           21          13
+hiddenbench       fc  1          11           14          25
+hiddenbench       fc  2           9           17          24
+hiddenbench       fc  5          11           15          24
+hiddenbench     star  1          10           12          28
+hiddenbench     star  2           8           20          22
+hiddenbench     star  5           7           20          23
 
-### CELL: # Fig 1 — N_eff and V violin, stratified by M
-<Figure size 1690x650 with 2 Axes>
 fig1 saved
 
 === Summary statistics within fixed M ===
-GPQA (M=4)      n=210
-  n_eff      : mean=1.912  median=1.852  max=3.882
-  cramers_v  : mean=0.460  median=0.437  max=1.000
+GPQA (M=4)      n=300
+  n_eff      : mean=1.965  median=1.901  max=3.882
+  cramers_v  : mean=0.451  median=0.436  max=1.000
 
-HB (M=3)        n=186
-  n_eff      : mean=2.185  median=2.117  max=2.990
-  cramers_v  : mean=0.357  median=0.344  max=0.702
+HB (M=3)        n=276
+  n_eff      : mean=2.038  median=2.034  max=2.990
+  cramers_v  : mean=0.351  median=0.344  max=0.702
 
 HB (M=4)        n=24
   n_eff      : mean=2.331  median=2.354  max=2.729
   cramers_v  : mean=0.294  median=0.297  max=0.411
 
-### CELL: # Label stacked bar by (dataset, config)
-<Figure size 1690x650 with 2 Axes>
+
 fig2 saved
 
-### CELL: print('=== Dominant attractor == correct option ===')
 === Dominant attractor == correct option ===
-  GPQA        : 0.471  (99/210)
-  HiddenBench : 0.238  (50/210)
+  GPQA        : 0.487  (146/300)
+  HiddenBench : 0.190  (57/300)
 
-  monostable    : 0.400  (36/90)
-  multistable   : 0.455  (80/176)
-  stochastic    : 0.214  (33/154)
+  monostable    : 0.338  (48/142)
+  multistable   : 0.418  (104/249)
+  stochastic    : 0.244  (51/209)
 
 GPQA:
-  monostable    : 0.417  n=72
-  multistable   : 0.510  n=102
-  stochastic    : 0.472  n=36
+  monostable    : 0.488  n=86
+  multistable   : 0.483  n=151
+  stochastic    : 0.492  n=63
 
 HiddenBench:
-  monostable    : 0.333  n=18
-  multistable   : 0.378  n=74
-  stochastic    : 0.136  n=118
+  monostable    : 0.107  n=56
+  multistable   : 0.316  n=98
+  stochastic    : 0.137  n=146
 
-### CELL: valid = df[df['label'] != 'insufficient'].copy()
+
 === Topology comparison (fc vs star): N_eff and V ===
 GPQA
-  W=1 n_eff      : fc=1.891  star=1.907  p=0.9204
-  W=1 cramers_v  : fc=0.499  star=0.464  p=0.2131
-  W=2 n_eff      : fc=1.935  star=1.940  p=0.9813
-  W=2 cramers_v  : fc=0.467  star=0.408  p=0.1552
-  W=5 n_eff      : fc=1.920  star=1.881  p=0.7201
-  W=5 cramers_v  : fc=0.468  star=0.455  p=0.6093
+  W=1 n_eff      : fc=1.960  star=1.934  p=0.7986
+  W=1 cramers_v  : fc=0.503  star=0.454  p=0.1777
+  W=2 n_eff      : fc=1.992  star=1.989  p=0.8713
+  W=2 cramers_v  : fc=0.454  star=0.409  p=0.1722
+  W=5 n_eff      : fc=1.962  star=1.955  p=0.9615
+  W=5 cramers_v  : fc=0.450  star=0.436  p=0.4080
 
 HiddenBench
-  W=1 n_eff      : fc=2.160  star=2.203  p=0.6810
-  W=1 cramers_v  : fc=0.350  star=0.329  p=0.7422
-  W=2 n_eff      : fc=2.242  star=2.189  p=0.5182
-  W=2 cramers_v  : fc=0.338  star=0.363  p=0.4810
-  W=5 n_eff      : fc=2.175  star=2.242  p=0.6983
-  W=5 cramers_v  : fc=0.353  star=0.368  p=0.5809
+  W=1 n_eff      : fc=2.004  star=2.044  p=0.6466
+  W=1 cramers_v  : fc=0.346  star=0.327  p=0.6791
+  W=2 n_eff      : fc=2.119  star=2.070  p=0.5214
+  W=2 cramers_v  : fc=0.332  star=0.360  p=0.4841
+  W=5 n_eff      : fc=2.024  star=2.106  p=0.4649
+  W=5 cramers_v  : fc=0.345  star=0.368  p=0.3502
 
 === W effect (Kruskal-Wallis, per dataset x topo) ===
-  GPQA         fc    n_eff      : H=0.139  p=0.9330
-  GPQA         fc    cramers_v  : H=0.958  p=0.6195
-  GPQA         star  n_eff      : H=0.097  p=0.9527
-  GPQA         star  cramers_v  : H=1.543  p=0.4623
-  HiddenBench  fc    n_eff      : H=0.631  p=0.7295
-  HiddenBench  fc    cramers_v  : H=0.287  p=0.8664
-  HiddenBench  star  n_eff      : H=0.173  p=0.9170
-  HiddenBench  star  cramers_v  : H=1.454  p=0.4835
+  GPQA         fc    n_eff      : H=0.026  p=0.9873
+  GPQA         fc    cramers_v  : H=1.405  p=0.4955
+  GPQA         star  n_eff      : H=0.072  p=0.9648
+  GPQA         star  cramers_v  : H=1.377  p=0.5023
+  HiddenBench  fc    n_eff      : H=1.417  p=0.4924
+  HiddenBench  fc    cramers_v  : H=0.099  p=0.9515
+  HiddenBench  star  n_eff      : H=0.260  p=0.8780
+  HiddenBench  star  cramers_v  : H=1.974  p=0.3726
 
 === Multistable fraction per config ===
   stratum          topo  W=1      W=2      W=5     
-  GPQA (M=4)       fc    0.63(35) 0.46(35) 0.54(35)
-  GPQA (M=4)       star  0.49(35) 0.37(35) 0.43(35)
-  HB (M=3)         fc    0.29(31) 0.39(31) 0.35(31)
-  HB (M=3)         star  0.29(31) 0.48(31) 0.52(31)
+  GPQA (M=4)       fc    0.62(50) 0.48(50) 0.54(50)
+  GPQA (M=4)       star  0.52(50) 0.44(50) 0.42(50)
+  HB (M=3)         fc    0.30(46) 0.37(46) 0.30(46)
+  HB (M=3)         star  0.26(46) 0.43(46) 0.41(46)
   HB (M=4)         fc    0.00(4)  0.00(4)  0.25(4) 
-  HB (M=4)         star  0.00(4)  0.00(4)  0.25(4)
+  HB (M=4)         star  0.00(4)  0.00(4)  0.25(4) 
 
-### CELL: valid = df[df['label'] != 'insufficient'].copy()
 === Spearman: N_eff / V vs accuracy ===
-  GPQA          N_eff vs acc: rho=0.027  p=0.6936  |  V vs acc: rho=0.094  p=0.1727  (n=210)
-  HiddenBench   N_eff vs acc: rho=0.153  p=0.0265  |  V vs acc: rho=0.274  p=0.0001  (n=210)
+  GPQA          N_eff vs acc: rho=-0.152  p=0.0085  |  V vs acc: rho=0.048  p=0.4056  (n=300)
+  HiddenBench   N_eff vs acc: rho=0.435  p=0.0000  |  V vs acc: rho=0.265  p=0.0000  (n=300)
 
 === Mean accuracy by label ===
 GPQA
-  monostable    : mean=0.390  median=0.080  n=72
-  multistable   : mean=0.413  median=0.480  n=102
-  stochastic    : mean=0.428  median=0.440  n=36
-    vs multi: p=0.1818
-    vs stoch: p=0.1742
-    vs stoch: p=0.7196
+  monostable    : mean=0.467  median=0.200  n=86
+  multistable   : mean=0.406  median=0.420  n=151
+  stochastic    : mean=0.400  median=0.440  n=63
+    vs multi: p=0.6417
+    vs stoch: p=0.7699
+    vs stoch: p=0.8491
 
 HiddenBench
-  monostable    : mean=0.361  median=0.160  n=18
-  multistable   : mean=0.338  median=0.310  n=74
-  stochastic    : mean=0.256  median=0.220  n=118
-    vs multi: p=0.3469
-    vs stoch: p=0.6503
-    vs stoch: p=0.0027
+  monostable    : mean=0.144  median=0.040  n=56
+  multistable   : mean=0.339  median=0.330  n=98
+  stochastic    : mean=0.254  median=0.230  n=146
+    vs multi: p=0.0000
+    vs stoch: p=0.0000
+    vs stoch: p=0.0001
 
-### CELL: # Fig 3 — N_eff vs accuracy scatter
-<Figure size 1690x650 with 2 Axes>
+
 fig3 saved
 
-### CELL: print('=== mean_sr_slope by label ===')
 === mean_sr_slope by label ===
-  monostable    : mean=0.555  median=0.559  n=90
-  multistable   : mean=0.412  median=0.402  n=176
-  stochastic    : mean=0.370  median=0.364  n=154
+  monostable    : mean=0.546  median=0.547  n=142
+  multistable   : mean=0.414  median=0.409  n=249
+  stochastic    : mean=0.373  median=0.369  n=209
 
 === MWU: mean_sr_slope across labels ===
-  monostable vs stochastic: p=0.0000  (0.555 vs 0.370)
-  monostable vs multistable: p=0.0000  (0.555 vs 0.412)
-  stochastic vs multistable: p=0.0000  (0.370 vs 0.412)
+  monostable vs stochastic: p=0.0000  (0.546 vs 0.373)
+  monostable vs multistable: p=0.0000  (0.546 vs 0.414)
+  stochastic vs multistable: p=0.0000  (0.373 vs 0.414)
 
 === Spearman: N_eff vs mean_sr_slope (per dataset) ===
-  GPQA        : rho=-0.693  p=0.0000  n=210
-  HiddenBench : rho=-0.195  p=0.0045  n=210
+  GPQA        : rho=-0.656  p=0.0000  n=300
+  HiddenBench : rho=-0.351  p=0.0000  n=300
 
-### CELL: valid = df[df['label']!='insufficient'].copy()
 === Spearman: D0 vs N_eff (per dataset) ===
-  GPQA        : rho=0.847  p=0.0000  n=210
-  HiddenBench : rho=-0.100  p=0.1492  n=210
+  GPQA        : rho=0.826  p=0.0000  n=300
+  HiddenBench : rho=0.118  p=0.0407  n=300
 
 === Partial Spearman: N_eff vs accuracy | D0 ===
-  GPQA        : raw rho=0.027 (p=0.6936)  partial rho=0.001 (p=0.9906)
-  HiddenBench : raw rho=0.153 (p=0.0265)  partial rho=0.181 (p=0.0087)
+  GPQA        : raw rho=-0.152 (p=0.0085)  partial rho=-0.102 (p=0.0774)
+  HiddenBench : raw rho=0.435 (p=0.0000)  partial rho=0.423 (p=0.0000)
 
-### CELL: print('=== Cross-config rank agreement of per-task N_eff ===')
 === Cross-config rank agreement of per-task N_eff ===
-  GPQA        : n_tasks=35  n_configs=6  pairwise Spearman mean=0.913  median=0.913  min=0.869  max=0.941
-  HiddenBench : n_tasks=35  n_configs=6  pairwise Spearman mean=0.782  median=0.796  min=0.597  max=0.880
+  GPQA        : n_tasks=50  n_configs=6  pairwise Spearman mean=0.902  median=0.906  min=0.835  max=0.945
+  HiddenBench : n_tasks=50  n_configs=6  pairwise Spearman mean=0.844  median=0.849  min=0.742  max=0.898
 
 === Task-level robustness: n_configs flagged multistable ===
-  GPQA        : 0cfg:10  1cfg:1  2cfg:2  3cfg:5  4cfg:10  6cfg:7
-    tasks multistable in >=4 configs: 17
-  HiddenBench : 0cfg:10  1cfg:7  2cfg:5  3cfg:4  4cfg:4  5cfg:1  6cfg:4
-    tasks multistable in >=4 configs: 9
+  GPQA        : 0cfg:12  1cfg:1  2cfg:4  3cfg:9  4cfg:13  5cfg:3  6cfg:8
+    tasks multistable in >=4 configs: 24
+  HiddenBench : 0cfg:17  1cfg:9  2cfg:6  3cfg:6  4cfg:6  5cfg:1  6cfg:5
+    tasks multistable in >=4 configs: 12
 
-### CELL: # Does the anti-conformity prompt change bistability?
 === SUMMARY TABLE ===
-  monostable    :  90 / 420  (21.4%)
-  multistable   : 176 / 420  (41.9%)
-  stochastic    : 154 / 420  (36.7%)
-  insufficient  :   0 / 420  (0.0%)
+  monostable    : 142 / 600  (23.7%)
+  multistable   : 249 / 600  (41.5%)
+  stochastic    : 209 / 600  (34.8%)
+  insufficient  :   0 / 600  (0.0%)
 
-N_eff overall: mean=2.057  median=2.010
-N_eff > 1.5  : 330 of 420 valid cells (78.6%)
-Cramers V overall mean: 0.405
+N_eff overall: mean=2.013  median=1.988
+N_eff > 1.5  : 458 of 600 valid cells (76.3%)
+Cramers V overall mean: 0.399
 
 GPQA
-  monostable    : 72  (34.3%)
-  multistable   : 102  (48.6%)
-  stochastic    : 36  (17.1%)
-  N_eff mean (M=4): 1.912  (n=210)
-  Dom correct: 99/210 (47.1%)
+  monostable    : 86  (28.7%)
+  multistable   : 151  (50.3%)
+  stochastic    : 63  (21.0%)
+  N_eff mean (M=4): 1.965  (n=300)
+  Dom correct: 146/300 (48.7%)
 
 HiddenBench
-  monostable    : 18  (8.6%)
-  multistable   : 74  (35.2%)
-  stochastic    : 118  (56.2%)
-  N_eff mean (M=3): 2.185  (n=186)
+  monostable    : 56  (18.7%)
+  multistable   : 98  (32.7%)
+  stochastic    : 146  (48.7%)
+  N_eff mean (M=3): 2.038  (n=276)
   N_eff mean (M=4): 2.331  (n=24)
-  Dom correct: 50/210 (23.8%)
+  Dom correct: 57/300 (19.0%)
 
-### CELL: # NOVEL ANALYSIS 1: Do GT-correct attractors have stronger basin selection (high
+
 === Cramers V: dom_correct vs not ===
-  Dominant=correct: V=0.453  n=149
-  Dominant=wrong:   V=0.379  n=271
+  Dominant=correct: V=0.441  n=203
+  Dominant=wrong:   V=0.377  n=397
   MWU p=0.0000
 
-  GPQA        : correct_V=0.464  wrong_V=0.457  p=0.4892
-  HiddenBench : correct_V=0.430  wrong_V=0.325  p=0.0000
+  GPQA        : correct_V=0.448  wrong_V=0.454  p=0.8240
+  HiddenBench : correct_V=0.421  wrong_V=0.329  p=0.0000
 
 === N_eff vs convergence rate (n_converged / n_reps) ===
-  GPQA        : rho=-0.194  p=0.0049  conv_rate mean=0.994
-  HiddenBench : rho=-0.042  p=0.5472  conv_rate mean=0.935
+  GPQA        : rho=-0.218  p=0.0001  conv_rate mean=0.994
+  HiddenBench : rho=-0.143  p=0.0129  conv_rate mean=0.940
 
 === Stochastic cells: N_eff and V distributions ===
-  stochastic   N_eff mean=2.313  V mean=0.283  n=154
-  multistable  N_eff mean=2.266  V mean=0.483  n=176
-  monostable   N_eff mean=1.211   V mean=0.460  n=90
-  stochastic with N_eff>=1.5: 154 / 154 (100.0%)
+  stochastic   N_eff mean=2.283  V mean=0.292  n=209
+  multistable  N_eff mean=2.258  V mean=0.484  n=249
+  monostable   N_eff mean=1.187   V mean=0.406  n=142
+  stochastic with N_eff>=1.5: 209 / 209 (100.0%)
     These have high N_eff but p_basin>=0.05 — coexistence without deterministic basin selection
 
-### CELL: # Fig 4 — heatmap N_eff per config
-<Figure size 1820x520 with 4 Axes>
 fig4 saved
 
-### CELL: from src.metrics.stats_utils import (task_spearman, cluster_bootstrap_ci,
 helpers ready
 
-### CELL: print('=== OVERVIEW TABLE VALUES (n cells; 3 decimals) ===')
 === OVERVIEW TABLE VALUES (n cells; 3 decimals) ===
-GPQA         n=210
-  N_eff    : mean=1.912  median=1.852
-  Cramers V: mean=0.460  median=0.437
-HiddenBench  n=210
-  N_eff    : mean=2.202  median=2.188
-  Cramers V: mean=0.350  median=0.338
+GPQA         n=300
+  N_eff    : mean=1.965  median=1.901
+  Cramers V: mean=0.451  median=0.436
+HiddenBench  n=300
+  N_eff    : mean=2.061  median=2.079
+  Cramers V: mean=0.346  median=0.341
 
-Overall N_eff mean=2.057  median=2.010
-Overall V mean=0.405  median=0.392
+Overall N_eff mean=2.013  median=1.988
+Overall V mean=0.399  median=0.391
 
-NOTE HiddenBench N_eff: mean=2.202 (table value 2.20); prior 2.19 = MEDIAN=2.188
-NOTE GPQA Cramers V mean=0.460 (table value 0.46; corrects 0.47)
+NOTE HiddenBench N_eff: mean=2.061 (table value 2.20); prior 2.19 = MEDIAN=2.079
+NOTE GPQA Cramers V mean=0.451 (table value 0.46; corrects 0.47)
 
-### CELL: print('=== TOPOLOGY fc-vs-star FAMILY: TEST COUNT ===')
 === TOPOLOGY fc-vs-star FAMILY: TEST COUNT ===
 Total Mann-Whitney tests in fc-vs-star family: 12
-min p = 0.1552   (max p = 0.9813)
-all p-values: 0.1552  0.2131  0.4810  0.5182  0.5809  0.6093  0.6810  0.6983  0.7201  0.7422  0.9204  0.9813
+min p = 0.1722   (max p = 0.9615)
+all p-values: 0.1722  0.1777  0.3502  0.4080  0.4649  0.4841  0.5214  0.6466  0.6791  0.7986  0.8713  0.9615
 
-### CELL: print('=== TASK-LEVEL (n~31) CORRECT-BASIN, HiddenBench M=3 only ===')
 === TASK-LEVEL (n~31) CORRECT-BASIN, HiddenBench M=3 only ===
-  correct-dominant  : plug-in V=0.435  bias-corr V=0.347  n_cells=45
-  incorrect-dominant: plug-in V=0.333  bias-corr V=0.226  n_cells=141
-  cell-level Mann-Whitney p = 1.812e-05
-  n tasks (M=3 HB) = 31
-  task-clustered bootstrap V diff = 0.102  CI[0.028, 0.176]  p=0.005
+  correct-dominant  : plug-in V=0.424  bias-corr V=0.334  n_cells=52
+  incorrect-dominant: plug-in V=0.334  bias-corr V=0.232  n_cells=224
+  cell-level Mann-Whitney p = 3.913e-05
+
+  n tasks (M=3 HB) = 46
+  task-clustered bootstrap V diff = 0.090  CI[0.025, 0.155]  p=0.005
 
   --- GPQA correct-basin (M=4): stays null ---
-  GPQA correct V=0.464 (n=99)  incorrect V=0.457 (n=111)  MWU p=0.489
-  GPQA task-clustered bootstrap V diff = 0.007  CI[-0.053, 0.068]  p=0.814
+  GPQA correct V=0.448 (n=146)  incorrect V=0.454 (n=154)  MWU p=0.824
 
-### CELL: print('=== CRAMERS V BIAS-CORRECTION (M9): plug-in vs bias-corrected ===')
+  GPQA task-clustered bootstrap V diff = -0.005  CI[-0.058, 0.046]  p=0.840
+
 === CRAMERS V BIAS-CORRECTION (M9): plug-in vs bias-corrected ===
-  GPQA        : plug-in mean V=0.460  bias-corrected mean V=0.381
-  HiddenBench : plug-in mean V=0.350  bias-corrected mean V=0.244
-  Overall     : plug-in mean V=0.405  bias-corrected mean V=0.312
+  GPQA        : plug-in mean V=0.451  bias-corrected mean V=0.370
+  HiddenBench : plug-in mean V=0.346  bias-corrected mean V=0.244
+  Overall     : plug-in mean V=0.399  bias-corrected mean V=0.307
 
-### CELL: print('=== TASK-LEVEL (n=35) HB CORRECTIONS ===')
 === TASK-LEVEL (n=35) HB CORRECTIONS ===
-  GPQA         N_eff-vs-accuracy : rho=0.042  p=0.812  n=35
-  HiddenBench  N_eff-vs-accuracy : rho=0.138  p=0.429  n=35
+  GPQA         N_eff-vs-accuracy : rho=-0.157  p=0.277  n=50
+  HiddenBench  N_eff-vs-accuracy : rho=0.437  p=0.001  n=50
 
-  GPQA         partial N_eff-acc|D0: rho=0.087  p=0.619
-  HiddenBench  partial N_eff-acc|D0: rho=0.175  p=0.315
+  GPQA         partial N_eff-acc|D0: rho=-0.087  p=0.547
+  HiddenBench  partial N_eff-acc|D0: rho=0.432  p=0.002
 
-  GPQA         N_eff-vs-SR-slope : rho=-0.787  p=0.000  n=35
-  HiddenBench  N_eff-vs-SR-slope : rho=-0.258  p=0.134  n=35
+  GPQA         N_eff-vs-SR-slope : rho=-0.745  p=0.000  n=50
+  HiddenBench  N_eff-vs-SR-slope : rho=-0.435  p=0.002  n=50
 
 === BH-FDR (task-level correlation family) ===
-  gpqa N_eff-acc    : p=0.8124  q=0.8124  survive=False
-  hiddenbench N_eff-acc: p=0.4288  q=0.5718  survive=False
+  gpqa N_eff-acc    : p=0.2767  q=0.2767  survive=False
+  hiddenbench N_eff-acc: p=0.0015  q=0.0021  survive=True
   gpqa N_eff-SR     : p=0.0000  q=0.0000  survive=True
-  hiddenbench N_eff-SR: p=0.1341  q=0.2683  survive=False
+  hiddenbench N_eff-SR: p=0.0016  q=0.0021  survive=True
 
-### CELL: print('=== STOCHASTIC vs MULTISTABLE accuracy (HiddenBench), task-clustered ==='
 === STOCHASTIC vs MULTISTABLE accuracy (HiddenBench), task-clustered ===
-  cell-level: stochastic mean=0.256 (n=118)  multistable mean=0.338 (n=74)
-  task-clustered bootstrap acc diff (stoch - multi) = -0.082  CI[-0.167, 0.001]  p=0.053
+  cell-level: stochastic mean=0.254 (n=146)  multistable mean=0.339 (n=98)
+
+  task-clustered bootstrap acc diff (stoch - multi) = -0.085  CI[-0.154, -0.016]  p=0.014
+
 
 === SR-slope by label (ordering survives) ===
-  monostable    : mean=0.555  n=90
-  multistable   : mean=0.412  n=176
-  stochastic    : mean=0.370  n=154
+  monostable    : mean=0.546  n=142
+  multistable   : mean=0.414  n=249
+  stochastic    : mean=0.373  n=209
   ordering monostable > multistable > stochastic holds
 
-### CELL: print('=== NULL CONFIG EFFECTS: effect size + task-level cluster CI + BH-FDR ===
 === NULL CONFIG EFFECTS: effect size + task-level cluster CI + BH-FDR ===
 --- Topology (fc vs star): paired-by-task difference ---
-  gpqa        W1 n_eff    : diff=-0.016 CI[-0.129,+0.095]  MWU p=0.9204
-  gpqa        W1 cramers_v: diff=+0.035 CI[-0.019,+0.094]  MWU p=0.2131
-  gpqa        W2 n_eff    : diff=-0.005 CI[-0.088,+0.077]  MWU p=0.9813
-  gpqa        W2 cramers_v: diff=+0.060 CI[-0.006,+0.125]  MWU p=0.1552
-  gpqa        W5 n_eff    : diff=+0.040 CI[-0.035,+0.114]  MWU p=0.7201
-  gpqa        W5 cramers_v: diff=+0.014 CI[-0.083,+0.112]  MWU p=0.6093
-  hiddenbench W1 n_eff    : diff=-0.043 CI[-0.147,+0.056]  MWU p=0.6810
-  hiddenbench W1 cramers_v: diff=+0.021 CI[-0.020,+0.061]  MWU p=0.7422
-  hiddenbench W2 n_eff    : diff=+0.053 CI[-0.053,+0.163]  MWU p=0.5182
-  hiddenbench W2 cramers_v: diff=-0.025 CI[-0.066,+0.012]  MWU p=0.4810
-  hiddenbench W5 n_eff    : diff=-0.067 CI[-0.181,+0.052]  MWU p=0.6983
-  hiddenbench W5 cramers_v: diff=-0.015 CI[-0.057,+0.027]  MWU p=0.5809
-  BH-FDR: 0/12 survive q<0.05  (min q=0.8907)
+  gpqa        W1 n_eff    : diff=+0.026 CI[-0.074,+0.132]  MWU p=0.7986
+
+  gpqa        W1 cramers_v: diff=+0.049 CI[-0.007,+0.115]  MWU p=0.1777
+  gpqa        W2 n_eff    : diff=+0.003 CI[-0.066,+0.073]  MWU p=0.8713
+
+  gpqa        W2 cramers_v: diff=+0.045 CI[-0.008,+0.096]  MWU p=0.1722
+
+  gpqa        W5 n_eff    : diff=+0.007 CI[-0.060,+0.076]  MWU p=0.9615
+
+  gpqa        W5 cramers_v: diff=+0.014 CI[-0.059,+0.089]  MWU p=0.4080
+  hiddenbench W1 n_eff    : diff=-0.040 CI[-0.122,+0.039]  MWU p=0.6466
+
+  hiddenbench W1 cramers_v: diff=+0.018 CI[-0.023,+0.060]  MWU p=0.6791
+
+  hiddenbench W2 n_eff    : diff=+0.049 CI[-0.031,+0.134]  MWU p=0.5214
+
+  hiddenbench W2 cramers_v: diff=-0.028 CI[-0.071,+0.010]  MWU p=0.4841
+  hiddenbench W5 n_eff    : diff=-0.081 CI[-0.172,+0.013]  MWU p=0.4649
+
+  hiddenbench W5 cramers_v: diff=-0.023 CI[-0.061,+0.014]  MWU p=0.3502
+  BH-FDR: 0/12 survive q<0.05  (min q=0.8939)
   all CIs contain 0 -> topology effect small and not distinguishable from zero
 
 --- W (Kruskal-Wallis): eps^2 effect size + W1-vs-W5 paired cluster CI ---
-  gpqa        fc    n_eff    : H=0.139 p=0.9330  eps2=-0.018  W5-W1 diff=+0.029 CI[-0.051,+0.117]
-  gpqa        fc    cramers_v: H=0.958 p=0.6195  eps2=-0.010  W5-W1 diff=-0.031 CI[-0.112,+0.048]
-  gpqa        star  n_eff    : H=0.097 p=0.9527  eps2=-0.019  W5-W1 diff=-0.027 CI[-0.138,+0.082]
-  gpqa        star  cramers_v: H=1.543 p=0.4623  eps2=-0.004  W5-W1 diff=-0.009 CI[-0.083,+0.070]
-  hiddenbench fc    n_eff    : H=0.631 p=0.7295  eps2=-0.013  W5-W1 diff=+0.015 CI[-0.091,+0.121]
-  hiddenbench fc    cramers_v: H=0.287 p=0.8664  eps2=-0.017  W5-W1 diff=+0.003 CI[-0.028,+0.031]
-  hiddenbench star  n_eff    : H=0.173 p=0.9170  eps2=-0.018  W5-W1 diff=+0.039 CI[-0.062,+0.140]
-  hiddenbench star  cramers_v: H=1.454 p=0.4835  eps2=-0.005  W5-W1 diff=+0.039 CI[-0.006,+0.083]
-  BH-FDR: 0/8 survive q<0.05  (min q=0.9527)
+
+  gpqa        fc    n_eff    : H=0.026 p=0.9873  eps2=-0.013  W5-W1 diff=+0.002 CI[-0.068,+0.074]
+  gpqa        fc    cramers_v: H=1.405 p=0.4955  eps2=-0.004  W5-W1 diff=-0.053 CI[-0.136,+0.021]
+
+  gpqa        star  n_eff    : H=0.072 p=0.9648  eps2=-0.013  W5-W1 diff=+0.021 CI[-0.070,+0.109]
+
+  gpqa        star  cramers_v: H=1.377 p=0.5023  eps2=-0.004  W5-W1 diff=-0.018 CI[-0.075,+0.040]
+
+  hiddenbench fc    n_eff    : H=1.417 p=0.4924  eps2=-0.004  W5-W1 diff=+0.020 CI[-0.062,+0.103]
+
+  hiddenbench fc    cramers_v: H=0.099 p=0.9515  eps2=-0.013  W5-W1 diff=-0.001 CI[-0.033,+0.030]
+
+  hiddenbench star  n_eff    : H=0.260 p=0.8780  eps2=-0.012  W5-W1 diff=+0.062 CI[-0.019,+0.146]
+
+  hiddenbench star  cramers_v: H=1.974 p=0.3726  eps2=-0.000  W5-W1 diff=+0.041 CI[+0.000,+0.081]
+  BH-FDR: 0/8 survive q<0.05  (min q=0.9873)
   effect sizes small, all CIs contain 0 -> memory-length effect not distinguishable from zero
 
-### CELL: print('=== N_eff <= M CHECK ===')
 === N_eff <= M CHECK ===
-valid cells checked: 420
+valid cells checked: 600
 cells with N_eff > M: 0
 max N_eff overall: 3.882  (max M=4)
 PASS: N_eff <= M holds for all cells
+
+saved fig5_energy_landscape.png

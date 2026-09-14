@@ -1,0 +1,58 @@
+/Users/I550854/Documents/Master Thesis/self-organization-mas/.venv/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+
+FC reps: 15,000  valid (>=1 flip): 12,506
+
+Saved fig1_topology_examples
+
+Saved fig2_accuracy_by_type
+
+Saved fig3_design_guideline
+
+=================================================================
+--- sec:results:eff_topology: topology type distribution ---
+  GPQA  (n=7,500):
+    flat        :   5.4%  acc=0.394
+    hub         :  11.0%  acc=0.393
+    two-hub     :  58.7%  acc=0.418
+    star        :   2.3%  acc=0.485
+    degenerate  :  22.6%  acc=0.450
+  HiddenBench  (n=7,500):
+    flat        :   6.8%  acc=0.242
+    hub         :  18.0%  acc=0.377
+    two-hub     :  59.2%  acc=0.247
+    star        :   5.4%  acc=0.562
+    degenerate  :  10.6%  acc=0.029
+
+--- sec:results:eff_topology: accuracy by type ---
+  GPQA: overall=0.423  star=0.485  two-hub=0.418
+  HiddenBench: overall=0.264  star=0.562  two-hub=0.247
+
+--- sec:results:eff_topology: hub selection (correct present at t=0) ---
+  GPQA hub: hub_init_correct=0.412  n=672  (chance=0.25)
+  GPQA two-hub: hub_init_correct=0.524  n=3422  (chance=0.25)
+  GPQA star: hub_init_correct=0.545  n=145  (chance=0.25)
+  HiddenBench hub: hub_init_correct=0.714  n=755  (chance=0.25)
+  HiddenBench two-hub: hub_init_correct=0.418  n=2161  (chance=0.25)
+  HiddenBench star: hub_init_correct=0.855  n=262  (chance=0.25)
+
+--- sec:results:eff_topology: star winner-take-all ---
+  GPQA: hub_correct->acc=0.861  hub_wrong->acc=0.156
+  HiddenBench: hub_correct->acc=0.924  hub_wrong->acc=0.107
+
+--- sec:results:eff_topology: design guideline (P(star) by n_unique) ---
+  n_unique=1: n=2,631  P(star)=0.3%
+  n_unique=2: n=8,647  P(star)=3.3%
+  n_unique=3: n=3,572  P(star)=6.7%
+  n_unique=4: n=150  P(star)=22.7%
+
+--- sec:results:eff_topology: (2,2) two-hub faction battle ---
+  Two-hub (2,2) overall acc: 0.342  n=2,634
+  Correct faction present: acc=0.613
+  No correct at start:     acc=0.087
+
+--- sec:results:eff_topology: nominal star comparison ---
+
+  GPQA nominal star: P(center started correct)=0.384
+  HiddenBench nominal star: P(center started correct)=0.150
+=================================================================
