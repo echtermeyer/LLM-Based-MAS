@@ -665,7 +665,7 @@ Deterministic decoding collapses MAD into voting among identical samples, and
 \citet{zhu2026demystifying} show the homogeneous deterministic case cannot improve
 over a single agent. We use temperature $0.7$ with reasoning disabled to obtain
 diverse yet focused outputs without chain-of-thought token overhead. An ablation
-comparing $T = 0.4$ against $T = 0.7$ in a comparable debate protocol found that
+comparing $\tau = 0.4$ against $\tau = 0.7$ in a comparable debate protocol found that
 the lower temperature increased the modal sycophancy rate by $6.2$ percentage
 points \citep{bertalanic2026costofconsensus}, providing external support for
 the higher-temperature choice.
@@ -684,5 +684,5 @@ the full grid on all 198 GPQA-Diamond tasks would be $198 \times 6 \times R \tim
 25$\,s, i.e.\ $\approx 248$\,h ($\approx 10.3$ days) at $R = 30$ and $\approx 413$\,h
 ($\approx 17.2$ days) at $R = 50$. The two-phase difficulty-based procedure of
 \autoref{sec:setup:design} reduces this to $\approx 29$\,h by running the full
-grid only on promoted Tier-3 tasks, while the screening pass still yields
+grid only on screened tasks, while the screening pass still yields
 prevalence estimates across the broader task set.

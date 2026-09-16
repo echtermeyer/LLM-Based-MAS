@@ -20,7 +20,7 @@ to outcomes; null and near-null results are reported as findings.
 This section reports overall system accuracy and efficiency across all
 600 task--configuration combinations (50 tasks $\times$ 2 datasets $\times$
 3 memory windows $\times$ 2 topologies, $R = 50$ repetitions each,
-$N = 30{,}000$ total).
+$n = 30{,}000$ total).
 Two metrics are reported throughout:
 
 \begin{itemize}
@@ -63,7 +63,7 @@ HiddenBench & $14.9\,\%$ & $\phantom{0}7.6\,\%$ & $\mathbf{26.1\,\%}$ & $46.3\,\
 \bottomrule
 \end{tabular}
 \caption[Baseline and debate accuracy by dataset]{Accuracy decomposition at round~0 and after debate.
-         All configurations pooled ($N = 15{,}000$ per dataset).
+         All configurations pooled ($n = 15{,}000$ per dataset).
          Oracle: fraction of repetitions where at least one agent is correct
          at round~0.}
 \label{tab:perf:baseline}
@@ -90,9 +90,10 @@ different stories:
         is present among the agents in roughly two thirds of repetitions: the limiting
         factor is not knowledge but the group's ability to identify and amplify
         the correct voice.
-        The discrepancy between oracle and achieved accuracy is a documented
-        property of plurality aggregation under peer influence rather than an
-        artefact of our setting \citep{bertalanic2026costofconsensus}.
+        The discrepancy between oracle and achieved accuracy, which we call the
+        \emph{oracle gap} following \citet{bertalanic2026costofconsensus}, is a
+        documented property of plurality aggregation under peer influence rather
+        than an artefact of our setting.
 
   \item \textbf{HiddenBench.}
         Here the dynamics are strikingly different.
@@ -239,7 +240,7 @@ consensus means the group has locked in on the majority-biased wrong answer
 before any corrective exchange; accuracy then rises sharply over the next
 few rounds before flattening.
 
-This asymmetry is one instance of a broader point that governs the whole chapter.
+This asymmetry is one instance of a broader point that governs everything that follows.
 The two benchmarks are so different in kind, GPQA a knowledge task where debate
 refines a mostly-correct start and HiddenBench a bias task where it must correct a
 systematically wrong one, that the motif analyses in the following sections must be
@@ -336,7 +337,10 @@ Three findings follow.
         Across the 600 cells, $76\,\%$ show more than one coexisting attractor
         ($N_{\mathrm{eff}} > 1.5$), split between deterministic basin selection
         (multistable) and outcomes that vary independently of the opening votes
-        (stochastic; the per-dataset breakdown is in Appendix~\ref{app:bistab}). This
+        (stochastic; the per-dataset breakdown is in Appendix~\ref{app:bistab}).
+        This prevalence figure is conditioned on the screened task set
+        (\autoref{sec:setup:design}) and should not be read as the motif rate
+        across an unselected task population. This
         structure is a property of the question, not the configuration: neither
         topology nor memory shifts either metric (all task-level confidence intervals
         contain zero), while per-task $N_{\mathrm{eff}}$ is highly consistent across

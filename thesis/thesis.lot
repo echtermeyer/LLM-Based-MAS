@@ -1,9 +1,9 @@
-\contentsline {table}{\numberline {1}{\ignorespaces Notation used throughout the thesis}}{17}{table.1}%
-\contentsline {table}{\numberline {2}{\ignorespaces Classification of tunable components}}{24}{table.2}%
-\contentsline {table}{\numberline {3}{\ignorespaces Baseline and debate accuracy by dataset}}{40}{table.3}%
-\contentsline {table}{\numberline {4}{\ignorespaces Accuracy and rounds by topology}}{42}{table.4}%
-\contentsline {table}{\numberline {5}{\ignorespaces Accuracy by ground-truth presence per task}}{49}{table.5}%
-\contentsline {table}{\numberline {6}{\ignorespaces Design principles mapped to diagnostic measurements}}{62}{table.6}%
+\contentsline {table}{\numberline {1}{\ignorespaces Notation used throughout the thesis}}{18}{table.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces Classification of tunable components}}{25}{table.2}%
+\contentsline {table}{\numberline {3}{\ignorespaces Baseline and debate accuracy by dataset}}{41}{table.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces Accuracy and rounds by topology}}{43}{table.4}%
+\contentsline {table}{\numberline {5}{\ignorespaces Accuracy by ground-truth presence per task}}{50}{table.5}%
+\contentsline {table}{\numberline {6}{\ignorespaces Design principles mapped to diagnostic measurements}}{64}{table.6}%
 \contentsline {table}{\numberline {7}{\ignorespaces Accuracy and efficiency by configuration}}{V}{table.7}%
 \contentsline {table}{\numberline {8}{\ignorespaces Self-reinforcement prevalence and slope by configuration}}{VI}{table.8}%
 \contentsline {table}{\numberline {9}{\ignorespaces Self-reinforcement slope by structural subgroup}}{VI}{table.9}%

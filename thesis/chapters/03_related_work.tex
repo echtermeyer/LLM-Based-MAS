@@ -2,6 +2,13 @@
 % CHAPTER 3: RELATED WORK
 % ============================================================
 
+This chapter locates the thesis in the literature in three passes.
+\autoref{sec:related:mad} and \autoref{sec:related:dynamics} survey what
+multi-agent debate does and how the interaction dynamics inside it have been
+studied; \autoref{sec:related:lenses} weighs the available ways of analysing such
+systems against one another; and \autoref{sec:related:gap} states the gap this
+thesis addresses.
+
 \subsection{Multi-Agent Debate: Design and Critique}
 \label{sec:related:mad}
 
@@ -70,8 +77,10 @@ these evaluations.
 \label{sec:related:dynamics}
 
 A distinct and more recent line looks inside the debate at how positions evolve
-and influence one another. Each of the four motifs we detect has a
-correspondingly documented pathology, and we take them in turn.
+and influence one another. Each of our four motifs corresponds to a debate
+phenomenon that this literature documents to a very different degree, and we take
+them in turn, before turning to the opening vote distribution, which is not
+itself a motif but the input on which they all act.
 
 \paragraph{Rising confidence.}
 \citet{prasad2025certain} stage repeated adversarial debates and find pervasive
@@ -96,20 +105,35 @@ the dose-response as a sigmoid with a model-specific threshold.
 \citet{cau2026agreementdrift} identify an aggregate directional asymmetry they
 call \emph{agreement drift}, which survives in balanced populations and so cannot
 be reduced to a majority effect. Where influence concentrates rather than
-diffusing, outcomes come to depend heavily on the competence of whichever agent
-occupies the centre \citep{conformitydynamics2026}, a dependency our star
-topology is designed to expose.
+diffusing, an emergent leader-follower structure forms
+\citep{chen2023consensus}, and outcomes come to depend heavily on the competence
+of whichever agent occupies the centre \citep{conformitydynamics2026}, a
+dependency our star topology is designed to expose.
 
 \paragraph{Premature lock-in.}
 \citet{chuang2025debate} report that role-playing LLM groups converge far more
 strongly and rapidly than human groups do, indicating a systematic bias toward
-premature agreement. A structurally sharper version is captured by HiddenBench
+premature agreement. Purely cooperative framings sharpen this: with no dissenting
+pressure a group can collapse into a mutually reinforcing echo chamber, the
+failure mode \citet{liang2024encouraging} name \emph{Degeneration-of-Thought}. A
+structurally sharper version is captured by HiddenBench
 \citep{li2026hiddenbench}, which adapts the hidden-profile paradigm from social
 psychology \citep{stasser1985pooling, schulzhardt2012synergy}: when the evidence
 needed for the correct answer is distributed across agents, collective accuracy
 collapses far below what a single fully-informed agent achieves, because agents
 lock onto shared information and fail to pool their private knowledge. We adopt
 HiddenBench as our second benchmark for exactly this reason.
+
+\paragraph{Oscillation and non-termination.}
+The fourth regime, sustained oscillation, is conspicuous by its near-absence from
+this literature. A debate that never converges but cycles through the same
+positions is a limit cycle in the dynamical sense
+\citep{strogatz2015nonlinear}, yet debate studies typically impose a fixed round
+budget and fold any run that fails to settle into an undifferentiated ``no
+consensus'' category, so a periodic orbit is never distinguished from slow
+convergence. We flag this near-silence because it prefigures our own finding that
+genuine limit cycles are essentially absent outside the star topology
+(\autoref{sec:results:lc}).
 
 \paragraph{The opening distribution.}
 That round-zero answers govern the outcome is stated in several forms.
@@ -123,46 +147,27 @@ Empirically, \citet{wu2025reallydebate} find that an agent starting inside a
 correct majority is almost perfectly stable while one facing an incorrect
 majority rarely recovers. In every case the opening distribution is observed as
 it arises rather than constructed, leaving its effect confounded with task
-difficulty and agent confidence, which is what \autoref{sec:results:seeded} is
+difficulty and agent confidence, which is what \autoref{sec:results:evid} is
 designed to separate.
 
 \medskip
-\noindent The vocabulary needed to name these phenomena precisely comes from
-complex-systems theory. Recurring interaction structures are studied as
-\emph{network motifs}, small subgraphs appearing more often than in a randomised
-network and generating characteristic behaviour \citep{milo2002network,
-alon2007network}; the complementary notion of a \emph{dynamical motif}, a
-recurring pattern in the trajectory such as an attractor or an oscillation, has
-recently been formalised for recurrent networks \citep{driscoll2024dynamical}.
-The individual regimes are classical: positive feedback and lock-in
-\citep{arthur1989competing}, and limit cycles, fixed points, and multistability
-in nonlinear dynamics \citep{strogatz2015nonlinear}. On the influence side,
-opinion-dynamics models formalise how agreement and social power propagate and
-when influence concentrates on a single node \citep{degroot1974consensus,
-jia2015opinion}, and the continuous-opinion, discrete-action framework
-\citep{martins2008coda} matches agents that hold latent confidence but cast
-discrete votes. The structural topology a designer imposes is moreover not the
-influence structure that forms, a distinction long standard in network
-neuroscience as structural versus effective connectivity
-\citep{friston2011connectivity} and one we take up in
-\autoref{sec:results:eff_topology}.
+\noindent The vocabulary for naming these phenomena precisely, network and
+dynamical motifs, positive feedback and lock-in, opinion dynamics and social
+power, and the distinction between structural and effective connectivity, was
+introduced in \autoref{sec:bg:motifs} and is not repeated here. What that section
+leaves open is whether the vocabulary is more than an analogy once it is carried
+to LLM populations.
 
-That this vocabulary applies to LLM populations is established.
+That it is more than an analogy is established empirically.
 \citet{ashery2025conventions} demonstrate the spontaneous emergence of
 universally adopted conventions in decentralised populations, show that strong
 collective biases arise even when individual agents exhibit none, and find that
 committed minorities can impose alternative conventions on the majority, the LLM
 analogue of the critical-mass threshold measured in human groups
-\citep{centola2018tipping}. That it can be made analytic is established too:
+\citep{centola2018tipping}. The same behaviour can be made analytic:
 \citet{okawa2026biasedconsensus} derive a mean-field treatment of debate from
 spin models, predicting a conformity threshold above which a collective norm
 emerges, smoothed into a crossover at the small group sizes typical of debate.
-Neither setting, however, has a correct answer for the collective to converge
-on, a limitation we return to in \autoref{sec:related:gap}. At the level of
-principle, \citet{miehling2025agentic} argue that agentic AI must be analysed
-through a systems-theoretic lens precisely because group-level behaviour cannot
-be predicted from individual agent properties, but their contribution is
-conceptual and supplies no empirical instrument.
 
 
 \subsection{Ways of Analysing Multi-Agent Systems}
@@ -204,7 +209,7 @@ game and estimating it through agent removal \citep{agentsthatmatter2026,
 cui2025introspecloo}. These yield causal or information-theoretic estimates
 rather than the adoption-based signature we use, at the price of model access or
 repeated re-execution; we return to the trade-off in
-\autoref{sec:results:dominance}.
+\autoref{sec:conclusion:future}.
 
 \paragraph{Learned diagnostics from logs.}
 A fifth and very recent approach trains a predictor on log-derived features,

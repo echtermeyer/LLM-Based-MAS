@@ -30,7 +30,7 @@ ground-truth option is present at $t = 0$ moves per-task accuracy from near zero
 (0.4--6.9\,\%) to 36--58\,\%, and the seeded-initialisation experiment shows it
 causally: placing a single correct agent into an otherwise-wrong opening profile
 raises pooled accuracy roughly thirteen-fold (1.8\,\% to 23.7\,\%), in all 34
-tasks tested (Sections~\ref{sec:results:evid} and~\ref{sec:results:seeded}).
+tasks tested (Section~\ref{sec:results:evid}).
 The self-reinforcement analysis supplies the mechanism by which the opening
 profile is converted into the outcome: SR is universal
 ($p_{\mathrm{SR}} \in [0.73, 0.88]$ in every cell), it is the convergence engine
@@ -46,6 +46,11 @@ We state this as the central empirical claim of the thesis: within the system we
 tested, deliberation functions predominantly as a selective amplifier of its
 initial vote distribution rather than as a mechanism that reasons a new answer
 into existence.
+In the language of \autoref{sec:bg:complex}, this is self-organization with its
+second ingredient missing: positive feedback and fluctuations are both present,
+but the negative feedback that would bound an early lead, Camazine's stabilising
+ingredient (ii), is absent, so the group amplifies its opening distribution
+instead of correcting it.
 This claim is not novel in kind. \citet{oh2026entrenchment} name homogenised
 dynamics that amplify the majority view regardless of correctness as one of two
 root causes of belief entrenchment, and \citet{estornell2024multillm} derive the

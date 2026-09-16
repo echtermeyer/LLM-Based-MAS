@@ -55,7 +55,7 @@ the topology effect survives large memory windows is an open question.
 
 \paragraph{Decoding stochasticity.}
 Every result in this thesis is conditioned on a single decoding temperature
-($T = 0.4$). Temperature controls the entropy of the output distribution: lower
+($\tau = 0.4$). Temperature controls the entropy of the output distribution: lower
 temperatures concentrate probability mass on the model's modal completion, higher
 temperatures spread it across alternatives. In the context of debate dynamics
 this is a first-order parameter: at high temperature agents start with more
@@ -64,7 +64,7 @@ they converge faster but may become overconfident. A recent physics-inspired
 account models the biased consensus problem as a Potts spin system and shows
 analytically that the system undergoes a phase transition as temperature increases
 from a consensus phase to a disordered phase \citep{okawa2026biasedconsensus}.
-Empirically, ablating temperature from $T = 0.4$ to $T = 0.7$ in a comparable
+Empirically, ablating temperature from $\tau = 0.4$ to $\tau = 0.7$ in a comparable
 protocol reduced the modal sycophancy rate by $6.2$ percentage points
 \citep{bertalanic2026costofconsensus}, suggesting that our findings may be
 conservative: the self-reinforcement and convergence rates we report are likely
@@ -72,8 +72,9 @@ higher than they would be at typical deployment temperatures. Replicating the
 main analyses at higher temperatures is a natural sensitivity check we did not
 perform.
 
-\paragraph{Task-selection bias from Tier-3 screening.}
-All quantitative results are conditioned on Tier-3 tasks, those where the outcome
+\paragraph{Task-selection bias from outcome-variance screening.}
+All quantitative results are conditioned on tasks selected by the screening
+procedure described in \autoref{sec:setup:design}: those where the outcome
 varies across repetitions under the screening configuration.
 By construction, this excludes tasks that are trivially easy (unanimous at $t=0$),
 nearly deterministic (the group always converges to the same answer), or too hard
@@ -81,12 +82,12 @@ for any signal to emerge.
 The prevalence rates reported here, how often each motif appears, are therefore
 rates \emph{within the contested regime}, not across the full task distribution.
 Extrapolating them to the broader population of questions, or to operating
-conditions where most tasks fall outside Tier~3, would overstate motif frequency.
+conditions where most tasks fall outside this regime, would overstate motif frequency.
 
 \paragraph{The causal evidence is GPQA-only.}
 The seeded-initialisation experiment, our only intervention and the strongest
 support for the amplifier claim, was run exclusively on GPQA
-(\autoref{sec:results:seeded}). This is a real restriction on the causal claim,
+(\autoref{sec:results:evid}). This is a real restriction on the causal claim,
 and in one respect the less favourable case is the one left untested: on
 HiddenBench, where agents begin systematically wrong, amplification of the opening
 distribution should if anything be more consequential (and more often harmful),
@@ -99,7 +100,7 @@ work.
 \paragraph{Adversarial agents and deployment risk.}
 The experiments in this thesis use cooperative, homogeneous agents: every agent is
 instructed to reason honestly and update in good faith.
-A devil's advocate probe (\autoref{sec:results:seeded}) suggests this is a
+A devil's advocate probe (\autoref{sec:results:evid}) suggests this is a
 consequential assumption.
 A single agent instructed to advocate persistently for a wrong answer reduces
 system accuracy from $63.7\,\%$ to $10.0\,\%$ even when two of four agents start
