@@ -34,7 +34,7 @@ crossed in a single factorial by \citet{mehdizadeh2026topologymemory}, who find
 no main effect of topology on coordination success but a strong interaction with
 memory: longer memory slows settling in decentralised networks and accelerates
 it in centralised ones, so the same parameter pushes the system in opposite
-directions depending on where an agent sits. Faster settling in the centralised
+directions depending on the network's structure. Faster settling in the centralised
 case, they note, means locking into a fragmented plateau rather than reaching
 agreement. Beyond these two, the decision protocol itself matters, with voting
 favouring reasoning tasks and consensus favouring knowledge tasks, and adding
@@ -97,8 +97,8 @@ signature that motivates a dynamical treatment.
 \paragraph{Conformity and influence concentration.}
 \citet{wynn2025talk} show that debate can \emph{decrease} accuracy over time
 even when stronger models outnumber weaker ones, as agents abandon correct
-answers rather than challenge flawed arguments; they attribute this to
-sycophancy \citep{sharma2023sycophancy}. \citet{cho2025herd} find the gap
+answers rather than challenge flawed arguments; they examine sycophancy
+\citep{sharma2023sycophancy} and social conformity among the contributing factors. \citet{cho2025herd} find the gap
 between an agent's own confidence and its perceived confidence in peers governs
 how likely it is to conform, and \citet{mehdizadeh2025peerpressure} characterise
 the dose-response as a sigmoid with a model-specific threshold.
@@ -114,8 +114,7 @@ dependency our star topology is designed to expose.
 \citet{chuang2025debate} report that role-playing LLM groups converge far more
 strongly and rapidly than human groups do, indicating a systematic bias toward
 premature agreement. Purely cooperative framings sharpen this: with no dissenting
-pressure a group can collapse into a mutually reinforcing echo chamber, the
-failure mode \citet{liang2024encouraging} name \emph{Degeneration-of-Thought}. A
+pressure a group can collapse into a mutually reinforcing echo chamber. A
 structurally sharper version is captured by HiddenBench
 \citep{li2026hiddenbench}, which adapts the hidden-profile paradigm from social
 psychology \citep{stasser1985pooling, schulzhardt2012synergy}: when the evidence
@@ -145,7 +144,7 @@ significantly with final accuracy and propose a diversity-aware initialisation
 to raise the chance that a correct hypothesis is present at the start.
 Empirically, \citet{wu2025reallydebate} find that an agent starting inside a
 correct majority is almost perfectly stable while one facing an incorrect
-majority rarely recovers. In every case the opening distribution is observed as
+majority recovers in only a minority of cases (3.6--34.4\% depending on the model). In every case the opening distribution is observed as
 it arises rather than constructed, leaving its effect confounded with task
 difficulty and agent confidence, which is what \autoref{sec:results:evid} is
 designed to separate.
@@ -165,7 +164,7 @@ collective biases arise even when individual agents exhibit none, and find that
 committed minorities can impose alternative conventions on the majority, the LLM
 analogue of the critical-mass threshold measured in human groups
 \citep{centola2018tipping}. The same behaviour can be made analytic:
-\citet{okawa2026biasedconsensus} derive a mean-field treatment of debate from
+\citet{okawa2026biasedconsensus} derives a mean-field treatment of debate from
 spin models, predicting a conformity threshold above which a collective norm
 emerges, smoothed into a crossover at the small group sizes typical of debate.
 
@@ -203,8 +202,8 @@ against a null.
 
 \paragraph{Influence attribution.}
 A fourth approach quantifies directed influence between agents, either
-information-theoretically through transfer entropy over execution traces
-\citep{caspian2026, infodynamics2026}, or by treating influence as a cooperative
+information-theoretically through transfer entropy over the utterances of
+interlocutors \citep{infodynamics2026}, or by treating influence as a cooperative
 game and estimating it through agent removal \citep{agentsthatmatter2026,
 cui2025introspecloo}. These yield causal or information-theoretic estimates
 rather than the adoption-based signature we use, at the price of model access or
@@ -259,23 +258,19 @@ conventions where any label is an acceptable equilibrium.
 \citet{mehdizadeh2026topologymemory} verify that their convention symbols carry
 no intrinsic model preference, precisely so that dynamics are not confounded by
 correctness. \citet{cau2026agreementdrift} choose a non-empirical proposition
-explicitly to avoid convergence driven by factual correctness, and
-\citet{okawa2026biasedconsensus} uses symbols with no correct answer. This is a
+explicitly to avoid convergence driven by factual correctness. This is a
 principled choice, and it is what makes those studies clean: if the goal is to
 understand how a group settles on \emph{a} convention, having no better
 convention available is exactly right. It also leaves them silent on the
 question a practitioner faces, which is not whether the group locks in but
-whether it locks in on the right answer.
-\citet{mehdizadeh2026topologymemory} say as much themselves, naming as a
-critical open question whether their findings survive in epistemic settings
-where the symmetry between options breaks because some claims are better
-supported than others.
+whether it locks in on the right answer---the epistemic case, where some claims
+are better supported than others, remains open.
 
 This thesis takes up that question. The gap it addresses is the absence of an
 empirical, literature-grounded detection of self-organization motifs in
 \emph{truth-valued} deliberation, and our response follows the three research
 questions of \autoref{sec:intro:rqs}. As an \emph{instrument}, we define
-detectors for self-reinforcement, bistability, dominance, and limit cycles, each
+detectors for self-reinforcement, multistability, dominance, and limit cycles, each
 grounded in the corresponding literature and each equipped with its own null
 model, and we run them over a repetition structure that makes
 across-repetition attractor statistics computable at all; prior work runs a

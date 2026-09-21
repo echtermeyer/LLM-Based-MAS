@@ -84,13 +84,13 @@ $F(\mathbf{x}^*) = \mathbf{x}^*$ and stays there. A structurally different
 regime is the \emph{limit cycle}: a closed periodic orbit to which nearby
 trajectories spiral, so the system revisits the same sequence of states
 indefinitely without ever settling. Unlike the neutrally stable oscillation of
-a frictionless pendulum, a limit cycle is structurally stable: small
+a frictionless pendulum, a limit cycle is attracting (asymptotically stable): small
 perturbations push the trajectory off the cycle transiently, but the dynamics
 pull it back.
 
 A qualitatively richer situation arises when the phase-space landscape contains
 not one valley but several, as illustrated in \autoref{fig:bg:doublewell}. A
-system is \emph{bistable} (or more generally \emph{multistable}) when two or
+system is \emph{multistable} when two or
 more distinct attractors coexist for the same parameter values
 \citep{feudel2008complex}. \autoref{fig:bg:doublewell} shows the simplest
 example, the potential $V(x) = (x^2 - 1)^2$: two stable states at $x = \pm 1$
@@ -110,7 +110,7 @@ decides how often each absorbing state is reached \citep{menck2013basin}.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.60\linewidth]{plots/bg/double_well.pdf}
-  \caption[Bistable double-well energy landscape]{The potential $V(x) = (x^2-1)^2$
+  \caption[Multistable double-well energy landscape]{The potential $V(x) = (x^2-1)^2$
     has two stable attractors at $x = \pm 1$, separated by an unstable fixed
     point at $x = 0$. The shaded regions are the two basins of attraction.
     Initial conditions in Basin~A converge to the left attractor; those in
@@ -136,7 +136,7 @@ randomly rewired surrogate with the same degree sequence. \citet{alon2007network
 showed that the \emph{coherent feed-forward loop}, a three-node pattern in
 which A influences both B and C while B also influences C, acts as a
 sign-sensitive delay filter under AND logic, and this functional property is
-conserved regardless of whether the nodes are genes, neurons, or traders.
+conserved a property that recurs across transcription, signalling and neuronal networks.
 A complementary concept is the \emph{dynamical motif}
 \citep{driscoll2024dynamical}: a recurring pattern in the \emph{trajectory} of
 a system rather than in its wiring. Where a structural motif is a statement
@@ -176,7 +176,7 @@ connectivity} from \emph{effective connectivity} \citep{friston2011connectivity}
 Structural connectivity is the static graph encoding who is allowed to
 communicate with whom. Effective connectivity is the causal influence one unit
 actually exerts on another across a recorded trajectory; it can be estimated
-from the trajectory even when the prescribed wiring is fixed. The same
+from the trajectory under a model of how influence operates, even when the prescribed wiring is fixed. The same
 structural graph can give rise to very different effective-connectivity patterns
 depending on which nodes happen to speak with authority at critical moments.
 
@@ -208,10 +208,10 @@ carry almost none, is the \emph{autocratic} pole of the model
 \citep{jia2015opinion}; it is the opinion-dynamics form of the dominance motif we
 detect. Convergence to a single consensus requires the trust network to be both
 strongly connected and aperiodic, and each condition can fail in a way that maps
-onto one of our motifs. If strong connectivity fails, the network splits into
-subgroups that settle on different consensus values, a group-level bistability;
+onto one of our motifs. If the network contains two or more closed groups that listen only to each other,
+those groups settle on different consensus values, a group-level multistability;
 if aperiodicity fails, the process never settles but cycles through a repeating
-sequence of states, a limit cycle. Bistability and limit cycles are thus the two
+sequence of states, a limit cycle. Multistability and limit cycles are thus the two
 ways the same convergence guarantee can break down.
 
 Three refinements of this basic picture recur in what follows. Agents often hold
@@ -222,8 +222,8 @@ confidence evolves continuously while its vote stays discrete
 (\autoref{sec:setup:protocol:state}). When the opinions are discrete labels with
 no intrinsic ranking, \emph{naming-game} and related discrete-consensus models
 describe how a population settles on a shared convention
-\citep{baronchelli2018consensus}, the regime our bistability analysis appeals to
-(\autoref{sec:results:bistability}). And a \emph{stubborn} agent that never
+\citep{baronchelli2018consensus}, the regime our multistability analysis appeals to
+(\autoref{sec:results:multistability}). And a \emph{stubborn} agent that never
 updates acts as a fixed anchor that can pull the group toward its position
 \citep{friedkin1999social}, precisely the variant our devil's advocate probe
 instantiates (\autoref{sec:results:evid}).
@@ -269,8 +269,8 @@ response. The group commits when it reaches sufficient agreement or a round
 limit is hit. The motivating argument is error correction: if agents make
 partially independent mistakes, deliberation lets the group surface and correct
 them. This gain assumes the mistakes are independent, however: correlated votes,
-which social influence itself induces, erode it and can push a group below
-single-agent accuracy \citep{ladha1992condorcet}. Reported accuracy gains on factual and mathematical
+which social influence itself induces, erode it, and beyond a threshold the
+majority no longer outperforms an individual \citep{ladha1992condorcet}. Reported accuracy gains on factual and mathematical
 reasoning \citep{du2024improving, liang2024encouraging, chen2024reconcile} and
 the use of debate panels as evaluators \citep{chan2024chateval} have made MAD
 a standard building block in collaborative AI systems. The term ``debate'' also

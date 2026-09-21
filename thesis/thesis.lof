@@ -1,22 +1,14 @@
-\contentsline {figure}{\numberline {1}{\ignorespaces Bistable double-well energy landscape}}{8}{figure.1}%
+\contentsline {figure}{\numberline {1}{\ignorespaces Multistable double-well energy landscape}}{8}{figure.1}%
 \contentsline {figure}{\numberline {2}{\ignorespaces Structural versus dynamical motif}}{9}{figure.2}%
 \contentsline {figure}{\numberline {3}{\ignorespaces Two-phase synchronous debate protocol}}{21}{figure.3}%
-\contentsline {figure}{\numberline {4}{\ignorespaces Accuracy and rounds by memory window}}{42}{figure.4}%
-\contentsline {figure}{\numberline {5}{\ignorespaces Self-reinforcement slope versus rounds to consensus}}{45}{figure.5}%
-\contentsline {figure}{\numberline {6}{\ignorespaces Emergent dominance excess in fully-connected debates}}{48}{figure.6}%
-\contentsline {figure}{\numberline {7}{\ignorespaces Vote-sequence timelines for two limit cycles}}{49}{figure.7}%
-\contentsline {figure}{\numberline {8}{\ignorespaces Accuracy by ground-truth presence at initialisation}}{50}{figure.8}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Causal dose-response of seeding correct agents}}{52}{figure.9}%
-\contentsline {figure}{\numberline {10}{\ignorespaces Effective topology types in FC runs}}{54}{figure.10}%
-\contentsline {figure}{\numberline {11}{\ignorespaces Accuracy by effective topology type}}{55}{figure.11}%
-\contentsline {figure}{\numberline {12}{\ignorespaces Initial vote diversity and star topology emergence}}{56}{figure.12}%
-\contentsline {figure}{\numberline {13}{\ignorespaces Accuracy versus rounds to consensus}}{V}{figure.13}%
-\contentsline {figure}{\numberline {14}{\ignorespaces Self-reinforcement slope versus task accuracy}}{VII}{figure.14}%
-\contentsline {figure}{\numberline {15}{\ignorespaces Bistability by configuration (heatmaps)}}{VIII}{figure.15}%
-\contentsline {figure}{\numberline {16}{\ignorespaces $N_{\mathrm {eff}}$ versus task accuracy}}{VIII}{figure.16}%
-\contentsline {figure}{\numberline {17}{\ignorespaces Recurrence matrices for two limit cycles}}{IX}{figure.17}%
-\contentsline {figure}{\numberline {18}{\ignorespaces Accuracy and efficiency by run-level feature}}{X}{figure.18}%
-\contentsline {figure}{\numberline {19}{\ignorespaces Feature-outcome correlation matrix}}{X}{figure.19}%
-\contentsline {figure}{\numberline {20}{\ignorespaces Feature distributions by outcome}}{XI}{figure.20}%
-\contentsline {figure}{\numberline {21}{\ignorespaces Accuracy and rounds by initial vote entropy}}{XI}{figure.21}%
-\contentsline {figure}{\numberline {22}{\ignorespaces Runtime saved by early stopping threshold}}{XVII}{figure.22}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Accuracy and rounds by memory window}}{39}{figure.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Self-reinforcement slope versus rounds to consensus}}{41}{figure.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Effective topology types in FC runs}}{43}{figure.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Initial vote diversity and star topology emergence}}{44}{figure.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Vote-sequence timelines for two limit cycles}}{46}{figure.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Accuracy by ground-truth presence at initialisation}}{48}{figure.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Causal dose-response of seeding correct agents}}{49}{figure.10}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Accuracy versus rounds to consensus}}{XI}{figure.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Recurrence matrices for two limit cycles}}{XIV}{figure.12}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Accuracy and efficiency by run-level feature}}{XV}{figure.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Feature distributions by outcome}}{XVI}{figure.14}%

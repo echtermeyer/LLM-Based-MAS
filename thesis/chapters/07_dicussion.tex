@@ -1,424 +1,334 @@
 % ============================================================
-% CHAPTER 7: DISCUSSION
+% CHAPTER 7: DISCUSSION AND LIMITATIONS
+%
+% NOTE: change the chapter heading in the main file from
+%   \section{Discussion}
+% to
+%   \section{Discussion and Limitations}
+% so that the scope of the claims is visible at the top level of
+% the table of contents as well as in subsection 7.4.
+%
 % Citations reuse verified entries in bibliography.bib only.
+% Old labels are preserved so existing cross-references resolve.
 % ============================================================
 
-This section brings together the empirical results from \autoref{sec:results}
-and draws out their interpretation, design implications, and scope.
-Section~\ref{sec:results:synthesis} reads all four motifs as faces of a single
-amplifier mechanism.
-Section~\ref{sec:discussion:interpretation} develops the interpretation of that
-mechanism, its two operating regimes, and the status of null results.
-Section~\ref{sec:discussion:design} translates the findings into empirically-grounded
-design principles and the groundwork for a diagnostic suite.
+\autoref{sec:results} reported what the system does. This section asks what it
+means, in four steps. Section~\ref{sec:results:synthesis} explains \emph{why} the
+system behaves as it does by locating it in the vocabulary of
+\autoref{sec:bg:complex}. Section~\ref{sec:discussion:interpretation} asks what
+that behaviour \emph{costs}, by measuring the debate against the vote it started
+from. Section~\ref{sec:discussion:design} asks what a practitioner can
+\emph{do} about it. Section~\ref{sec:discussion:limitations} states the bounds on
+all three together with the work that would remove them.
 
-\subsection{The Amplifier Mechanism: Reading the Motifs Together}
+
+\subsection{The Missing Ingredient}
 \label{sec:results:synthesis}
 
-The preceding sections measured four motifs and a high-repetition distribution.
-Read together, they do not describe four separate phenomena but four views of a
-single underlying mechanism.
-This subsection states that mechanism explicitly, shows how each measurement is a
-signature of it, and separates what the data establish from what they do not.
+This subsection answers why the system behaves as it does, and it does so by
+returning to the definition of self-organization rather than by adding new
+measurements. Previously, in \autoref{sec:bg:complex} introduced the four ingredients that Camazine and
+colleagues identify as recurring in self-organizing systems, which are positive
+feedback, negative feedback, fluctuations, and repeated local interaction. Three
+of the four are clearly present in our results. Positive feedback is self-reinforcement,
+which appears in every one of the twelve combinations of dataset, topology, and
+memory window at a prevalence between $0.733$ and $0.881$ against a null of
+$0.5$, and which is the engine that makes the debate settle, since tasks with
+steeper confidence slopes reach consensus in fewer rounds in every combination we
+tested. Fluctuations are visible as multistability, since $76\,\%$ of the $600$
+task and configuration cells admit more than one stable outcome across
+repetitions of the same question. Repeated local interaction is the debate
+protocol itself. Thus, the second ingredient, negative feedback, is the one that is missing. 
+Nothing in the protocol bounds an early lead. No agent is rewarded for holding out, the group
+pays no cost for converging quickly, and confidence climbs fastest in exactly
+those repetitions where the debate has least to resolve, which are the ones that
+never change their votes and the ones that start unanimous.
 
-\paragraph{The convergent finding.}
-Across every analysis in the preceding section, the property that most strongly governs
-the group's final answer is the composition of the votes \emph{before any debate
-takes place}.
-The high-repetition experiment shows this observationally: whether the
-ground-truth option is present at $t = 0$ moves per-task accuracy from near zero
-(0.4--6.9\,\%) to 36--58\,\%, and the seeded-initialisation experiment shows it
-causally: placing a single correct agent into an otherwise-wrong opening profile
-raises pooled accuracy roughly thirteen-fold (1.8\,\% to 23.7\,\%), in all 34
-tasks tested (Section~\ref{sec:results:evid}).
-The self-reinforcement analysis supplies the mechanism by which the opening
-profile is converted into the outcome: SR is universal
-($p_{\mathrm{SR}} \in [0.73, 0.88]$ in every cell), it is the convergence engine
-(task-level $\rho(\bar\beta, \text{rounds}) \in [-0.89, -0.73]$ everywhere), and
-its accuracy effect is a pure amplification, positive when the correct option
-is already present ($r_{pb} = +0.20$ GPQA / $+0.15$ HB) and negative when it is
-absent ($-0.11$ / $-0.07$), cancelling to near zero in the margin.
-In short, the debate reliably \emph{amplifies} whichever position the opening
-distribution favours; it only rarely \emph{generates} a position no agent
-initially held (de-novo recovery in 15 of 34 seeded tasks, but at just 1.8\,\%
-of repetitions).
-We state this as the central empirical claim of the thesis: within the system we
-tested, deliberation functions predominantly as a selective amplifier of its
-initial vote distribution rather than as a mechanism that reasons a new answer
-into existence.
-In the language of \autoref{sec:bg:complex}, this is self-organization with its
-second ingredient missing: positive feedback and fluctuations are both present,
-but the negative feedback that would bound an early lead, Camazine's stabilising
-ingredient (ii), is absent, so the group amplifies its opening distribution
-instead of correcting it.
-This claim is not novel in kind. \citet{oh2026entrenchment} name homogenised
-dynamics that amplify the majority view regardless of correctness as one of two
-root causes of belief entrenchment, and \citet{estornell2024multillm} derive the
-same conclusion theoretically from response homogeneity. What our data add is
-measurement: a per-motif decomposition of how the amplification is realised,
-conditioned on correctness throughout, and a causal test of the input on which
-it operates.
+That absence is the finding. A system with amplification and no damping does not
+deliberate its way to an answer, it magnifies whatever asymmetry it starts with.
+This also shows that \suitename{} divides the problem in a useful way, because the four detectors turn out to measure not four phenomena but one mechanism seen from four angles.
+Self-reinforcement is the view within a stable segment, where an agent
+grows more certain of a position it already held rather than of anything the
+exchange revealed. Dominance is the view within a run, where influence
+concentrates above the topology-keyed null in all but one of the hundred task and
+benchmark combinations even though every agent in a fully connected run is wired
+identically, so the group reliably elects a hierarchy that the structure never
+specified. Multistability is the view across repetitions, where the same question
+lands in different basins on different runs because the opening draw differs, and
+it counts the basins that self-reinforcement then collapses into one. Limit
+cycles are the boundary case where the magnification never terminates, and they
+are informative precisely because they are almost absent, since nearly every
+sequence reaches a fixed point and the $47$ agent level and $32$ system level
+flagged cases sit almost entirely in the star topology. That the fully connected
+topology produces no genuine cycles is a clean statement about cooperative
+protocol design rather than a measurement failure, because without a single node
+that aggregates all peer signals there is no way to reconstruct the opposing
+majority after every flip.
 
-\paragraph{How each motif is a signature of the same mechanism.}
-The remaining three motifs describe \emph{how} the amplification plays out, not a
-separate process.
-\emph{Bistability} is the cross-repetition face of amplification: because the outcome is
-selected by the (stochastic) opening profile, repeated repetitions of the same task land
-in different basins, so multi-attractor coexistence is common
-($N_{\mathrm{eff}} \geq 1.5$ in 78.6\,\% of cells) and is a stable property of the
-task rather than of the configuration (cross-config $\rho = 0.78$--$0.91$).
-The within-task accuracy relationship is dataset-specific: on GPQA higher
-$N_{\mathrm{eff}}$ predicts lower accuracy ($\rho = -0.57$), because competing
-attractors create wrong-answer basins in a setting where agents usually start
-correct; on HiddenBench it predicts higher accuracy ($\rho = +0.41$), because
-bistability gives the minority-correct faction a competing stable basin in a
-setting where the dominant attractor is wrong.
-The negative coupling between bistability and self-reinforcement
-(task-level $\rho(N_{\mathrm{eff}}, \bar\beta) = -0.79$ on GPQA) is exactly what the
-amplifier picture predicts: strong within-basin amplification means fast lock-in
-to one attractor per repetition, whereas high attractor multiplicity dilutes the SR
-signal across competing basins.
-\emph{Dominance} is the within-repetition face: amplification is typically driven by a
-small, concentrated cascade ($D$ correlates $\approx 0.87$ on GPQA and $\approx 0.76$ on HiddenBench at the task level with the top source's share and \emph{negatively} with total conversion volume), i.e.\ one agent tips a
-near-balanced start rather than the group converging by diffuse attrition.
-Configurations with higher dominance also require more rounds to converge
-($\rho = +0.55$ GPQA, $+0.73$ HiddenBench, within-task), because subordinate agents
-resist before capitulating.
-\emph{Limit cycles} are the boundary case in which amplification fails to
-terminate: when the opening profile is symmetric between two defensible options
-and the star hub sits in the minority, each flip reconstructs the opposing
-majority and the group never locks in, running to the hard cap.
-Finally, the effective topology analysis supplies a within-run complement: even with
-a fixed FC structure, the emergent influence star, where one agent captures most
-conversions, achieves near-ceiling accuracy because the correct agent tends to win
-the influence competition.
-This is the amplifier operating at a finer grain: the debate amplifies whichever
-agent the opening competition selects, and diverse initialisation raises the
-probability that competition is won by the correct one.
-
-\paragraph{The one axis that matters, and the one that does not.}
-Two negative results sharpen the picture.
-First, the \emph{structural} design axes we varied, communication topology and
-memory window, do not change \emph{whether} the system reaches the correct
-answer: topology has no accuracy effect at the task level (the confidence
-interval for the fc--star gap contains zero on both benchmarks), the memory
-window has none that survives multiple-comparison correction (a single
-HiddenBench/fc cell is nominally significant, $q = 0.064$), and bistability is
-invariant to both.
-Their influence is confined to the \emph{dynamics}: star topology is slower,
-is the sole source of genuine limit cycles, and mechanically concentrates
-influence; larger memory windows speed HiddenBench convergence slightly.
-The structural topology parameter is distinct from the \emph{emergent} influence
-topology: conditional on FC runs, whether an effective star forms does predict
-accuracy substantially, but this emergence is driven by the opening vote
-composition rather than by the structural configuration, so the same conclusion
-holds at every level of analysis, the opening vote is the dominant lever.
-Second, the system's own internal signals are not indicators of correctness:
-confidence rises by essentially the same amount on correct and incorrect repetitions
-($+1.63$ vs.\ $+1.64$ on GPQA, with incorrect rising very slightly more), and on HiddenBench early unanimity is
-anti-correlated with accuracy (round-2 stops reach only 2.5\,\%).
-What \emph{does} move accuracy, the opening vote composition, is set before
-any of these knobs act.
-
-\paragraph{Scope of the claim.}
-These statements are bounded by what we varied and what we held fixed.
-We manipulated topology, memory window, task difficulty, benchmark, and (in the
-seeded experiment) the opening vote composition; we did \emph{not} vary the base
-model, the number of agents ($N = 4$), agent heterogeneity, or the cooperative
-framing.
-The amplifier characterisation is therefore established \emph{for a homogeneous,
-cooperative, 4-agent debate on one model family across two benchmarks}, with
-one axis (initial composition) tested causally and the rest observationally.
-Whether the same mechanism dominates for heterogeneous models, larger groups, or
-adversarial protocols is an open question we return to in
-\autoref{sec:limitations}.
-The value of the motif lens is that each of these
-signatures is separately measurable from ordinary interaction logs, so a
-practitioner can check which regime a given system is in rather than having to
-assume it.
+Read this way the four motifs yield one claim rather than four findings. Within
+the system we tested, deliberation works predominantly as a selective amplifier
+of its initial vote distribution rather than as a mechanism that reasons a new
+answer into existence. The claim is not novel in kind.
+\citet{oh2026entrenchment} name homogenised dynamics that amplify the majority
+view regardless of correctness as a root cause of belief entrenchment, and
+\citet{estornell2024multillm} derive the same conclusion theoretically from
+response homogeneity. What \suitename{} adds is measurement. Each face of the
+mechanism is separately detectable from ordinary interaction logs and each was
+tested against a null that destroys the pattern and leaves everything else
+intact, so a practitioner can check which regime a system is in rather than
+having to assume it.
 
 
-\subsection{Interpretation of Findings}
+\subsection{A Lossy Amplifier}
 \label{sec:discussion:interpretation}
 
-The preceding section argued that all four motifs are signatures of the same
-amplifier mechanism.
-This section unpacks what that implies: how SR should be read as a dynamical
-process rather than a benefit, how the two benchmarks place the system in
-qualitatively different operating regimes, why the structural null results are
-informative, and what the robustness check does and does not show.
+This subsection asks what the missing ingredient costs, by measuring the debate
+against the only baseline that isolates its contribution, which is the vote the
+same four agents already held before talking.
+The seeded experiment answers that directly, because it fixes the number of
+correct agents in the opening profile and leaves the debate itself untouched.
+Accuracy climbs from $1.8\,\%$ with no correct seed to $26.2\,\%$, $63.7\,\%$,
+and $86.3\,\%$ as one, two, and three agents begin on the correct option, and it
+does so in almost every individual task. Set against what a plurality vote at
+round $0$ would already deliver, the pattern is not a uniform gain. Where the
+correct answer starts behind, the debate helps, since a lone correct agent faces
+a plurality baseline of zero and still wins a quarter of the time, and an even
+split of two against two improves on a baseline of $38\,\%$. Where the correct
+answer starts ahead, the debate erodes it, since a correct supermajority of three
+that plurality voting would preserve with certainty is talked out of the right
+answer in roughly one repetition in seven.
 
-\paragraph{Self-reinforcement as an amplifier, not a benefit.}
-The single most robust behavioural finding is that self-reinforcement is universal
-and is the engine of convergence, yet is blind to correctness: it is present in
-every configuration and predicts fewer rounds everywhere, but its relationship to
-accuracy reverses sign depending on whether the correct option is present in the
-opening votes. This is the empirical content of describing the system as an
-amplifier: reinforcement strengthens whatever plurality exists at the outset,
-which helps when that plurality is right and hurts when it is wrong. The reading
-aligns with, and gives a dynamical mechanism for, the critical literature that
-finds debate often fails to beat simple baselines \citep{liu2025stopovervaluing}
-and that majority voting alone accounts for much of the apparent gain
-\citep{zhang2025debateorvote}: if the process mostly amplifies the initial vote,
-then its expected value over a population of repetitions is close to that of the opening
-vote itself. It is also consistent with the anti-Bayesian confidence drift
-documented by \citet{prasad2025certain}, which we observe directly as
-outcome-independent confidence gain.
-The reversal of the predicted $W$-slope ordering on GPQA (§\ref{sec:results:sr})
-further supports a peer-conformity reading: shorter memory reduces each agent's
-exposure to peer uncertainty, allowing confidence to ratchet more freely regardless
-of correctness.
+Debate is therefore better described not as majority voting with reasoning
+attached but as a transformation that widens the distribution around the opening
+signal. It moves outcomes away from the initial plurality in both directions,
+which is useful exactly when that plurality is unreliable and harmful when it is
+already good. This one property accounts for the two operating regimes we observe
+and, we think, for much of the disagreement in the literature about whether
+debate works. On GPQA the agents usually begin with the correct option present,
+the plurality of the opening votes already reaches $40.5\,\%$, there is little
+room above that baseline, and debate adds under two percentage points. On
+HiddenBench the shared model bias drives the opening plurality below chance,
+because the errors are correlated in the way that biased information sampling
+produces in human hidden profile groups
+\citep{stasser1985pooling, li2026hiddenbench}, and the same widening recovers
+$18.5$ percentage points. The two benchmarks are not an easy and a hard version
+of one task, they are the two sides of the crossing point where the
+transformation stops paying, observed inside a single experimental setup. Results
+reported on benchmarks that sit on one side or the other will disagree about
+debate for reasons that have nothing to do with the protocol, which is consistent
+with the finding that debate often fails to beat simple baselines
+\citep{liu2025stopovervaluing} and that majority voting alone accounts for much
+of the apparent gain \citep{zhang2025debateorvote}.
 
-One comparison we deliberately do not make is against chain-of-thought or
-self-consistency: our question is not whether debate is the best inference-time
-method but what \emph{happens inside} it, so the fair reference point is the round-0
-majority vote of the same four agents, and our ``gain'' figures are stated relative
-to that pre-deliberation baseline rather than to an external single-agent method.
+The motif signatures track the same crossing point, which is the strongest
+internal evidence that one mechanism is at work. Multistability helps on
+HiddenBench, where more coexisting attractors go with higher accuracy at
+$\rho = +0.44$, because a competing basin gives the correct minority a foothold
+against a dominant attractor that is wrong, while on GPQA the relationship is
+weakly negative and not significant, which is what we would expect where the
+single dominant basin is already the right one. Dominance reverses in the same
+way. When the debate elects its own hub in a fully connected run, that hub
+started correct far more often than a random agent does, and effective star runs
+reach the highest accuracy of the four structural types on both benchmarks. When
+the hub is imposed by the wiring instead, the fixed centre is no more likely to
+be correct than anyone else, so it spreads the shared bias rather than correcting
+it, and higher concentration then goes with lower accuracy.
 
-\paragraph{Two regimes: refinement and correction.}
-The two benchmarks are not merely easy and hard versions of one task; they place
-the system in two qualitatively different regimes, and the motif signatures track
-the difference. On GPQA the agents usually begin with the correct option present
-(oracle $70.6\,\%$), so amplification is mostly \emph{refinement}: SR consolidates
-a frequently-correct start, the group ends above the $25\,\%$ chance baseline
-($42.2\,\%$), and higher influence concentration is neutral-to-mildly-helpful. On
-HiddenBench the agents begin systematically wrong, majority voting at $t=0$
-scores below random ($7.6\,\%$) because errors are correlated, the LLM analogue of
-biased information sampling in human hidden-profile groups
-\citep{stasser1985pooling, li2026hiddenbench}; yet the same amplifier mechanism
-operates here on a biased starting distribution.
-The $+18.5$\,pp gain over the majority baseline reflects those repetitions where a
-correct initial signal is amplified, not a systematic reasoning correction: the
-oracle bound ($46.3\,\%$) confirms that the correct answer is available in roughly
-half of repetitions, and amplification of those openings drives the recovery.
-The motif differences follow: bistability is deeper on HiddenBench and, crucially,
-its relationship to accuracy reverses sign between datasets, helping on HiddenBench
-(where the dominant attractor is often wrong and a competing basin is beneficial)
-but hurting on GPQA (where competing attractors create wrong-answer basins that
-the system can fall into); the group's final accuracy is no better than chance,
-limit cycles concentrate there, and influence concentration cuts both ways, helping
-in the fully-connected topology but \emph{lowering} accuracy when forced through a
-single hub (star). The same mechanism (amplification of the opening profile) thus
-produces opposite-looking phenomenology depending on the reliability of that
-profile, which is precisely why a practitioner cannot read off system health from
-accuracy alone.
-
-A complementary asymmetry appears at the individual level.
-On GPQA, agents who vote correctly at $t=0$ are marginally more confident than
-those who do not (mean $7.39$ vs.\ $7.25$; point-biserial $r = +0.047$, $p < 0.001$):
-correctness and confidence align, so initially-correct agents carry both a numerical
-majority and a confidence advantage into deliberation.
-On HiddenBench the direction reverses ($r = -0.092$, $p < 0.001$; $7.20$ correct
-vs.\ $7.39$ wrong): an agent whose single private fact happens to mislead them is
-more confident than one whose fact points to the correct answer.
-The initially-correct minority thus faces a double obstacle---structural outvoting by
-three peers and a confidence deficit---which accounts for the smaller
-informed-agent influence advantage on HiddenBench ($+1$\,pp) versus GPQA ($+15$\,pp).
-
-\paragraph{Structural axes shape dynamics, not correctness.}
-Topology and memory window, the two axes most often tuned in the debate
-literature \citep{li2024sparsetopology, kaesberg2025voting}, had no accuracy
-effect that survives multiple-comparison correction, but clear effects on the
-dynamics: the star
-topology is slower, concentrates influence roughly threefold, and is the only
-configuration that produces genuine (hub-driven) limit cycles, while larger memory
-windows modestly speed HiddenBench convergence. Both halves of this dissociation
-are corroborated externally. On the null side, network type has no significant
-main effect on coordination in an eight-topology factorial
-\citep{mehdizadeh2026topologymemory} and communication density does not lift
-accuracy above a non-communicative baseline at any level tested
-\citep{bertalanic2026costofconsensus}. On the dynamics side, the same
-eight-topology study finds a large memory-by-topology interaction on settling
-time, confirming that these axes move the trajectory even where they do not
-move the outcome. This dissociation between
-dynamical and epistemic effects is itself a finding: it means these knobs are
-levers on \emph{how} the group deliberates (cost, worst-case runtime,
-entrenchment) but not on \emph{whether} it is right, and it explains why
-topology-tuning results in the literature are mixed \citep{yang2025revisiting}.
-The key qualification is that the structural topology parameter is distinct from the
-\emph{emergent} influence topology.
-Within FC runs, effective star formation, where one agent captures most of the
-conversion credit and the correct agent tends to win that competition, predicts
-above-average accuracy; this structure is inaccessible by assigning the star
-parameter but arises naturally from diverse opening positions.
-Prescribing a structural hub fixes the center before the debate can select it, and
-on hard questions the randomly assigned center started correct only 15.0\,\% of
-the time versus 85.5\,\% for a debate-elected hub.
-The mechanism is direct: within effective-star runs, when the hub votes correctly at
-$t=0$ group accuracy reaches $86.1\,\%$ on GPQA and $92.4\,\%$ on HiddenBench;
-when it votes incorrectly, accuracy collapses to $15.6\,\%$ and $10.7\,\%$
-respectively.
-The hub's opening vote---a function of its randomly assigned private
-information---is the single largest predictor of group outcome in the star
-configuration, which explains why prescribing the star parameter is unreliable
-without also controlling which agent occupies the center.
-
-\paragraph{Null and near-null results as findings.}
-Several results are informative precisely because they are negative, and the study
-was designed to treat them as such (\autoref{sec:intro:rqs}). Genuine limit cycles
-are essentially absent in the fully-connected topology; bistability is invariant to
-topology and memory; memory window does not move accuracy; and the marginal
-SR--accuracy correlation is near zero. The last is not a true null but a
-cancellation of two opposite conditional effects, which we could only see by
-conditioning on ground-truth presence, a reminder that an aggregate null can
-hide structured, offsetting effects. Reporting these against principled null models
-(shuffle surrogates, permutation tests, sign tests) is what separates ``no effect''
-from ``not enough power to see one,'' and we have tried to keep that distinction
-explicit throughout.
-
-\paragraph{Robustness to the system prompt.}
-The agent persona used throughout includes an explicit anti-conformity
-instruction, so we can ask whether the motif structure is an artefact of that
-particular wording. A paired comparison against an earlier repetition with a milder
-persona, on the same HiddenBench questions and configurations
-(Appendix~\ref{app:sysprompt}), shows that the more critical prompt changes the
-\emph{dynamics}, faster fully-connected convergence, fewer cap-hits, and a higher
-unanimous-convergence rate, but does not change accuracy (0 of 6 configurations)
-and does not suppress self-reinforcement (0 of 6). The apparent shift toward more
-multistable labels is a by-product of more repetitions converging rather than a genuine
-change in attractor multiplicity. The amplifier mechanism thus survives a
-deliberate attempt to make agents less conformist, which is mild evidence that it
-is a property of the interaction structure rather than of a single prompt. This is
-a single HiddenBench comparison, and is not evidence of robustness across models or
-group sizes, which we did not test.
-\citet{bertalanic2026costofconsensus} argue on structural grounds that
-prompt-level remedies are unlikely to resolve these dynamics: adversarial
-prompting risks widening the oracle gap by increasing the rate at which valid
-reasoning is attacked, and distinct prompts across a homogeneous parameter space
-produce stylistic variance without decoupling the underlying error distributions.
-Our null result on accuracy is consistent with that expectation.
+The adversarial probe shows what the transformation actually tracks, and it is
+not correctness. Replacing one of the two incorrect agents in the two seed
+condition with an agent that keeps arguing for a wrong option throughout
+collapses accuracy from $63.7\,\%$ to $10.0\,\%$, in every task, and leaves the
+group below what a single correct agent with no adversary achieves. Two correct
+agents out of four are not enough to hold the line against one that never moves.
+The amplifier responds to persistence, and since a cooperative agent that is
+right and an adversarial agent that is committed produce the same observable
+signal, the protocol has no basis on which to tell them apart. Whatever lift
+truth seeding provides is equally available to anyone willing to supply a
+confident wrong answer instead.
 
 
-\subsection{From Dynamics to Diagnostics: Design Implications}
+\subsection{What to Measure Instead}
 \label{sec:discussion:design}
 
 The motivation for this thesis was that outcome metrics tell a practitioner
-\emph{whether} a configuration worked but never \emph{why}, and give no way to
-tell a healthy deliberation from a pathological one \citep{miehling2025agentic}.
-The \suitename{} detectors are a first, partial answer: each is computed from
-ordinary interaction logs and each reports on a distinct aspect of the
-deliberative dynamics. We do not claim to deliver a validated diagnostic tool.
-What the evidence supports is more modest and, we think, more honest: a set of
-\emph{empirically-grounded design principles}, tiered by how strongly our data
-support them, together with the observation that the very quantities used to
-detect each motif can serve as the instruments a future diagnostic suite would
-need. This subsection states the principles and that mapping.
+whether a configuration worked but never why, and give no way to separate a
+healthy deliberation from a pathological one \citep{miehling2025agentic}. The
+negative half of our answer is that the signals an operator would naturally reach
+for instead are uninformative or inverted. Confidence rises monotonically across
+rounds whether the final answer is correct or not, so a confident group is not a
+reliable one. Unanimity is worse than uninformative on HiddenBench, where
+repetitions that stop early lock in the shared wrong answer almost universally
+and reach only XXX\,\%, because early consensus forecloses the exchange that the
+benchmark requires. Debate length carries no signal either, since longer debates
+are no more accurate. The same holds for the two structural knobs the literature
+most often tunes \citep{li2024sparsetopology, mehdizadeh2026topologymemory}. Neither
+topology nor memory window has an accuracy effect that survives correction for
+multiple comparisons, and both are clearly visible in the dynamics, since the
+star needs more rounds on both benchmarks, is the sole source of genuine limit
+cycles, and concentrates influence by construction. Network type having no main
+effect on coordination in an eight topology factorial
+\citep{mehdizadeh2026topologymemory} and communication density failing to lift
+accuracy above a non communicative baseline \citep{bertalanic2026costofconsensus}
+point the same way, and the dissociation explains why topology tuning results in
+the literature are mixed.
 
-\paragraph{A tiered reading of the evidence.}
-We separate the principles by evidential strength so that the confident claims are
-not diluted by the speculative ones.
-\emph{Tier 1 (strong: universal across our cells, and for the first, causal).}
-(1)~The opening vote composition is the dominant lever on the outcome; investment
-in the process that generates round-0 votes dominates tuning of the debate itself.
-(2)~The system amplifies far more readily than it generates, so it is best used as
-a consensus filter over candidate answers rather than as a mechanism expected to
-discover an answer no agent holds. (3)~The system's own confidence and unanimity
-are not signals of correctness and must not be used to gate trust
-(corroborated independently by \citealt{bertalanic2026costofconsensus}, who
-report near-zero confidence--correctness correlations and show that peer
-exchange further degrades confidence discrimination).
-\emph{Tier 2 (directional: consistent in sign, but dataset-dependent in size, so
-``verify on your own setup'').} (4)~Communication topology is a lever on
-efficiency and worst-case behaviour, not accuracy; the fully-connected topology is
-the safer default and the star should be used only when a designated aggregator is
-wanted. (5)~A hard round cap with explicit ``unresolved'' handling is necessary,
-because only some topologies admit non-terminating debates and every observed limit
-cycle ran to the cap
-(failure to recognise termination conditions accounts for 12.4\% of annotated
-multi-agent failures in deployed frameworks; \citealt{cemri2025mast}). (6)~Decisive leadership helps when all agents can see one
-another (fully-connected) but \emph{hurts} when influence is forced through a
-single hub (on HiddenBench/star, higher dominance lowers accuracy), so its value
-depends both on the topology and on whether the leader is more likely correct.
-(7)~Diverse initialisation on multi-option tasks raises the probability of
-effective star formation from under $1\,\%$ to $23\,\%$; since the effective hub
-disproportionately starts correct, this is a low-cost lever for above-average
-accuracy on questions with $\geq\!4$ answer options
-(consistent with enforced perspective diversity as an entrenchment remedy;
-\citealt{oh2026entrenchment}).
-(8)~Persistent non-updating agents are a vulnerability: a single devil's advocate
-reduces accuracy from $63.7\,\%$ to $10.0\,\%$ even when outnumbered two-to-one,
-so non-updating behaviour should be monitored and handled explicitly
-(the convention-formation analogue is minority-driven norm change;
-\citealt{ashery2025conventions}; see also \citealt{yao2025sycophancy} and
-\citealt{pitre2025consensagent} for mitigation).
-\emph{Tier 3 (diagnostic / minor knobs).} (9)~Bistability is a stable property of
-the task, so tasks can be profiled offline, and stochastic tasks, where
-convergence is effectively random and accuracy tends to be lowest, can be flagged
-for routing elsewhere.
-(10)~The memory window is a minor efficiency knob, not an accuracy lever.
-(11)~Prompt changes (e.g.\ anti-conformity instructions) buy dynamical robustness,
-not accuracy.
+The positive half is that the composition of the opening votes is readable,
+cheap, and decisive, and that one design choice does reach it. The effective
+influence topology that emerges inside a fully connected run predicts accuracy
+even though the prescribed topology does not, because the debate elects a hub
+that disproportionately started correct while a prescribed hub is fixed before
+the debate can select anyone. Whether that election happens depends on how
+diverse the opening votes are, since stars almost never form when all four agents
+start on the same option and roughly one run in five becomes a star when all four
+start on different ones. Diverse initialisation is therefore the one lever in our
+grid that touches accuracy, and it does so because it acts on the input to the
+amplifier rather than on the amplifier itself. Enforced perspective diversity has
+already been proposed as a remedy for entrenchment \citep{oh2026entrenchment},
+and what we add is the mechanism behind it.
 
-\paragraph{Each detector is an instrument.}
-The practical bridge from these principles to a future tool is that every
-principle above is checkable with a quantity we already compute
-(\autoref{tab:design:instruments}). This is what we mean by ``groundwork for a
-diagnostic suite'' rather than the suite itself: the measurements exist and have
-been validated against null models on 30{,}000 repetitions; what remains, packaging
-them into an online monitor, and validating the recommendations on models and group
-sizes beyond ours, is future work, not a claim we make here.
+\autoref{tab:design:instruments} states the resulting guidance together with the
+result it rests on, the strength of that evidence, and the quantity that checks
+it. We do not deliver a validated diagnostic tool, and the table should be read
+as a set of hypotheses with their provenance attached rather than as a
+specification. What it does show is that every recommendation here is checkable
+from ordinary interaction logs using a \suitename{} detector that has already
+been tested against a null model on $30{,}000$ repetitions, which is what we mean
+by groundwork for a diagnostic suite rather than the suite itself. Taken together
+the guidance is deflationary, and usefully so. A system whose answer is largely
+fixed before deliberation begins, that cannot manufacture a correct answer absent
+from its inputs, and whose own confidence does not track correctness is one whose
+reliability has to be established upstream in the agents that produce the opening
+positions and externally through verification that does not trust the group,
+rather than through longer or more elaborate debate.
 
 \begin{table}[H]
 \centering
-
 \small
-\begin{tabular}{p{4.3cm}p{3.5cm}p{5.2cm}}
+\begin{tabular}{p{3.9cm}p{3.0cm}p{2.7cm}p{3.6cm}}
 \toprule
-Principle & Observable (this thesis) & How a builder checks it \\
+Guidance & Evidence & Observable & How a builder checks it \\
 \midrule
-Opening composition is the master lever (T1)
-  & $P(\text{GT present})$, initial plurality; seeded contrast
-  & Log the round-0 vote profile; relate to outcome across repetitions \\
+Invest in the process that generates the opening votes rather than in tuning the
+debate
+  & Causal, seeded dose response (\autoref{sec:results:evid})
+  & $P(\text{GT present})$, opening plurality
+  & Log the opening vote profile and relate it to the outcome across repetitions \\
 \addlinespace
-Amplifies, does not generate (T1)
-  & De-novo recovery rate
-  & Fraction of repetitions whose final answer was absent at $t=0$ \\
+Use the system as a filter over candidate answers, not as a way to discover one
+no agent holds
+  & Causal, the zero seed arm (\autoref{sec:results:evid})
+  & De novo recovery rate
+  & Measure the fraction of repetitions whose final answer was absent at $t=0$ \\
 \addlinespace
-Confidence / unanimity $\neq$ quality (T1)
-  & Outcome-independent confidence gain; early-stop accuracy
-  & Check self-confidence calibration against held-out truth \\
+Do not gate trust on the group's confidence, its unanimity, or the length of the
+debate
+  & Every cell, self-reinforcement and early stop analyses
+    (\autoref{sec:results:sr})
+  & Confidence gain by outcome, accuracy of early stops
+  & Check confidence calibration against held out truth \\
 \addlinespace
-Topology sets dynamics, not accuracy (T2)
-  & Rounds, cap-rate, dominance $D$ by topology
-  & Compare efficiency / worst-case across topologies, not accuracy \\
+Seed distinct opening positions on tasks with four or more options
+  & Observational, effective topology analysis
+  & Opening vote diversity, effective topology type
+  & Track how often an effective star forms as opening diversity rises \\
 \addlinespace
-Cap + unresolved-flagging is required (T2)
-  & RQA determinism + period guard
-  & Flag any repetition reaching the round cap as unresolved \\
+Treat topology and memory as efficiency levers and flag capped repetitions as
+unresolved
+  & Every cell, the accuracy and efficiency grid and the limit cycle detector
+  & Rounds, cap rate, dominance $D$
+  & Compare cost and worst case across topologies rather than accuracy \\
 \addlinespace
-Profile tasks; route stochastic ones (T3)
-  & $N_{\mathrm{eff}}$, Cram\'er's $V$, cell label
-  & Pre-classify tasks offline; treat stochastic tasks with caution \\
-\addlinespace
-Diverse init raises P(effective star) (T2)
-  & Initial vote entropy; effective topology type
-  & On $\geq\!4$-option tasks, seed distinct starting positions to raise
-    P(star) toward $23\,\%$ \\
-\addlinespace
-Non-updating agents are a vulnerability (T2)
-  & Per-agent vote entropy across rounds
-  & Flag agents with near-zero vote entropy; treat as suspect \\
+Monitor agents that never update their vote
+  & Single probe, the adversarial arm (\autoref{sec:results:evid})
+  & Vote entropy per agent across rounds
+  & Flag near zero vote entropy and discount the agent's influence \\
 \bottomrule
 \end{tabular}
-\caption[Design principles mapped to diagnostic measurements]{Mapping from design principle to the measurement that checks it. Every
-         observable is computed in this thesis from ordinary interaction logs;
-         the right column states how a practitioner would apply it to their own
-         system. The suite itself is not built here, this is the set of
-         instruments it would use.}
+\caption[Design guidance mapped to results and to diagnostic
+         measurements]{Design guidance, the result it rests on, the strength of
+         that evidence, and the measurement that checks it. Every observable is
+         computed in this thesis from ordinary interaction logs. The suite itself
+         is not built here, this is the set of instruments it would use.}
 \label{tab:design:instruments}
 \end{table}
 
-\paragraph{Relation to enterprise deployment.}
-The three Tier-1 principles are, in effect, safety principles for deploying such
-systems in consequential settings. A system that confidently reaches unanimity on
-a wrong answer, that cannot manufacture a correct answer absent from its inputs,
-and whose outcome is largely fixed before deliberation begins, is one whose
-reliability must be established \emph{upstream} (in the quality and diversity of
-the agents that produce the opening positions) and \emph{externally} (through
-verification that does not trust the system's own confidence), not through longer
-or more elaborate debate. This is a deflationary message, but a useful one: it
-directs effort toward the levers that our data show actually move the outcome and
-away from those that do not. We emphasise once more that these recommendations are
-grounded in a single model family, four agents, and two benchmarks, and should be
-treated as hypotheses to be re-checked, using exactly the instruments in
-\autoref{tab:design:instruments}, on any new deployment.
+\subsection{Limitations and Future Work}
+\label{sec:discussion:limitations}
+\label{sec:limitations}
+\label{sec:conclusion:future}
+
+The first limitation is the scope of the experimental grid. We varied
+communication topology, memory window, task difficulty, and benchmark, and in the
+seeded experiment the composition of the opening votes, but we did not vary the
+base model, the group size, the homogeneity of the agents, or the cooperative
+framing. Every result reported here is therefore a statement about a homogeneous,
+cooperative, four agent debate on one model family, and nothing in it establishes
+what happens outside that setting. Each of these fixed choices is a direction for
+further work. Group size is the most immediate, since $N = 4$ with three or four
+answer options leaves a state space small enough that votes repeat and influence
+concentrates by chance alone, which is why every detector required a null in the
+first place, and a larger group would relax that constraint while letting the
+effective topology analysis distinguish structures that four agents cannot
+express. The structural knobs are narrow for a related reason, since fully
+connected and star are the two extremes of a much larger space, and intermediate
+structures such as rings, sparse or layered graphs, and dynamically rewiring ones
+would show whether hub driven cycles are specific to a single aggregator or arise
+wherever information is funnelled through a bottleneck. The memory window we
+tested is short relative to the round cap, and at a sufficiently large $W$ a
+spoke in a star can reconstruct the whole exchange from accumulated hub
+summaries, at which point the structural difference between the topologies
+largely disappears, so extending $W$ upward would locate the point at which the
+distinction stops mattering. Agent heterogeneity is the axis the critical
+literature considers decisive, since it identifies model diversity rather than
+debate itself as the reliable source of gains
+\citep{liu2025stopovervaluing, chen2024reconcile} and capability asymmetry as a
+driver of harmful herding \citep{wynn2025talk}.
+
+The second limitation is the reach of the causal evidence. The seeded experiment
+is our only intervention and it was run on GPQA, so the amplifier claim is causal
+there and observational on HiddenBench, where it rests on the association between
+the presence of the ground truth in the opening votes and the final answer. The
+diverse initialisation lever is observational throughout, because we measure that
+the probability of an effective star rises with opening diversity across
+naturally occurring runs rather than manipulating that diversity ourselves, and
+the maximum diversity condition holds only six runs on HiddenBench. The effective
+topology analysis is further confined to fully connected runs, since a leaf in a
+star can only ever be converted by the centre, and its four types are separated
+by thresholds on the share of influence captured by the top one or two agents, so
+the rare types at $2.3\,\%$ and $5.4\,\%$ of runs carry real uncertainty.
+Two interventions would address this. Seeding each agent with a distinct opening
+answer would test the diversity lever directly, and perturbing or removing the
+elected hub would establish whether its influence is causal or whether it proxies
+for question specific expertise.
+
+The third limitation is what \suitename{} is able to certify. All four detectors
+identify signatures rather than dynamical objects. A positive confidence slope is
+not a proof of a feedback loop, a recurrence test flags periodic structure rather
+than a mathematically certified limit cycle, $N_{\mathrm{eff}}$ counts coexisting
+endpoints rather than a certified attractor landscape, and the dominance index
+records where conversions concentrate rather than who caused them. Two of the
+detectors also have a known direction of error. The self-reinforcement prevalence
+may be inflated, because an agent whose confidence falls is more likely to flip
+its vote and end the segment, which censors negative slopes, and a matched null
+that models the flip hazard would show how much of the excess above the baseline
+is genuine. The dominance graph is built from vote adoptions during the
+\updatephase{} phase, which is precisely where the protocol instructs agents to
+update, so a strong hub to spoke edge may reflect persuasion or merely the
+routing of information. Removal based attribution, which estimates an agent's
+contribution by masking its messages
+\citep{agentsthatmatter2026, cui2025introspecloo}, would
+replace the concentration index with an interventional measure of influence and
+is the natural successor to what we report here.
+
+The fourth limitation concerns what the reported rates describe. The tasks were
+screened for outcome variation across repetitions, so the prevalences we report
+characterise the regime in which the outcome is genuinely contested rather than
+the full distribution of questions. This follows from the objective, which was to
+characterise the dynamics rather than to evaluate the benchmarks, but it does
+mean the rates should not be read as how often each motif would appear in
+arbitrary deployment, and establishing that would require running the unscreened
+task set. The study is also exploratory and reports many tests across twelve
+configuration cells and four motifs, so we have leaned throughout on effect sizes
+and on consistency across cells rather than on isolated significance, and the
+central claims rest on effects that are large and repeated rather than on any
+single borderline test.

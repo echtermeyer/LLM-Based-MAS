@@ -1,13 +1,13 @@
 \contentsline {table}{\numberline {1}{\ignorespaces Notation used throughout the thesis}}{18}{table.1}%
 \contentsline {table}{\numberline {2}{\ignorespaces Classification of tunable components}}{25}{table.2}%
-\contentsline {table}{\numberline {3}{\ignorespaces Baseline and debate accuracy by dataset}}{41}{table.3}%
-\contentsline {table}{\numberline {4}{\ignorespaces Accuracy and rounds by topology}}{43}{table.4}%
-\contentsline {table}{\numberline {5}{\ignorespaces Accuracy by ground-truth presence per task}}{50}{table.5}%
-\contentsline {table}{\numberline {6}{\ignorespaces Design principles mapped to diagnostic measurements}}{64}{table.6}%
-\contentsline {table}{\numberline {7}{\ignorespaces Accuracy and efficiency by configuration}}{V}{table.7}%
-\contentsline {table}{\numberline {8}{\ignorespaces Self-reinforcement prevalence and slope by configuration}}{VI}{table.8}%
-\contentsline {table}{\numberline {9}{\ignorespaces Self-reinforcement slope by structural subgroup}}{VI}{table.9}%
-\contentsline {table}{\numberline {10}{\ignorespaces Mean dominance by configuration}}{VII}{table.10}%
-\contentsline {table}{\numberline {11}{\ignorespaces Bistability label distribution by dataset}}{VIII}{table.11}%
-\contentsline {table}{\numberline {12}{\ignorespaces Limit-cycle detection funnel}}{IX}{table.12}%
-\contentsline {table}{\numberline {13}{\ignorespaces System-prompt effect on motif measures}}{XII}{table.13}%
+\contentsline {table}{\numberline {3}{\ignorespaces Motif classification}}{28}{table.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces Baseline and debate accuracy by dataset}}{38}{table.4}%
+\contentsline {table}{\numberline {5}{\ignorespaces Effective topology types, prevalence and accuracy}}{44}{table.5}%
+\contentsline {table}{\numberline {6}{\ignorespaces Summary of self-organisation motif findings}}{47}{table.6}%
+\contentsline {table}{\numberline {7}{\ignorespaces Accuracy by ground-truth presence per task}}{48}{table.7}%
+\contentsline {table}{\numberline {8}{\ignorespaces Design guidance mapped to results and to diagnostic measurements}}{56}{table.8}%
+\contentsline {table}{\numberline {9}{\ignorespaces Accuracy and efficiency by configuration}}{X}{table.9}%
+\contentsline {table}{\numberline {10}{\ignorespaces Self-reinforcement slope by structural subgroup}}{XII}{table.10}%
+\contentsline {table}{\numberline {11}{\ignorespaces Multistability label distribution by dataset}}{XII}{table.11}%
+\contentsline {table}{\numberline {12}{\ignorespaces Mean dominance by configuration}}{XIII}{table.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces Limit-cycle detection funnel}}{XIV}{table.13}%

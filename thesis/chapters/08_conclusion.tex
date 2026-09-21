@@ -1,69 +1,86 @@
 % ============================================================
-% CHAPTER 8: CONCLUSION
+% CHAPTER 9: CONCLUSION
 % Citations reuse verified entries in bibliography.bib only.
 % ============================================================
 
 This thesis asked whether the dynamical vocabulary of complex systems can be
 applied empirically to LLM-based multi-agent debate, and what such a treatment
-reveals that outcome metrics cannot. We built a controlled cooperative debate
-system, developed four literature-grounded motif detectors, and ran the full grid
-on two deliberately contrasting benchmarks, comprising 30{,}000 debates. We
-answer the three research questions in turn.
+reveals that outcome metrics cannot. To answer it we built a two phase debate
+protocol whose logs expose private beliefs and confidences alongside public
+messages, defined \suitename{} as four motif detectors each grounded in the
+complex systems or opinion dynamics literature and each tested against its own
+null model, and ran the full grid on two deliberately contrasting benchmarks
+across $30{,}000$ debates.
 
-\paragraph{RQ1: measurement.}
-The motifs are detectable, at very different prevalences, and each detector
-distinguishes genuine structure from a principled null. Self-reinforcement is
-\emph{universal}: positive confidence trends dominate in every configuration
-($p_{\mathrm{SR}} \in [0.73, 0.88]$, all cluster-bootstrap intervals excluding the
-$0.5$ baseline). Bistability is \emph{common and task-intrinsic}: most task--config
-cells show genuine multi-attractor coexistence ($N_{\mathrm{eff}} \geq 1.5$ in
-$76.3\,\%$), and this is a stable property of the task rather than the
-configuration. Dominance appears as \emph{behavioural influence concentration}
-above the topology-keyed null even in fully-connected debate. Limit cycles are
-\emph{rare but real}: $99\,\%$ of sequences converge, and the small residue that
-does not yields $47$ agent-level and $32$ system-level statistically flagged cases,
-of which $33$ and $7$ respectively are genuine period-2 oscillations on manual
-inspection, arising almost exclusively under the star
-topology through a hub-driven mechanism. The absence of genuine cycles in
-fully-connected debate is itself a clean result rather than a measurement failure.
+The first research question asked whether the motifs can be measured at all.
+\suitename{} detects them, at very different prevalences, and the differences are
+themselves informative. Self-reinforcement is universal, with a prevalence
+between $0.733$ and $0.881$ in every combination of dataset, topology, and memory
+window. Multistability is common and belongs to the question rather than to the
+configuration, since $76\,\%$ of the $600$ task and configuration cells admit more
+than one stable outcome and per-task values are consistent across configurations.
+Dominance emerges behaviourally even where the wiring is symmetric, concentrating
+above the topology-keyed null in all but one of the hundred task and benchmark
+combinations. Limit cycles are rare and real, since almost every sequence reaches
+a fixed point and the small residue yields $47$ agent level and $32$ system level
+flagged cases, most of them clean period two orbits on inspection. That they sit
+almost entirely in the star topology, and that the fully connected topology
+produces none, is a clean result about cooperative protocol design rather than a
+measurement failure.
 
-\paragraph{RQ2: characterisation.}
-The two structural axes shape the \emph{dynamics} but not the \emph{correctness}
-of debate. Topology is the dominant structural lever: the star is slower,
-concentrates influence roughly threefold, and is the sole source of genuine limit
-cycles, while the fully-connected topology produces stronger self-reinforcement and
-faster convergence. The memory window has only secondary effects on convergence
-speed and none on accuracy, and bistability is invariant to both axes.
-What governs outcomes is the \emph{composition of the opening votes}: motifs are
-informative as diagnostics of a dynamical process, not as guarantees of quality.
-Self-reinforcement is the convergence mechanism everywhere (task-level
-$\rho(\bar\beta,\text{rounds}) \in [-0.89, -0.73]$), yet it amplifies the initial
-vote distribution rather than selecting for the correct answer. Dominance is
-helpful when every agent sees every other but harmful when influence is forced
-through a single hub. Bistability marks the tasks where convergence is least
-reliable, and limit cycles mark pure efficiency failures. The motifs thus form an
-explanatory layer beneath accuracy, and are the basis for the tiered,
-empirically-grounded design principles of \autoref{sec:discussion:design}.
+The second research question asked what governs the motifs and what they predict.
+The two structural axes shape the dynamics and not the correctness of the debate.
+The star topology is slower on both benchmarks, concentrates influence by
+construction, and is the only source of genuine cycles, while the memory window
+affects convergence speed only and multistability is invariant to both. What
+governs the outcome instead is the composition of the opening votes.
+Self-reinforcement is the convergence mechanism everywhere, yet it strengthens
+whichever option leads at the outset rather than the correct one, so faster
+convergence is not more accurate convergence. Multistability decides how many
+outcomes are available to be selected and helps only where the single basin the
+group would otherwise fall into is the wrong one. Dominance helps when the debate
+elects its own hub, because an elected hub started correct far more often than a
+random agent, and hurts when the hub is prescribed by the wiring, because a fixed
+centre spreads the shared bias instead of correcting it. Limit cycles mark pure
+efficiency failures, since every one of them ran to the cap without producing a
+decision.
 
-\paragraph{RQ3: causation.}
-The outcome is largely determined before deliberation begins. Observationally,
-whether the ground-truth option is present in the opening votes is the strongest
-predictor of accuracy; causally, the seeded-initialisation experiment shows that
-placing one correct agent into an otherwise-wrong opening raises accuracy roughly
-thirteen-fold and in every task tested, while the system almost never manufactures
-a correct answer no agent initially held. The overarching finding, stated with its
-scope, is that \emph{within a homogeneous, cooperative, 4-agent debate on one
-model family across two benchmarks}, deliberation functions predominantly as a
-selective amplifier of its initial vote distribution rather than as a mechanism
-that reasons a new answer into existence.
+The third research question asked whether the opening votes are causally
+responsible for the outcome. They are. Observationally, whether the ground truth
+appears at all in the opening distribution is the strongest predictor of accuracy
+we measured. Causally, seeding one correct agent into an otherwise wrong opening
+raises accuracy from $1.8\,\%$ to $26.2\,\%$ and the effect holds in every task
+tested, while the system almost never recovers an answer no agent initially held.
+The same experiment shows the limits of the effect, since a correct supermajority
+that a plurality vote would preserve with certainty is talked out of the right
+answer in roughly one repetition in seven, and a single agent that never updates
+collapses accuracy from $63.7\,\%$ to $10.0\,\%$ even when outnumbered two to one
+by correct agents. Stated with its scope, the overarching finding is that within
+a homogeneous, cooperative, four agent debate on one model family across two
+benchmarks, deliberation works predominantly as a selective amplifier of its
+initial vote distribution rather than as a mechanism that reasons a new answer
+into existence.
 
+The three contributions therefore close on each other. The instrument made the
+characterisation possible, because motif prevalence is only meaningful against a
+null and attractor statistics are only visible under repeated runs of the same
+task. The characterisation made the causal test necessary, because three of the
+four motifs pointed back to the same opening distribution and only an
+intervention could separate that from task difficulty. The causal test in turn
+explains what the instrument was measuring all along, since each detector reads
+one face of a single amplification process. That is also why \suitename{}
+survives the deflationary result. If the debate mostly magnifies what it started
+with, then the quantities worth logging are no longer accuracy and confidence but
+the shape of the opening distribution and the concentration of influence that
+follows from it, and those are exactly the quantities these four detectors
+compute.
 
 Multi-agent debate is often presented as a way to make language models reason
-better together \citep{du2024improving, liang2024encouraging}.
-Our results suggest a more precise and more cautious picture: in the homogeneous
-cooperative setting we studied, the debate mostly amplifies what its members
-already believe.
-The \suitename{} suite operationalises this insight into four measurable detectors,
-each computable from ordinary interaction logs; its broader value is as groundwork
-for a diagnostic instrument that would let a practitioner check, before trusting
-the group's output, which dynamical regime the deliberation is actually in.
+better together \citep{du2024improving, liang2024encouraging}. Our results
+suggest a more precise and more cautious picture, in which the group mostly
+magnifies what its members already believe, so the interesting question is not
+whether the debate converged but on what it converged and from where.
+\suitename{} turns that question into four measurements computable from ordinary
+interaction logs, and its broader value is as groundwork for a diagnostic
+instrument that would let a practitioner check which dynamical regime a
+deliberation is in before trusting what it produces.

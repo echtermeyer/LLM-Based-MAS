@@ -1,2 +1,6 @@
-\contentsline {prompt}{\numberline {1}{\ignorespaces Shared agent persona (system prompt)}}{XIII}{prompt.1}%
-\contentsline {prompt}{\numberline {2}{\ignorespaces Per-step agent instructions by phase}}{XIV}{prompt.2}%
+\contentsline {prompt}{\numberline {1}{\ignorespaces Shared agent persona (system prompt)}}{VIII}{prompt.1}%
+\contentsline {prompt}{\numberline {2}{\ignorespaces Per-step agent instructions by phase}}{VIII}{prompt.2}%
+\contentsline {prompt}{\numberline {3}{\ignorespaces Devil's advocate persona (system prompt)}}{IX}{prompt.3}%
+\contentsline {prompt}{\numberline {4}{\ignorespaces Devil's advocate \textit {Update}{} instruction}}{IX}{prompt.4}%
+\contentsline {prompt}{\numberline {5}{\ignorespaces GPQA question context}}{IX}{prompt.5}%
+\contentsline {prompt}{\numberline {6}{\ignorespaces HiddenBench question context}}{X}{prompt.6}%

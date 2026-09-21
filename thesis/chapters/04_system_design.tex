@@ -332,7 +332,7 @@ votes, public messages, and arguments:
     &= \big\{\big(v_j^{t-k},\, \text{pub}_j^{t-k},\, \text{argument}_j^{t-k}\big)\big\}_{j \in \mathcal{N}(i),\ k=1..\min(t,\,W)}.
 \end{align}
 Peer entries are presented in randomised order at each call to mitigate position
-bias \citep{zheng2024selectors}, and round-$0$ entries omit the argument field, which does not exist yet. A larger memory window
+bias, and round-$0$ entries omit the argument field, which does not exist yet. A larger memory window
 $W$ exposes more history but also interacts with documented long-context
 degradation \citep{liu2024lostmiddle}, which is why we treat $W$ as an explicit
 perturbation axis rather than fixing it implicitly. $W = 1$ is the near-Markov
@@ -345,7 +345,7 @@ for the unanimous states, meaning that once consensus is reached, escape is rare
 We therefore stop a repetition as soon as $u$ consecutive rounds are
 unanimously agreed. The threshold $u$ trades efficiency against reliability: too
 small and a transient consensus may be cut short; too large and the savings
-shrink. Analysing pilot repetitions (see \autoref{fig:time_savings} in the appendix), we find that the
+shrink. Analysing pilot repetitions (the efficiency trade-off is detailed in Appendix~\ref{app:knobs}), we find that the
 harmful case, in which stopping would have prevented a later recovery to the
 correct answer, stays negligible while coverage remains high, and we set $u = 3$
 with a hard cap of $T = 15$. 
@@ -416,12 +416,12 @@ question-answering benchmark of 198 questions in biology, physics, and
 chemistry, written by domain experts and validated through a ``Google-proof''
 protocol that resists retrieval-based shortcuts. It satisfies all four criteria
 directly: four-option multiple choice ($M = 4$) provides the discrete decision
-variable; expert validation gives unambiguous ground truth; frontier models fall
-well below ceiling \citep{rein2024gpqa, becker2025orchestration}, leaving genuine
-headroom for debate; and agents genuinely disagree at round one
-\citep{becker2025orchestration}.
+variable; expert validation gives unambiguous ground truth; at release, frontier
+models were well below ceiling \citep{rein2024gpqa}, and while the most capable
+models have since reached $\sim$85\% \citep{becker2025orchestration}, mid-tier
+models remain well below, leaving genuine headroom for debate.
 GPQA-Diamond also has direct multi-agent precedent
-\citep{becker2025orchestration, kenton2024debate, he2025dimo, wang2025mars}. We
+\citep{becker2025orchestration, kenton2024debate, wang2025mars}. We
 adopt it as the \textbf{primary} dataset. 
 The main cavueat is that this benchmark has less cumulative MAD literature compared to MMLU or GSM8K, which is however mostly the case as its a moer recent benchmark and not because of a methodological pivot. 
 A second caveat concerns comparability of the accuracy numbers: published figures
@@ -474,7 +474,7 @@ are the canonical levers for network-motif analysis:
 \begin{itemize}
   \item \textbf{Memory window} $W \in \{1, 2, 5\}$, with $W = 1$ the near-Markov
         baseline. Memory content is an established driver of debate behaviour
-        \citep{du2024improving, li2024sparsetopology}.
+        \citep{du2024improving, mehdizadeh2026topologymemory, marandi2026protocols}.
   \item \textbf{Topology} $\in \{\textsc{fc}, \textsc{star}\}$. Fully-connected
         probes the symmetric baseline; the star probes hub-induced dominance,
         following evidence that centralised structures concentrate influence
@@ -498,8 +498,9 @@ axes:
         model to isolate topology and memory effects from capability-asymmetry
         effects of heterogeneous models \citep{wynn2025talk}.
   \item \textbf{Sampling} temperature $0.7$, reasoning disabled: diverse yet
-        focused outputs, avoiding the degenerate identical-sample case
-        \citep{zhu2026demystifying}.
+        focused outputs; for homogeneous agents stochasticity arises solely from
+        sampling \citep{zhu2026demystifying}, so a positive temperature is necessary
+        for any response diversity.
   \item \textbf{Framing} cooperative, with the full \arguephase{}/\updatephase{} structured
         output as the measurement instrument, and synchronous execution to
         remove agent-order confounds.
@@ -525,13 +526,13 @@ excluded.
 \toprule
 \textbf{Knob} & \textbf{Verdict} & \textbf{Value} & \textbf{Key references} \\
 \midrule
-Memory $W$ & scan & $\{1, 2, 5\}$ & \citep{du2024improving, li2024sparsetopology} \\
+Memory $W$ & scan & $\{1, 2, 5\}$ & \citep{du2024improving, mehdizadeh2026topologymemory, marandi2026protocols} \\
 Topology & scan & fc, star & \citep{li2024sparsetopology, chen2023consensus, liu2025problemsolving} \\
 Agents $N$ & fix & $4$ & \citep{du2024improving, li2026hiddenbench} \\
 Rounds $T$ & fix & $15$ (cap), $u=3$ & \citep{kaesberg2025voting, yang2025revisiting} \\
 Output structure & fix & full \arguephase{}/\updatephase{} & \citep{liang2024encouraging, he2025dimo} \\
 Framing & fix & cooperative & \citep{liang2024encouraging, du2024improving} \\
-Synchrony & fix & parallel-synchronous & \citep{du2024improving, liu2024groupdebate} \\
+Synchrony & fix & parallel-synchronous & \citep{du2024improving, chan2024chateval} \\
 Model & fix & \texttt{mistral-medium-instruct} & \citep{liu2025stopovervaluing, wynn2025talk} \\
 Temperature & fix & $0.7$, no reasoning & \citep{zhu2026demystifying} \\
 Information cond. & scan (dataset) & GPQA ($M{=}4$), HiddenBench ($M{\in}\{3,4\}$) & \citep{li2026hiddenbench, stasser1985pooling} \\
@@ -563,10 +564,10 @@ procedure, raw task difficulty is held roughly constant by construction: it is a
 The ``difficulty regime'' contrast that RQ2 refers to is therefore operationalised
 at the benchmark level, GPQA (a refinement regime, agents mostly start correct)
 versus HiddenBench (a correction regime, agents start systematically wrong).
-A further interpretive consequence concerns bistability. Because tasks are
+A further interpretive consequence concerns multistability. Because tasks are
 retained precisely because their final answer varies across repetitions under the
 screening configuration, the prevalence of coexisting attractors reported in
-\autoref{sec:results:bistability} is conditioned on this selection and should not
+\autoref{sec:results:multistability} is conditioned on this selection and should not
 be read as an estimate of motif frequency in an unselected task population; see
 \autoref{sec:discussion:limitations} for discussion.
 

@@ -21,9 +21,10 @@ final task performance, treating the deliberation itself as an opaque process
 that either does or does not yield a better answer. Recent critical
 reassessments show that this outcome-centric view is fragile: debate frequently
 fails to outperform single-model baselines, collapses under controlled comparison
-with simpler alternatives, and exhibits failure rates between 41\% and 86.7\%
-across seven frameworks \citep{liu2025stopovervaluing, zhang2025debateorvote,
-bertalanic2026costofconsensus, cemri2025mast}. More
+with simpler alternatives \citep{liu2025stopovervaluing, zhang2025debateorvote,
+bertalanic2026costofconsensus}; multi-agent LLM systems more broadly exhibit
+failure rates between 41\% and 86.7\% across seven frameworks
+\citep{cemri2025mast}. More
 troublingly, the failures that do occur are not random noise but exhibit
 structure. When two LLMs debate, both tend to grow \emph{more} confident that
 they have won as the exchange proceeds, with confidence escalating away from a
@@ -33,8 +34,7 @@ converge prematurely on the evidence they already share and fail to surface the
 private knowledge needed for the correct answer, so that collective accuracy
 collapses far below what a single agent achieves with complete information
 \citep{li2026hiddenbench}. Purely cooperative framings can further collapse the
-debate into a mutually agreeing echo chamber, a failure mode termed
-Degeneration-of-Thought \citep{liang2024encouraging}.
+debate into a mutually agreeing echo chamber.
 
 What these pathologies have in common is that they are \emph{dynamical}. Rising
 confidence, premature lock-in, and conformity cascades are properties of how
@@ -59,7 +59,7 @@ regimes have precise names and precise signatures: \emph{self-reinforcement},
 the positive feedback by which a state amplifies its own persistence
 \citep{arthur1989competing}; \emph{limit cycles}, self-sustained periodic
 oscillations that never settle \citep{strogatz2015nonlinear};
-\emph{bistability}, the coexistence of multiple stable outcomes selected by
+\emph{multistability}, the coexistence of multiple stable outcomes selected by
 initial conditions \citep{feudel2008complex}; and \emph{dominance}, the
 concentration of influence onto a single node \citep{degroot1974consensus,
 jia2015opinion}. Such patterns are studied as \emph{motifs}, recurring structural or
@@ -74,19 +74,19 @@ dominance motif. The connection has begun to be made.
 universally adopted social conventions in decentralised LLM populations, show
 that strong collective biases arise even when individual agents exhibit none,
 and find that committed adversarial minorities can impose alternative
-conventions on the majority. \citet{okawa2026biasedconsensus} derive a formal model predicting that once
-conformity pressure among agents exceeds a critical threshold, the group is
-pulled toward a shared bias regardless of what any individual agent believes.
-What these treatments share is a substrate in which no option is better than any
+conventions on the majority. \citet{okawa2026biasedconsensus} derives a formal model predicting that once
+conformity pressure among agents exceeds a critical threshold, even small
+individual biases are amplified into a shared collective bias.
+What these convention-based treatments share is a substrate in which no option is better than any
 other, so they can show that a group locks in but not whether it locks in on the
-right answer; \citet{mehdizadeh2026topologymemory} name the epistemic case, where
-some claims are better supported than others, as a critical open question.
+right answer; the epistemic case, where some claims are better supported than
+others, remains open.
 
 This thesis addresses that gap. We construct a controlled cooperative
 multi-agent debate system in which homogeneous LLM agents deliberate over
 multiple rounds on tasks with verifiable ground truth, and we develop a suite of
 detectors, each grounded in the complex-systems and opinion-dynamics literature,
-that identify self-reinforcement, limit cycles, bistability, and dominance in
+that identify self-reinforcement, limit cycles, multistability, and dominance in
 the resulting interaction logs. We run this system across a controlled grid of
 communication topologies and memory configurations on two complementary
 benchmarks: GPQA-Diamond \citep{rein2024gpqa}, a graduate-level science
@@ -107,9 +107,7 @@ configuration tends to produce correct answers but whether a given deliberation
 is proceeding soundly or pathologically, whether the group is genuinely
 correcting an error or confidently converging on a shared mistake, and whether it
 will terminate at all. Outcome metrics cannot answer these questions.
-Instruments are beginning to appear from other directions: online monitors
-based on conditional transfer entropy over execution traces
-\citep{caspian2026} and learned classifiers that predict from interpretable
+Instruments are beginning to appear from other directions: learned classifiers that predict from interpretable
 features whether a query warrants debate at all \citep{fan2026imad}. What does
 not yet exist is an instrument grounded in the dynamical vocabulary itself, one
 that names which regime a deliberation is in rather than only flagging that
@@ -138,7 +136,7 @@ questions, ordered by the class of evidence each requires.
 
 \begin{itemize}
   \item[\textbf{RQ1}] \textbf{Measurement.} Can self-organization motifs,
-        specifically self-reinforcement, limit cycles, bistability, and
+        specifically self-reinforcement, limit cycles, multistability, and
         dominance, be detected in cooperative LLM-based multi-agent debate using
         detectors grounded in the complex-systems and opinion-dynamics literature
         and each tested against a principled null model? And which of these motifs
@@ -172,7 +170,7 @@ This thesis makes three contributions, one for each research question.
         exposes exactly the quantities motif detection requires
         (\autoref{sec:exp}). On top of it we specify \suitename{}
         (Self-Organization Motif Analysis): detectors for self-reinforcement,
-        bistability, dominance, and limit cycles, each grounded in the
+        multistability, dominance, and limit cycles, each grounded in the
         complex-systems or opinion-dynamics literature and each tested against
         its own null model (\autoref{sec:method}). Every detector states what it
         can and cannot claim, distinguishing a measured signature from a
@@ -185,7 +183,7 @@ This thesis makes three contributions, one for each research question.
         contrasting benchmarks: a refinement regime in which agents mostly start
         correct, and a correction regime in which they start systematically
         wrong (\autoref{sec:results}). Self-reinforcement is universal and drives
-        convergence, bistability is common and is a stable property of the task
+        convergence, multistability is common and is a stable property of the task
         rather than of the configuration, dominance emerges behaviourally even
         under a symmetric topology, and genuine limit cycles are essentially
         absent outside the star, where they arise through a hub-driven

@@ -33,6 +33,7 @@ bindingoffset = 0mm]{geometry}
 \usepackage{ragged2e}
 \usepackage{xcolor}
 \usepackage[round, comma]{natbib}
+\usepackage{tabularx}
 \usepackage{fancyhdr}
 \newcommand{\changefont}{%
     \fontsize{8}{11}\selectfont
@@ -131,45 +132,42 @@ Supervised by \mysupervisor
 
 \begin{abstract}
 
-Multi-agent debate is promoted as a way to make language models reason better
-together, but it is evaluated almost entirely by final accuracy, which reveals
-nothing about how a group arrives at its answer or whether it is deliberating
-soundly. We study cooperative LLM debate as a dynamical system and define
-\suitename{} (Self-Organization Motif Analysis), a suite of detectors for four
-self-organization motifs, self-reinforcement, limit cycles,
-bistability, and dominance, each measured from interaction logs applied to 30{,}000 debates across two benchmarks. Their
-prevalence varies sharply: self-reinforcement is universal, bistability common,
-dominance behaviourally present, and genuine limit cycles rare and confined to one
-topology, an informative pattern in itself.
+Multi-agent debate, where several language model agents answer on their own and then
+argue and revise over several rounds, is widely promoted as a way to make models
+reason better together. It is judged almost entirely by outcome metrics, usually the
+accuracy of the final answer, which record where a deliberation ended but nothing
+about how it got there. The failures reported for debate are all about the how.
+Groups lock onto what they already share instead of pooling what individual agents
+privately know, and agents drop a correct answer rather than challenge a confident
+peer. Two debates can end on the same answer, one because the group weighed the
+arguments and one because it only amplified the position it began with, and an
+outcome metric scores both alike. Explaining what that score is tracking means
+measuring the trajectory, which is what the study of dynamical systems is for.
 
-Our central result is that the four motifs are faces of one mechanism: the debate
-predominantly amplifies the vote distribution it starts with rather than reasoning
-a new answer into existence. Self-reinforcement is universal and drives
-convergence, yet is blind to correctness, strengthening whichever option leads at
-the outset. A causal seeding experiment on GPQA confirms the amplifier reading:
-inserting a single correct agent into an otherwise-wrong opening raises accuracy
-from $1.8\,\%$ to $23.7\,\%$, while the system almost never recovers a correct answer that
-no agent initially held. The structural design choices we varied, communication topology and
-memory window, change convergence speed, worst-case runtime, and influence
-concentration, but not accuracy, which is largely fixed before deliberation begins.
-Within that envelope, analysing the emergent influence topology within FC runs
-reveals a complementary lever: effective star formation, where one agent
-concentrates the majority of conversions, is rare but achieves markedly
-above-average accuracy because the hub disproportionately started correct;
-maximally diverse initialisation raises the probability of this emergence from
-under $1\,\%$ to $23\,\%$.
-The internal signals a user might trust are misleading: confidence rises regardless
-of correctness, and early unanimity on biased tasks predicts wrong answers.
-A persistent adversarial agent exploits the same dynamics in reverse: a single
-devil's advocate reduces accuracy from $63.7\,\%$ to $10.0\,\%$ even when
-outnumbered two-to-one by correct agents, because the amplifier cannot distinguish
-high confidence from adversarial persistence.
+We treat cooperative LLM debate as such a system and define \suitename{}, four
+detectors that read recurring patterns from ordinary debate logs, each tested against
+a null model that destroys the pattern and leaves everything else intact. They track
+confidence reinforcing whatever position an agent already holds, several stable
+answers coexisting for the same question, influence concentrating on one agent, and
+deliberation that oscillates instead of settling. We run them over $30{,}000$ debates
+across a grid of communication topologies and memory windows, on GPQA-Diamond, where
+agents usually start with the correct answer somewhere in the group, and HiddenBench,
+where they start systematically wrong.
 
-Beyond detecting the motifs, we show that each detector, computed from ordinary
-logs, can serve as a diagnostic of deliberative health, and we distil the findings
-into design principles graded by evidential strength, as groundwork for a diagnostic
-suite. All claims are bounded to the tested setting, a homogeneous, cooperative,
-4-agent debate on one model family.
+The four patterns turn out to be faces of one mechanism, and together they explain
+what accuracy was tracking all along. Debate mostly amplifies the votes it starts
+with rather than reasoning a new answer into existence. A seeding experiment that
+fixes only the opening votes makes this causal, since adding one correct agent to an
+otherwise wrong opening lifts accuracy from $1.8\,\%$ to $26.2\,\%$, while the group
+almost never recovers an answer no agent initially held. Topology and memory window
+change how fast a debate settles and how much influence concentrates, but not how
+often it is right. What can be acted on is the opening composition, because diverse
+starting positions make it far more likely that the group elects an informed leader,
+and those runs are markedly more accurate.
+
+Every detector runs on logs a system already produces, so each doubles as a candidate
+health check on a live deliberation. All claims are bounded to the setting we tested,
+a homogeneous, cooperative, four-agent debate on one model family.
 
 \end{abstract}
 
@@ -217,10 +215,10 @@ suite. All claims are bounded to the tested setting, a homogeneous, cooperative,
 \input{chapters/07_dicussion}
 \newpage
 
-\section{Limitations and Future Work}
-\label{sec:limitations}
-\input{chapters/08_limitations}
-\newpage
+% \section{Limitations and Future Work}
+% \label{sec:limitations}
+% \input{chapters/08_limitations}
+% \newpage
 
 \section{Conclusion}
 \label{sec:conclusion}
