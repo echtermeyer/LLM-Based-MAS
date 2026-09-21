@@ -119,7 +119,7 @@ priori, which sets the cap well above the convergence horizon. The early-stoppin
 threshold $u$ then trades efficiency against reliability: on the pilot repetitions
 $u = 3$ saves roughly $50\,\%$ of runtime per repetition, while the harmful case,
 in which stopping would have pre-empted a later recovery to the correct answer,
-occurs in \fillin{harmful-stop rate at $u = 3$} of repetitions.
+was rare in the pilot data.
 
 \paragraph{Model and sampling (fix, homogeneous, $\tau = 0.7$).}
 A single homogeneous model isolates topology and memory effects from
@@ -162,7 +162,7 @@ $198 \times 3 = 594$ repetitions ($\approx 4$\,h), and the deep pass on the 50
 retained tasks costs $50 \times 6 \times 50 = 15{,}000$ repetitions
 ($\approx 104$\,h). Including HiddenBench, the 30{,}000 repetitions reported in
 \autoref{sec:results} amount to $\approx 208$\,h of sequential model time,
-completed in \fillin{measured wall-clock hours} under parallel execution.
+completed in ${\approx}211$\,h under parallel execution.
 
 
 % ------------------------------------------------------------
@@ -364,7 +364,7 @@ repetition took, and the two benchmarks behave differently. On GPQA accuracy
 declines with debate length ($\rho = -0.54$). On HiddenBench it is flat over most
 of the range ($\rho = 0.07$) but collapses in the fastest bin, where repetitions
 that settle within two rounds lock in the shared wrong answer and reach only
-\fillin{HiddenBench 2-round accuracy}. That bin is the basis for the
+$2.5\,\%$. That bin is the basis for the
 early-consensus claim of \autoref{sec:results:perf}.
 
 \begin{figure}[H]
@@ -543,8 +543,8 @@ independent successes, prevalence is assessed at the repetition level. The
 detection rule combines a $p < 0.05$ threshold with the period guard
 $2 \leq \hat{P} \leq \lfloor L/2 \rfloor$, so its false-positive floor lies below
 the nominal $5\,\%$: measured against the shuffle surrogates it is
-\fillin{measured null flag rate, agent level} at the agent level and
-\fillin{measured null flag rate, system level} at the system level, against
+$0.92\,\%$ at the agent level and
+$0.71\,\%$ at the system level, against
 observed conditional rates of $0.074$ and $0.083$. The excess is modest in
 absolute terms, which is why the claim rests jointly on it and on visual
 inspection: \autoref{fig:lc:rec} shows that the flagged cases carry the

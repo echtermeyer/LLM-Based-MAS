@@ -24,9 +24,6 @@
 %   sec:method:lc:agent
 %   sec:method:lc:system
 %
-% OPEN DECISION: see the TODO in 5.2 Detection about the cluster
-% bootstrap. It affects 5.2, 5.3, 5.4 and the Conclusion.
-%
 % Persuasiveness and message alignment are retained (commented out at
 % the end of this file) for later reference but are no longer part of
 % the methodology. Per-detector implementation notes and the list of
@@ -224,23 +221,9 @@ window amplifies the internal drive,
 whereas under a \emph{peer-conformity} reading a longer window mainly adds peer
 content, and the ordering may be absent or reversed. 
 
-% TODO (decision, affects 5.3, 5.4 and the Conclusion): Section 6 never reports a
-% cluster-bootstrap interval; the word "bootstrap" does not occur in the results
-% chapter at all. What 6.2 actually reports is the range of p_SR across the 12
-% cells, the count "all 50 tasks individually above 0.5 in every cell", and
-% task-level Spearman / point-biserial correlations. No interval on slope
-% differences across W is reported either. The Conclusion nonetheless claims
-% "all cluster-bootstrap intervals excluding the 0.5 baseline".
-% Either (a) add the per-cell bootstrap CIs to Section 6.2 and keep the sentence
-% below as written, or (b) replace it with the task-count and correlation
-% machinery that Section 6 actually uses, and fix the Conclusion to match.
 Both readings are reported per config-task and then summarised across tasks,
 for example ``above $0.5$ in $k$ of $50$ tasks'', so that an effect is shown to be
-broad rather than driven by one task. Uncertainty comes from a cluster bootstrap
-over repetitions, stratified by task \citep{efron1979bootstrap}, which resamples
-whole repetitions so that segments from the same repetition stay together. A
-signature is read as present when the resampled interval excludes its baseline,
-$0.5$ for prevalence and $0$ for slope differences across $W$.
+broad rather than driven by one task.
 
 \paragraph{Worked example.}
 In the running scenario, suppose agent~$0$ holds option~$A$ for five rounds with
