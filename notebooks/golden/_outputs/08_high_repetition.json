@@ -1,0 +1,48 @@
+{
+  "notebook": "08_high_repetition",
+  "section": "sec:results:evid",
+  "generated": "2026-09-21T17:42:50.856977",
+  "numbers": {
+    "tasks": {
+      "q84": {
+        "acc": 0.269,
+        "n_absent": 257,
+        "acc_absent": 0.0039,
+        "n_present": 743,
+        "acc_present": 0.361,
+        "n_plurality": 213,
+        "acc_plurality": 0.62,
+        "n_present_nonplur": 530,
+        "acc_present_nonplur": 0.257,
+        "chi2_absent_vs_present": 122.0,
+        "p_absent_vs_present": 2.525063657391027e-28
+      },
+      "q125": {
+        "acc": 0.273,
+        "n_absent": 293,
+        "acc_absent": 0.0307,
+        "n_present": 707,
+        "acc_present": 0.373,
+        "n_plurality": 250,
+        "acc_plurality": 0.552,
+        "n_present_nonplur": 457,
+        "acc_present_nonplur": 0.276,
+        "chi2_absent_vs_present": 121.0,
+        "p_absent_vs_present": 4.114550310711104e-28
+      },
+      "q144": {
+        "acc": 0.509,
+        "n_absent": 144,
+        "acc_absent": 0.0694,
+        "n_present": 856,
+        "acc_present": 0.583,
+        "n_plurality": 403,
+        "acc_plurality": 0.717,
+        "n_present_nonplur": 453,
+        "acc_present_nonplur": 0.464,
+        "chi2_absent_vs_present": 128.0,
+        "p_absent_vs_present": 1.1193568349603652e-29
+      }
+    }
+  }
+}

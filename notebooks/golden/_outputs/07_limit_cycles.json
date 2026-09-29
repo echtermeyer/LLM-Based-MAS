@@ -1,0 +1,30 @@
+{
+  "notebook": "07_limit_cycles",
+  "section": "sec:results:lc",
+  "generated": "2026-09-21T00:00:00",
+  "numbers": {
+    "n_agent_total": 120000,
+    "n_agent_fp": 119355,
+    "pct_agent_fp": 99.5,
+    "n_sys_total": 30000,
+    "n_sys_fp": 29609,
+    "pct_sys_fp": 98.7,
+    "n_agent_candidates": 633,
+    "n_sys_candidates": 388,
+    "n_agent_too_short": 12,
+    "n_sys_too_short": 3,
+    "n_agent_flagged": 47,
+    "n_sys_flagged": 32,
+    "p_lc_cond_agent": 0.0742,
+    "p_lc_cond_sys": 0.0825,
+    "fp_floor_agent": 0.0092,
+    "fp_floor_sys": 0.0071,
+    "fp_floor_agent_pct": 0.92,
+    "fp_floor_sys_pct": 0.71,
+    "n_genuine_p2_agent": 33,
+    "pct_genuine_p2_agent": 70.0,
+    "n_agent_flag_star": 45,
+    "n_agent_flag_hb": 34,
+    "n_sys_flag_star": 26
+  }
+}

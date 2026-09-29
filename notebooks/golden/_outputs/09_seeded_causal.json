@@ -1,0 +1,23 @@
+{
+  "notebook": "09_seeded_causal",
+  "section": "sec:results:evid",
+  "generated": "2026-09-21T15:53:29.521502",
+  "numbers": {
+    "seeded_k0_acc": 0.018,
+    "seeded_k1_acc": 0.262,
+    "seeded_k2_acc": 0.6368,
+    "seeded_k3_acc": 0.8632,
+    "seeded_n_tasks": 50,
+    "seeded_k0_to_k1_increase_n_tasks": 50,
+    "seeded_k1_to_k2_increase_n_tasks": 50,
+    "seeded_k2_to_k3_increase_n_tasks": 47,
+    "seeded_k2_plurality_baseline": 0.3824,
+    "mean_first_round_k1_winners": 1.34,
+    "da_k2_base_acc": 0.6368,
+    "da_acc": 0.1,
+    "da_drop_n_tasks": 50,
+    "da_unanimity": 0.872,
+    "seeded_k0_denovo_reps": 45,
+    "seeded_k0_denovo_tasks": 21
+  }
+}

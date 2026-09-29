@@ -1,0 +1,33 @@
+{
+  "notebook": "05_bistability",
+  "section": "sec:results:bistability",
+  "generated": "2026-09-21T00:00:00",
+  "numbers": {
+    "n_cells_total": 600,
+    "n_multistable": 249,
+    "n_stochastic": 209,
+    "n_monostable": 142,
+    "n_eff_gt15": 458,
+    "frac_eff_gt15": 0.7633,
+    "gpqa_n_monostable": 86,
+    "gpqa_n_multistable": 151,
+    "gpqa_n_stochastic": 63,
+    "hb_n_monostable": 56,
+    "hb_n_multistable": 98,
+    "hb_n_stochastic": 146,
+    "gpqa_neff_mean": 1.965,
+    "gpqa_v_mean": 0.451,
+    "hb_neff_mean": 2.061,
+    "hb_v_mean": 0.346,
+    "cfg_neff_min": 1.934,
+    "cfg_neff_max": 2.119,
+    "cfg_v_min": 0.327,
+    "cfg_v_max": 0.503,
+    "neff_acc_rho_gpqa_cell": -0.1516,
+    "neff_acc_rho_hb_cell": 0.435,
+    "neff_acc_rho_gpqa_task": -0.1568,
+    "neff_acc_rho_hb_task": 0.4374,
+    "neff_sr_rho_gpqa_task": -0.7447,
+    "neff_sr_rho_hb_task": -0.4354
+  }
+}

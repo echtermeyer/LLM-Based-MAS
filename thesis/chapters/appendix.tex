@@ -362,7 +362,7 @@ HiddenBench & fc / $W=1$ & $25.2\,\%$ & $5.18$ & $2.5\,\%$ & $4.27$ \\
 \autoref{fig:app:perf:rounds_acc} relates accuracy to the number of rounds a
 repetition took, and the two benchmarks behave differently. On GPQA accuracy
 declines with debate length ($\rho = -0.54$). On HiddenBench it is flat over most
-of the range ($\rho = 0.07$) but collapses in the fastest bin, where repetitions
+of the range ($\rho = 0.08$) but collapses in the fastest bin, where repetitions
 that settle within two rounds lock in the shared wrong answer and reach only
 $2.5\,\%$. That bin is the basis for the
 early-consensus claim of \autoref{sec:results:perf}.
@@ -386,9 +386,9 @@ early-consensus claim of \autoref{sec:results:perf}.
 
 Prevalence and slope are stable across configurations. Over $W \in \{1,2,5\}$,
 $p_{\mathrm{SR}}$ ranges from $0.763$ to $0.825$ on GPQA fully-connected, $0.733$
-to $0.809$ on GPQA star, $0.839$ to $0.881$ on HiddenBench fully-connected, and
-$0.804$ to $0.844$ on HiddenBench star, with mean segment slopes $\bar\beta$
-between $0.350$ and $0.515$ confidence points per round. No configuration
+to $0.809$ on GPQA star, $0.841$ to $0.883$ on HiddenBench fully-connected, and
+$0.806$ to $0.847$ on HiddenBench star, with mean segment slopes $\bar\beta$
+between $0.354$ and $0.515$ confidence points per round. No configuration
 approaches the no-feedback null of $0.5$.
 
 What the slope does respond to is structural, and \autoref{tab:sr:subgroups} gives
@@ -461,7 +461,7 @@ stochastic; HiddenBench is far more stochastic than GPQA, that is, its endpoints
 more often coexist without the opening votes selecting between them.
 
 Neither structural axis moves either metric. Across the twelve configurations mean
-$N_{\mathrm{eff}}$ spans only $1.95$ to $2.12$ and mean Cram\'er's $V$ only $0.34$
+$N_{\mathrm{eff}}$ spans only $1.93$ to $2.12$ and mean Cram\'er's $V$ only $0.33$
 to $0.50$, with no consistent gradient in $W$ or topology, which is the basis for
 reading multistability as a property of the question rather than of the
 configuration.
@@ -518,7 +518,7 @@ Dataset & Topology & $W=1$ & $W=2$ & $W=5$ & $\bar{z}$ & Flagged \\
 \midrule
 GPQA        & fc   & 0.154 & 0.154 & 0.155 & $+0.53$ & 7.7\,\% \\
 GPQA        & star & 0.601 & 0.601 & 0.610 & \multicolumn{2}{c}{---} \\
-HiddenBench & fc   & 0.157 & 0.178 & 0.179 & $+0.73$ & 10.9\,\% \\
+HiddenBench & fc   & 0.158 & 0.178 & 0.179 & $+0.73$ & 11.2\,\% \\
 HiddenBench & star & 0.540 & 0.574 & 0.578 & \multicolumn{2}{c}{---} \\
 \bottomrule
 \end{tabular}

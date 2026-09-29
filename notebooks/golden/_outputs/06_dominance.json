@@ -1,0 +1,32 @@
+{
+  "notebook": "06_dominance",
+  "section": "sec:results:dominance",
+  "generated": "2026-09-21T00:00:00",
+  "numbers": {
+    "n_tasks_gpqa_pos": 49,
+    "n_tasks_hb_pos": 50,
+    "n_tasks_total": 50,
+    "gpqa_fc_z_bar": 0.534,
+    "hb_fc_z_bar": 0.731,
+    "gpqa_fc_flagged_pct": 7.7,
+    "hb_fc_flagged_pct": 11.16,
+    "dacc_rho_gpqa_fc": -0.1483,
+    "dacc_rho_gpqa_star": 0.0784,
+    "dacc_rho_hb_fc": 0.5565,
+    "dacc_rho_hb_star": -0.2855,
+    "drounds_rho_gpqa_median": 0.6,
+    "drounds_rho_hb_median": 0.6571,
+    "gp_fc_w1_D": 0.154,
+    "gp_fc_w2_D": 0.154,
+    "gp_fc_w5_D": 0.155,
+    "gp_star_w1_D": 0.601,
+    "gp_star_w2_D": 0.601,
+    "gp_star_w5_D": 0.61,
+    "hi_fc_w1_D": 0.158,
+    "hi_fc_w2_D": 0.178,
+    "hi_fc_w5_D": 0.179,
+    "hi_star_w1_D": 0.54,
+    "hi_star_w2_D": 0.574,
+    "hi_star_w5_D": 0.578
+  }
+}

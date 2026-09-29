@@ -111,7 +111,7 @@ Ludwig-Maximilians-Universität München
 \vfill
 
 \large
-Munich, September 30\textsuperscript{th}, 2026
+Munich, October 4\textsuperscript{th}, 2026
       
 \vfill
 
@@ -132,44 +132,54 @@ Supervised by \mysupervisor
 
 \begin{abstract}
 
-Multi-agent debate, where several language model agents answer on their own and then
-argue and revise over several rounds, is widely promoted as a way to make models
-reason better together. It is judged almost entirely by outcome metrics, usually the
-accuracy of the final answer, which record where a deliberation ended but nothing
-about how it got there. The failures reported for debate are all about the how.
-Groups lock onto what they already share instead of pooling what individual agents
-privately know, and agents drop a correct answer rather than challenge a confident
-peer. Two debates can end on the same answer, one because the group weighed the
-arguments and one because it only amplified the position it began with, and an
-outcome metric scores both alike. Explaining what that score is tracking means
-measuring the trajectory, which is what the study of dynamical systems is for.
+A popular way to improve how language models reason is multi-agent debate, in which
+several agents discuss a problem over multiple rounds. As such systems move into real
+applications, it matters not only whether they reach good answers but also whether
+the way they reach them can be trusted. Recent studies raise doubts on both counts,
+showing that debate often does no better than a simple vote, as groups agree too
+early on what they already share and agents abandon correct answers to follow
+confident peers. These failures arise from how the discussion unfolds, yet debate is
+mostly judged by outcome measures such as final accuracy. Such measures cannot tell
+apart two debates that reach the same answer, one because the group corrected an
+early mistake and the other because it simply amplified the answer most of its agents
+started with. Studying the discussion itself calls for a theory of how interacting
+parts produce collective behaviour, which is exactly what complex systems theory
+offers. If debate behaves like other complex systems, its failures should leave
+recognisable patterns that explain why it goes wrong and could signal problems early.
+We connect this theory to multi-agent debate and introduce Self-Organization Motif
+Analysis (\suitename{}), a method that detects four such patterns in debates, from
+self-reinforcing positions to emerging leaders.
 
-We treat cooperative LLM debate as such a system and define \suitename{}, four
-detectors that read recurring patterns from ordinary debate logs, each tested against
-a null model that destroys the pattern and leaves everything else intact. They track
-confidence reinforcing whatever position an agent already holds, several stable
-answers coexisting for the same question, influence concentrating on one agent, and
-deliberation that oscillates instead of settling. We run them over $30{,}000$ debates
-across a grid of communication topologies and memory windows, on GPQA-Diamond, where
-agents usually start with the correct answer somewhere in the group, and HiddenBench,
-where they start systematically wrong.
-
-The four patterns turn out to be faces of one mechanism, and together they explain
-what accuracy was tracking all along. Debate mostly amplifies the votes it starts
-with rather than reasoning a new answer into existence. A seeding experiment that
-fixes only the opening votes makes this causal, since adding one correct agent to an
-otherwise wrong opening lifts accuracy from $1.8\,\%$ to $26.2\,\%$, while the group
-almost never recovers an answer no agent initially held. Topology and memory window
-change how fast a debate settles and how much influence concentrates, but not how
-often it is right. What can be acted on is the opening composition, because diverse
-starting positions make it far more likely that the group elects an informed leader,
-and those runs are markedly more accurate.
-
-Every detector runs on logs a system already produces, so each doubles as a candidate
-health check on a live deliberation. All claims are bounded to the setting we tested,
-a homogeneous, cooperative, four-agent debate on one model family.
+Applied to $30{,}000$ debates, these patterns reveal a single mechanism, as debate
+mostly amplifies the answers agents hold at the start rather than producing new ones.
+When we change only how many agents start with the correct answer, for instance, the
+group ends correctly more often with each additional correct agent, while it rarely
+reaches a correct answer that none of its agents started with. Diverse starting
+answers, in turn, make it more likely that the group follows an agent who was right
+from the beginning. Since \suitename{} largely works with information that many
+debate systems already record, the path to an answer becomes something practitioners
+can measure rather than merely assume. This thesis thus connects complex systems
+theory with multi-agent debate and turns the resulting insights into concrete design
+guidance. 
 
 \end{abstract}
+
+\newpage
+
+\section*{Acknowledgements}
+
+First of all, I would like to thank Ali Modarressi, who supervised this thesis at LMU
+Munich. He helped me turn my ideas into proper scientific work and taught me a lot
+about academic standards along the way. Working with Ali was a lot of fun, and I
+always enjoyed the friendly and relaxed atmosphere of our meetings. I would also like
+to thank Prof.\ Dr.\ Hinrich Schütze for making this thesis possible.
+
+Furthermore, I am very grateful to Julius Eckhardt and Christoph Kommer at SAP. They
+helped me find this topic, took the time to introduce me to complex systems theory and
+made sure I had the language models and computing resources my experiments needed.
+Many of the ideas in this thesis came up in our conversations, and their feedback on
+my drafts helped me a lot. I really enjoyed working with both of them and am grateful
+for their support throughout the project.
 
 \newpage
 \tableofcontents
@@ -317,7 +327,7 @@ I hereby confirm that I have written all parts of this work myself. The followin
 All AI outputs and suggestions were independently evaluated and selectively adopted after critical review.
 
 \vspace{0.8cm}
-München, 30.09.2026 \\
+München, 04.10.2026 \\
 
 \vspace{1cm}
 
