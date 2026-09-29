@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "--seed-dir",
     type=Path,
-    default=_REPO_ROOT / "data/seeds",
+    default=_REPO_ROOT / "dataset/seeds",
     help="Directory containing seed JSON files",
 )
 parser.add_argument(

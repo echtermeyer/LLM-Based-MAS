@@ -5,6 +5,8 @@ scripts/*
 !scripts/golden/
 !scripts/plot_bg_double_well.py
 !scripts/plot_bg_motifs.py
+!scripts/run_gpqa_full_sim.sh
+!scripts/run_subset_scans_nothink.sh
 results/*
 !results/mas/
 results/mas/*
