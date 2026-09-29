@@ -92,3 +92,9 @@ source data was intentionally not committed, so those specific values do not rec
 clone. See [`notebooks/golden/INDEX.md`](notebooks/golden/INDEX.md) for the full section →
 notebook → status map and [`thesis/STATISTICAL_REVIEW_LEDGER.md`](thesis/STATISTICAL_REVIEW_LEDGER.md)
 for the claim-by-claim statistical audit.
+
+## Acknowledgements
+
+This work was carried out with the support of **Julius Eckhardt** and **Christoph Kommer**
+at SAP, who helped shape the topic, introduced me to complex systems theory, and provided the
+language models and computing resources the experiments required.
