@@ -1,6 +1,6 @@
 # Self-Organization Patterns in LLM-based Multi-Agent Systems
 
-Master's thesis of **Eric Echtermeyer** (supervised by Prof. Dr. Hinrich Schütze, Ali Modarressi), carried out with the support of Julius Eckhardt and Christoph Kommer at SAP.
+Master's thesis of Eric Echtermeyer. Huge thanks to Julius Eckhardt and Christoph Kommer at SAP for supporting me throughout this work — thank you both very much.
 
 📄 **[Read the thesis (PDF)](thesis/thesis.pdf)**
 
