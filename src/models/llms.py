@@ -9,12 +9,14 @@ from langchain_core.language_models import BaseChatModel
 load_dotenv()
 
 _creds_path = Path(__file__).parents[2] / "gen_ai_credential.json"
-_creds = json.loads(_creds_path.read_text())
+# Credentials are only needed to call models; analysis-only imports work without them.
+if _creds_path.exists():
+    _creds = json.loads(_creds_path.read_text())
 
-os.environ["AICORE_AUTH_URL"] = _creds["url"]
-os.environ["AICORE_CLIENT_ID"] = _creds["clientid"]
-os.environ["AICORE_CLIENT_SECRET"] = _creds["clientsecret"]
-os.environ["AICORE_BASE_URL"] = _creds["serviceurls"]["AI_API_URL"]
+    os.environ["AICORE_AUTH_URL"] = _creds["url"]
+    os.environ["AICORE_CLIENT_ID"] = _creds["clientid"]
+    os.environ["AICORE_CLIENT_SECRET"] = _creds["clientsecret"]
+    os.environ["AICORE_BASE_URL"] = _creds["serviceurls"]["AI_API_URL"]
 
 from gen_ai_hub.proxy.langchain.init_models import init_llm
 from gen_ai_hub.proxy.langchain.amazon import (
