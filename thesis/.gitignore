@@ -9,3 +9,4 @@
 *.toc
 *.pdf
 !thesis.pdf
+!plots/**/*.pdf

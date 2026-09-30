@@ -1,6 +1,5 @@
 gen_ai_credential.json
 gen_ai_credential_agai.json
-plots/
 scripts/*
 !scripts/golden/
 !scripts/plot_bg_double_well.py
