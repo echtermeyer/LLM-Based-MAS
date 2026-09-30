@@ -238,10 +238,12 @@ unresolved
   & Rounds, cap rate, dominance $D$
   & Compare cost and worst case across topologies rather than accuracy \\
 \addlinespace
-Monitor agents that never update their vote
-  & Single probe, the adversarial arm (\autoref{sec:results:evid})
+Treat an outcome that follows a single agent that never updates its vote as
+that agent's answer
+  & Single probe, the adversarial arm (\autoref{sec:results:evid}), and the
+    effective topology analysis
   & Vote entropy per agent across rounds
-  & Flag near zero vote entropy and discount the agent's influence \\
+  & Flag near zero vote entropy and verify that agent's answer externally \\
 \bottomrule
 \end{tabular}
 \caption[Design guidance mapped to results and to diagnostic
@@ -251,6 +253,96 @@ Monitor agents that never update their vote
          is not built here, this is the set of instruments it would use.}
 \label{tab:design:instruments}
 \end{table}
+
+\autoref{fig:design:flow} orders the same guidance by when a practitioner
+encounters it. Panel (a) collects the choices made while building the system:
+investing in the opening votes, choosing topology and memory by cost and worst
+case, and using the group to select among candidate answers rather than to
+generate new ones. Panel (b) turns the remaining observables into checks on the
+log of a single debate. A run that reaches the round cap without converging is
+unresolved, a final answer that no agent held at $t=0$ lies outside the
+amplifier's normal behaviour, and an outcome that follows a single agent that
+never changed its vote is only as reliable as that agent. A debate that passes
+all three checks is accepted only provisionally, because neither its
+confidence, its unanimity, nor its length indicates whether it is correct. Like
+the table, the figure states hypotheses grounded in our results rather than a
+validated procedure.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      font=\fontsize{8.5}{10}\selectfont,
+      >={Stealth[length=2mm]},
+      execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
+      design/.style={draw=black!60, rounded corners=2pt, fill=black!4,
+                     text width=38mm, minimum height=15mm, align=center, inner sep=3pt},
+      check/.style={diamond, aspect=2.5, draw=blue!60!black, fill=blue!10, thick,
+                    text width=31mm, align=center, inner sep=2.5pt},
+      flag/.style={draw=orange!80!black, fill=orange!12, rounded corners=2pt,
+                   text width=40mm, minimum height=11mm, align=center, inner sep=3pt},
+      accept/.style={draw=green!45!black, fill=green!10, rounded corners=2pt,
+                     text width=62mm, minimum height=11mm, align=center, inner sep=3pt},
+      start/.style={draw=black!70, fill=black!10, rounded corners=6pt,
+                    text width=34mm, minimum height=8mm, align=center},
+      flow/.style={->, draw=black!70, thick},
+      lab/.style={font=\fontsize{7.5}{9}\selectfont\itshape, text=black!65},
+      panel/.style={font=\fontsize{9.5}{11}\selectfont, anchor=west, inner sep=0pt},
+    ]
+
+    % ------------------------------------------------------------------
+    % (a) Design time
+    % ------------------------------------------------------------------
+    \node[panel] at (0, 1.25) {\textbf{(a)} Designing the system};
+
+    \node[design] (d1) at (2.05,0)
+      {\textbf{Opening votes}\\[2pt]\fontsize{7.5}{9}\selectfont invest in how agents produce them; seed distinct opening positions};
+    \node[design, right=7mm of d1] (d2)
+      {\textbf{Deliberation}\\[2pt]\fontsize{7.5}{9}\selectfont choose topology and memory by cost and worst case};
+    \node[design, right=7mm of d2] (d3)
+      {\textbf{Final answer}\\[2pt]\fontsize{7.5}{9}\selectfont use the group as a filter over candidates, not as a source of new ones};
+    \draw[flow] (d1) -- (d2);
+    \draw[flow] (d2) -- (d3);
+
+    % ------------------------------------------------------------------
+    % (b) Run-time audit of one debate
+    % ------------------------------------------------------------------
+    \node[panel] at (0, -1.85) {\textbf{(b)} Auditing one debate from its log};
+
+    \node[start] (log) at (4.2,-2.6) {interaction log of one repetition};
+
+    \node[check, below=5mm of log] (c1) {Did the run hit the round cap without converging?};
+    \node[flag, anchor=west] (f1) at ($(c1.east)+(10mm,0)$)
+      {\textbf{Unresolved}: report no answer, not the tie-broken plurality};
+
+    \node[check, below=5mm of c1] (c2) {Was the final answer absent from all votes at $t = 0$?};
+    \node[flag, anchor=west] (f2) at ($(c1.east |- c2)+(10mm,0)$)
+      {\textbf{De novo answer}: outside the system's normal behaviour; verify externally};
+
+    \node[check, below=5mm of c2] (c3) {Did the outcome follow one agent that never changed its vote?};
+    \node[flag, anchor=west] (f3) at ($(c1.east |- c3)+(10mm,0)$)
+      {\textbf{Single-agent outcome}: only as reliable as that agent; verify its answer externally};
+
+    \node[accept, below=6mm of c3] (ok)
+      {\textbf{Accept provisionally.} Do not raise trust because the group is
+       confident, unanimous, or debated for long; verify externally when stakes are high};
+
+    \draw[flow] (log) -- (c1);
+    \draw[flow] (c1) -- node[lab, above]{yes} (f1);
+    \draw[flow] (c1) -- node[lab, right]{no} (c2);
+    \draw[flow] (c2.east) -- node[lab, above]{yes} (f2);
+    \draw[flow] (c2) -- node[lab, right]{no} (c3);
+    \draw[flow] (c3.east) -- node[lab, above]{yes} (f3);
+    \draw[flow] (c3) -- node[lab, right]{no} (ok);
+    \draw[flow] (f3.south) |- (ok.east);
+  \end{tikzpicture}
+  \caption[Design guidance as a decision procedure]{The design guidance of
+    \autoref{tab:design:instruments} ordered into a decision procedure.
+    \textbf{(a)} Choices made when building the system, from the opening votes
+    to the final answer. \textbf{(b)} Checks applied to the log of a single
+    debate before its answer is used. The procedure holds within the tested
+    setting (one model, four agents, two benchmarks).}
+  \label{fig:design:flow}
+\end{figure}
 
 \subsection{Limitations and Future Work}
 \label{sec:discussion:limitations}

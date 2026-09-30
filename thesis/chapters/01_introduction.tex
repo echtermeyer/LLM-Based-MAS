@@ -161,61 +161,36 @@ One commitment underpins these questions. Every detector is tested against a nul
 \subsection{Contributions \& Structure}
 \label{sec:intro:contributions}
 
-This thesis makes three contributions, one for each research question.
+Rather than judging debate by its final answer, this thesis measures how the
+debate reaches it. To this end, it makes three contributions.
 
 \begin{itemize}
-  \item \textbf{An instrument for measuring debate dynamics.} We define a
-        two-phase synchronous debate protocol that separates public messages
-        from private beliefs and confidences, so that the interaction log
-        exposes exactly the quantities motif detection requires
-        (\autoref{sec:exp}). On top of it we specify \suitename{}
-        (Self-Organization Motif Analysis): detectors for self-reinforcement,
-        multistability, dominance, and limit cycles, each grounded in the
-        complex-systems or opinion-dynamics literature and each tested against
-        its own null model (\autoref{sec:method}). Every detector states what it
-        can and cannot claim, distinguishing a measured signature from a
-        certified attractor. Running $R = 50$ repetitions of every task--config
-        cell is what makes across-repetition attractor statistics measurable at
-        all.
+  \item \textbf{\suitename{}, an instrument for measuring debate dynamics.}
+        A two-phase debate protocol that logs private beliefs and confidences
+        separately from public messages (\autoref{sec:exp}), together with four
+        motif detectors, each grounded in the complex-systems or
+        opinion-dynamics literature and tested against its own null model
+        (\autoref{sec:method}).
 
-  \item \textbf{An empirical characterisation at scale.} We apply \suitename{}
-        to 30{,}000 debates across twelve configurations and two deliberately
-        contrasting benchmarks: a refinement regime in which agents mostly start
-        correct, and a correction regime in which they start systematically
-        wrong (\autoref{sec:results}). Self-reinforcement is universal and drives
-        convergence, multistability is common and is a stable property of the task
-        rather than of the configuration, dominance emerges behaviourally even
-        under a symmetric topology, and genuine limit cycles are essentially
-        absent outside the star, where they arise through a hub-driven
-        mechanism. Reading the emergent influence graph within fully-connected
-        runs reveals a lever the structural topology parameter cannot reach: a
-        rare effective star, formed preferentially from diverse opening
-        positions, is markedly more accurate than the fully-connected mean.
-        Throughout, the structural axes we varied move the dynamics but not the
-        accuracy.
+  \item \textbf{A repeated-run characterisation at scale.} 30{,}000 debates
+        across twelve configurations and two deliberately contrasting
+        benchmarks, with $R = 50$ repetitions per task and configuration, which
+        makes across-repetition attractor statistics measurable in the first
+        place (\autoref{sec:results}).
 
-    \item \textbf{A causal test of the initial-condition effect.} A
-        seeded-initialisation experiment manipulates only the composition of the
-        opening votes, leaving the debate itself unchanged. Inserting a single
-        correct agent into an otherwise-incorrect opening raises accuracy from
-        $1.8\,\%$ to $26.2\,\%$, and does so in all 50 tasks tested. In the
-        unseeded arm, where no agent starts correct, the system arrives at the
-        correct answer in under $2\,\%$ of repetitions, and its ability to do so
-        declines as tasks get harder. A devil's advocate probe confirms the
-        complementary vulnerability under a controlled composition: a single
-        agent that never updates its position outweighs two agents that start
-        correct, collapsing accuracy from $63.7\,\%$ to $10.0\,\%$. Together
-        these upgrade the central claim from association to intervention: within
-        the setting we tested, deliberation functions predominantly as a
-        selective amplifier of its opening vote distribution
-        (\autoref{sec:results}).
+  \item \textbf{A controlled intervention on the opening votes.} A
+        seeded-initialisation experiment and an adversarial probe that
+        manipulate only the composition of the opening votes while leaving the
+        debate itself unchanged (\autoref{sec:results}).
 \end{itemize}
 
-\noindent From these results we derive design guidance graded by how strongly our
-data support each claim, and show that every \suitename{} detector, computed from
-ordinary interaction logs, is a candidate observable for monitoring deliberative
-health (\autoref{sec:discussion}). We deliver the measurements and the mapping
-from principle to observable, not a packaged tool.
+\noindent Read together, the four motifs describe a single mechanism: a debate
+with positive feedback but no negative feedback, which acts as a selective but
+lossy amplifier of its opening votes. It strengthens what the agents already
+hold, rarely produces an answer none of them started with, and can erode a
+correct majority. From this we derive evidence-graded design guidance, mapping
+each recommendation to an observable that can be computed from ordinary
+interaction logs (\autoref{sec:discussion}).
 
 \paragraph{Structure of this thesis.}
 The thesis follows the arc of the three research questions. \emph{Background}
@@ -231,8 +206,8 @@ null model each is tested against. \emph{Results} (\autoref{sec:results}) applie
 the instrument, reporting accuracy and efficiency, the four motifs in turn, the
 emergent influence topology, and the seeded-initialisation experiment.
 \emph{Discussion} (\autoref{sec:discussion}) reads the motifs together as one
-amplifier mechanism and distils the findings into evidence-graded design
-principles. \emph{Limitations and Future Work} (\autoref{sec:limitations}) states
+amplifier mechanism, traces it to the absence of negative feedback, and distils
+the findings into evidence-graded design principles. \emph{Limitations and Future Work} (\autoref{sec:limitations}) states
 the scope of the claims and the agenda they imply, and
 \emph{Conclusion} (\autoref{sec:conclusion}) returns to the three research
 questions.

@@ -82,8 +82,11 @@ consensus on both benchmarks, and especially on HiddenBench, with $p < 0.001$ in
 both cases. The reason is that every spoke must route its messages through a single
 hub. The star partly compensates by sending half as many messages per round, so each
 round costs fewer tokens. Under the star topology, a larger memory window also speeds
-up convergence on HiddenBench. Exact values for all configurations are given in
-Appendix~\ref{app:perf:configs}.
+up convergence on HiddenBench. Exact values for all configurations, each with the
+standard error of its accuracy across the 50 tasks, are given in
+Appendix~\ref{app:perf:configs}. This standard error stays below $0.05$ in every
+configuration, so accuracy is reported as a point estimate without a dispersion
+term elsewhere in this thesis.
 
 
 % -----------------------------------------------------------------------------
