@@ -5,7 +5,7 @@
 \usepackage{alltt}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{acronym}
+\usepackage[nohyperlinks]{acronym}
 \usepackage{multirow} 
 \usepackage{float}
 \usepackage{booktabs}
@@ -183,6 +183,24 @@ for their support throughout the project.
 
 \newpage
 \tableofcontents
+
+\newpage
+\phantomsection
+\section*{List of Abbreviations}
+\addcontentsline{toc}{section}{List of Abbreviations}
+\begin{acronym}[RLHF]
+  \acro{AI}{artificial intelligence}
+  \acro{API}{application programming interface}
+  \acro{CI}{confidence interval}
+  \acro{LLM}{large language model}
+  \acro{MAD}{multi-agent debate}
+  \acro{MAS}{multi-agent system}
+  \acrodefplural{MAS}[MAS]{multi-agent systems}
+  \acro{OLS}{ordinary least squares}
+  \acro{RLHF}{reinforcement learning from human feedback}
+  \acro{RQA}{recurrence quantification analysis}
+  \acro{SOMA}[SOMA]{Self-Organization Motif Analysis}
+\end{acronym}
 
 \newpage
 

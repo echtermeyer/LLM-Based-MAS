@@ -41,7 +41,7 @@ $D$ of which $A$ is correct, and they write an agent's state as its option with 
 confidence as a subscript, so that $D_8$ is a vote for $D$ with a confidence score of $8$.
 
 The motifs those subsections detect are preselected rather than exhaustively
-enumerated and each is motivated by a documented failure mode of LLM-based debate.
+enumerated and each is motivated by a documented failure mode of \ac{LLM}-based debate.
 \autoref{tab:method:motifs} lists them together with their classification and the
 section in which each detector is defined. Further motifs that fit the same
 framework but fall outside this study are shown in
@@ -116,7 +116,7 @@ this is positive autoregulation, a node that augments its own production
 expressed \emph{confidence}. Self-reinforcement is then the tendency of an agent
 to push its own confidence upward while it holds a position, driven by
 accumulating commitment rather than by new incoming information. The
-pattern is already documented as in multi-turn LLM debate, confidence tends to rise
+pattern is already documented as in multi-turn \ac{LLM} debate, confidence tends to rise
 across rounds even where no new information justifies
 the rise \citep{prasad2025certain}.
 
@@ -139,8 +139,7 @@ least-squares fit to average over. An agent that flips can contribute several
 segments, and one that locks in early contributes a single long one. Agents are
 exchangeable, so we pool segments within a config and never match them across
 repetitions.
-Within each kept segment we fit the confidence on the round index by ordinary
-least squares,
+Within each kept segment we fit the confidence on the round index by \ac{OLS},
 \begin{equation}
   c_i^t = \beta_0 + \beta_{\mathrm{seg}}\, t + \varepsilon_t,
   \qquad t \in \{t_s, \ldots, t_e\},
@@ -500,8 +499,7 @@ which has period~2. We drop converged sequences whole instead of trimming them,
 since a trailing constant run cannot be separated into cycle-internal repeats and
 genuine convergence.
 
-We quantify periodicity in the remaining candidates with categorical recurrence
-quantification analysis \citep{cocodale2014crqa}. For sequence positions $a, b$ the
+We quantify periodicity in the remaining candidates with categorical \ac{RQA} \citep{cocodale2014crqa}. For sequence positions $a, b$ the
 recurrence matrix \citep{eckmann1987recurrence} records where the sequence revisits a symbol,
 \begin{equation}
   R(a,b) = \mathbb{1}[\,x_a = x_b\,], \qquad a \neq b,

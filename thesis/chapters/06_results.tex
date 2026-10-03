@@ -141,7 +141,7 @@ $133{,}696$ segments. Three findings follow.
   \caption[Self-reinforcement slope versus rounds to consensus]{Mean segment slope
            $\bar\beta$ against mean rounds to consensus at the task level. Each panel
            is one combination of dataset and topology, each point is one task, and
-           colours denote the memory window. The dashed line is the pooled OLS fit.}
+           colours denote the memory window. The dashed line is the pooled \ac{OLS} fit.}
   \label{fig:sr:efficiency}
 \end{figure}
 
@@ -182,7 +182,7 @@ settle on a unanimous endpoint are included. Three findings follow.
         Multiple absorbing states are theoretically expected here. Naming-game
         dynamics admit one equilibrium per available answer option
         \citep{baronchelli2018consensus, ashery2025conventions}, so a four-option
-        task can in principle land on any of four attractors. Prior LLM debate
+        task can in principle land on any of four attractors. Prior \ac{LLM} debate
         studies do not report which end state each run reaches
         \citep{cau2026agreementdrift, mehdizadeh2026topologymemory}. Our repeated-runs design makes the full
         attractor landscape visible.
@@ -333,7 +333,7 @@ specified, and the group's answer follows whichever agent wins that election. Ac
 is high when the elected hub started correct, and it suffers when a fixed hub
 entrenches a shared error. This is the structural counterpart to the causal test in
 \autoref{sec:results:evid}, which shows the same dependence on the opening votes by
-direct manipulation. It also mirrors reports that LLM agents form hub-like structure through preferential-attachment links
+direct manipulation. It also mirrors reports that \ac{LLM} agents form hub-like structure through preferential-attachment links
 \citep{mehdizadeh2025homophily} and that locally clustered agents coordinate better than high-betweenness bridges
 \citep{mehdizadeh2026topologymemory}. Per-cell concentration values across all
 configurations are in Appendix~\ref{app:dom:supp}.
@@ -346,7 +346,7 @@ configurations are in Appendix~\ref{app:dom:supp}.
 Limit cycles are the rarest motif in this system, and the only one that is a failure
 rather than a variant of convergence. A limit cycle is a debate that never settles and
 oscillates between vote configurations instead of reaching a fixed point. We detect
-them with categorical recurrence quantification. A sequence is flagged when its
+them with categorical \ac{RQA}. A sequence is flagged when its
 determinism exceeds a shuffle-null floor and its dominant period lies in a genuine
 oscillatory band with $2 \leq \hat{P} \leq \lfloor L/2 \rfloor$. The full construction
 is given in \autoref{sec:method:lc}. The cooperative design suppresses oscillation
@@ -382,7 +382,7 @@ $98.7\,\%$ do. These converged sequences never enter the test. Three findings fo
         inversion loop cannot form. In practice, repetitions that reach the cap
         should therefore be flagged as unresolved rather than reported as a
         decision. Failure to recognise termination conditions is a catalogued failure
-        mode of deployed multi-agent systems \citep{cemri2025mast}, and our result
+        mode of deployed \acp{MAS} \citep{cemri2025mast}, and our result
         names a specific dynamical route to it.
 \end{enumerate}
 
@@ -491,7 +491,7 @@ strongest predictor of final accuracy, consistently across all three tasks, as
            vote distribution at $t=0$. Left bars show repetitions in which at least
            one agent voted correctly before debate, and right bars show repetitions
            in which no agent did. The dashed line marks the mean per-agent accuracy
-           at $t=0$. Error bars are Wilson 95\,\% confidence intervals
+           at $t=0$. Error bars are Wilson 95\,\% \acp{CI}
            \citep{wilson1927ci}. The data cover three GPQA tasks with $R=1{,}000$
            each, $W=2$, and the fully-connected topology.}
   \label{fig:highrep:init_votes_split}
@@ -502,7 +502,7 @@ strongest predictor of final accuracy, consistently across all three tasks, as
 \small
 \begin{tabular}{lcccc}
 \toprule
-Task & Overall & GT absent & GT present & GT is plurality \\
+Task & Overall & Ground truth absent & Ground truth present & Ground truth is plurality \\
      & acc.    & (acc., $n$) & (acc., $n$) & (acc., $n$) \\
 \midrule
 q84  & 0.269 & 0.004~(257) & 0.361~(743) & 0.620~(213) \\
@@ -511,9 +511,9 @@ q144 & 0.509 & 0.069~(144) & 0.583~(856) & 0.717~(403) \\
 \bottomrule
 \end{tabular}
 \caption[Accuracy by ground-truth presence per task]{Accuracy by ground-truth presence
-         in the initial vote distribution, with $R=1{,}000$ per task. GT absent and
-         GT present indicate whether the correct option appears in the vote profile
-         at $t=0$. GT is plurality is the subset of present repetitions in which the
+         in the initial vote distribution, with $R=1{,}000$ per task. Ground truth absent and
+         ground truth present indicate whether the correct option appears in the vote profile
+         at $t=0$. Ground truth is plurality is the subset of present repetitions in which the
          correct option holds the initial plurality.}
 \label{tab:highrep:init_votes}
 \end{table}
@@ -598,8 +598,7 @@ Three findings follow.
 
   \item \textbf{Outcomes are all-or-nothing and decided early.} Every repetition in
         every condition ends fully unanimous. The correct seeds either convert the
-        whole group or capitulate entirely, and no repetition ends with the ground
-        truth as a surviving minority. When the correct side wins, it wins fast and
+        whole group or capitulate entirely, and no repetition ends with the ground truth as a surviving minority. When the correct side wins, it wins fast and
         reaches a plurality within the first one to two rounds, with a mean first
         round of $1.3$. Persuasion is front-loaded. The opening exchange, not
         protracted deliberation, decides the outcome.
@@ -622,13 +621,13 @@ win now works for the adversary, so the group follows the most persistent voice
 rather than the most correct one. This matches the tipping-point dynamics that
 \citet{centola2018tipping} report for human conventions, where a committed minority of
 about $25\,\%$ is enough to overturn the majority. Our adversary is exactly such a
-committed minority of one in four agents. Similar effects have been reported for LLMs.
-\citet{agarwal2025cwpor} show that a forcefully argued falsehood can override a truthful answer in an LLM judge's decision, and \citet{yao2025sycophancy} describe how agents give in to
+committed minority of one in four agents. Similar effects have been reported for \acp{LLM}.
+\citet{agarwal2025cwpor} show that a forcefully argued falsehood can override a truthful answer in an \ac{LLM} judge's decision, and \citet{yao2025sycophancy} describe how agents give in to
 each other too early, a problem that prompt-based fixes now try to address
 \citep{pitre2025consensagent}.
 
 Taken together, the three experiments upgrade the amplifier reading from correlation
-to intervention. The multi-agent system is a \emph{lossy amplifier of its initial vote
+to intervention. The \ac{MAS} is a \emph{lossy amplifier of its initial vote
 distribution}. It reliably strengthens whatever the opening votes favour, more so as
 that signal grows, yet it neither manufactures a correct answer that no agent held
 nor protects a correct one that a persistent dissenter attacks. The composition of

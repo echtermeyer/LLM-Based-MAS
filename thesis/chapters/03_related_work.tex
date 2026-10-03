@@ -1,6 +1,6 @@
 This chapter gives an overview of related literature of this thesis. It begins 
 with \autoref{sec:related:mad} and \autoref{sec:related:dynamics} that survey what
-multi-agent debate does and how the interaction dynamics inside it have been
+\ac{MAD} does and how the interaction dynamics inside it have been
 studied. \autoref{sec:related:lenses} continues by weighing the available ways of analysing such
 systems against one another and \autoref{sec:related:gap} finishes by 
 stating the research gap this thesis addresses.
@@ -8,7 +8,7 @@ stating the research gap this thesis addresses.
 \subsection{Multi-Agent Debate: Design and Critique}
 \label{sec:related:mad}
 
-The multi-agent debate (MAD) paradigm was introduced by
+The \ac{MAD} paradigm was introduced by
 \citet{du2024improving}, who let several instances of a language model
 independently propose answers and then critique and revise them over multiple
 rounds before committing to a collective response. This ``society of minds'' setup
@@ -37,10 +37,10 @@ favouring reasoning tasks and consensus favouring knowledge tasks, and adding
 agents helping where adding rounds can hurt \citep{kaesberg2025voting}.
 
 Against this largely optimistic literature, also a more critical literature has emerged.
-\citet{liu2025stopovervaluing} find that MAD frequently fails to outperform
+\citet{liu2025stopovervaluing} find that \ac{MAD} frequently fails to outperform
 chain-of-thought \citep{wei2022chainofthought} or self-consistency
 \citep{wang2023selfconsistency} despite far greater compute, and report that
-model heterogeneity improves MAD frameworks.
+model heterogeneity improves \ac{MAD} frameworks.
 Furthermore, \citet{zhang2025debateorvote} show that majority voting alone accounts for most
 of the attributed gains, and prove that under their setup debate does not
 improve expected correctness on its own, since agents' beliefs change from round to
@@ -69,7 +69,7 @@ outcome, and whether two systems with the same accuracy reach it through
 different dynamics.
 
 
-\subsection{Interaction Dynamics in LLM Collectives}
+\subsection{Interaction Dynamics in \texorpdfstring{\acs{LLM}}{LLM} Collectives}
 \label{sec:related:dynamics}
 
 Another area of work looks inside the debate at how positions evolve
@@ -107,7 +107,7 @@ depends heavily on how competent the central agent is
 expose.
 
 \paragraph{Premature lock-in.}
-\citet{chuang2025debate} report that role-playing LLM groups converge more
+\citet{chuang2025debate} report that role-playing \ac{LLM} groups converge more
 strongly than human groups do, indicating a systematic bias toward
 premature agreement. Purely cooperative framings furhter sharpen this, since with no dissenting
 pressure a group can collapse into a mutually reinforcing echo chamber. A
@@ -146,8 +146,8 @@ designed to separate.
 \medskip
 \noindent The vocabulary for describing these phenomena was introduced in
 \autoref{sec:bg:motifs}. What remains open is whether it is more than an analogy
-when applied to LLM populations. Recent work suggests it is.
-\citet{ashery2025conventions} show that populations of LLM agents spontaneously
+when applied to \ac{LLM} populations. Recent work suggests it is.
+\citet{ashery2025conventions} show that populations of \ac{LLM} agents spontaneously
 reach consensus on an arbitrary shared choice, that strong collective biases can
 arise even when no individual agent has one, and that a committed minority can
 overturn the majority position. The last effect mirrors the critical-mass threshold
@@ -179,7 +179,7 @@ worked, not \emph{why}.
 Opening the models is the wrong level for our question. Consensus, oscillation,
 and influence concentration are properties of the \emph{group} trajectory, not of
 any single forward pass \citep{miehling2025agentic}, and the internals of
-API-served models are inaccessible anyway. Reading transcripts is more
+\ac{API}-served models are inaccessible anyway. Reading transcripts is more
 informative, and we use it informally to examine flagged limit-cycle cases
 (\autoref{sec:results:lc}). However, on its own it is subjective, does not scale
 to tens of thousands of repetitions, and cannot be tested against a null.
@@ -210,7 +210,7 @@ driscoll2024dynamical}. Its advantages address the gaps above. It operates at th
 group level, scales to the full dataset, needs only interaction logs and no
 labelled outcomes, and gives each motif a falsifiable signature that can be tested
 against a principled null. However, it also has disadvantages. For instance,
-transferring motif concepts from physical and biological systems to an LLM
+transferring motif concepts from physical and biological systems to an \ac{LLM}
 collective is a modelling choice, not a law. The detection thresholds are partly
 conventional, and a four-agent group is small for some of these measures. Without
 intervention, the detectors also identify \emph{signatures} and
@@ -233,7 +233,7 @@ None of these findings is tested against a null model that shows what the same
 statistic looks like by chance, so a detection rate alone could simply reflect
 the small, discrete state space.
 
-More importantly, where complex-systems concepts have been applied to LLM
+More importantly, where complex-systems concepts have been applied to \ac{LLM}
 collectives, the tasks were chosen to have no correct answer.
 \citet{ashery2025conventions} study arbitrary choices where any shared label is
 equally good. \citet{mehdizadeh2026topologymemory} check that the model itself

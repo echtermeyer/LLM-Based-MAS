@@ -1,10 +1,5 @@
-% ============================================================
-% CHAPTER 9: CONCLUSION
-% Citations reuse verified entries in bibliography.bib only.
-% ============================================================
-
 This thesis asked whether the dynamical vocabulary of complex systems can be
-applied empirically to LLM-based multi-agent debate, and what such a treatment
+applied empirically to \ac{LLM}-based \ac{MAD}, and what such a treatment
 reveals that outcome metrics cannot. To answer it we built a two phase debate
 protocol whose logs expose private beliefs and confidences alongside public
 messages, defined \suitename{} as four motif detectors each grounded in the
@@ -46,11 +41,12 @@ efficiency failures, since every one of them ran to the cap without producing a
 decision.
 
 The third research question asked whether the opening votes are causally
-responsible for the outcome. They are. Observationally, whether the ground truth
-appears at all in the opening distribution is the strongest predictor of accuracy
-we measured. Causally, seeding one correct agent into an otherwise wrong opening
-raises accuracy from $1.8\,\%$ to $26.2\,\%$ and the effect holds in every task
-tested, while the system almost never recovers an answer no agent initially held.
+responsible for the outcome, and the answer is yes. Observationally, the presence
+of the ground truth in the opening distribution is the strongest predictor of
+accuracy we measured. Causally, seeding one correct agent into an otherwise wrong
+opening raises accuracy from $1.8\,\%$ to $26.2\,\%$ and the effect holds in
+every task tested, while the system almost never recovers an answer no agent
+initially held.
 The same experiment shows the limits of the effect, since a correct supermajority
 that a plurality vote would preserve with certainty is talked out of the right
 answer in roughly one repetition in seven, and a single agent that never updates
@@ -75,7 +71,7 @@ the shape of the opening distribution and the concentration of influence that
 follows from it, and those are exactly the quantities these four detectors
 compute.
 
-Multi-agent debate is often presented as a way to make language models reason
+\ac{MAD} is often presented as a way to make language models reason
 better together \citep{du2024improving, liang2024encouraging}. Our results
 suggest a more precise and more cautious picture, in which the group mostly
 magnifies what its members already believe, so the interesting question is not

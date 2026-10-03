@@ -1,25 +1,11 @@
-% ============================================================
-% CHAPTER 7: DISCUSSION AND LIMITATIONS
-%
-% NOTE: change the chapter heading in the main file from
-%   \section{Discussion}
-% to
-%   \section{Discussion and Limitations}
-% so that the scope of the claims is visible at the top level of
-% the table of contents as well as in subsection 7.4.
-%
-% Citations reuse verified entries in bibliography.bib only.
-% Old labels are preserved so existing cross-references resolve.
-% ============================================================
-
 \autoref{sec:results} reported what the system does. This section asks what it
 means, in four steps. Section~\ref{sec:results:synthesis} explains \emph{why} the
 system behaves as it does by locating it in the vocabulary of
 \autoref{sec:bg:complex}. Section~\ref{sec:discussion:interpretation} asks what
 that behaviour \emph{costs}, by measuring the debate against the vote it started
 from. Section~\ref{sec:discussion:design} asks what a practitioner can
-\emph{do} about it. Section~\ref{sec:discussion:limitations} states the bounds on
-all three together with the work that would remove them.
+\emph{do} about it. Finally, Section~\ref{sec:discussion:limitations} states the limitations on
+all three together with potential future work.
 
 
 \subsection{The Missing Ingredient}
@@ -185,21 +171,6 @@ amplifier rather than on the amplifier itself. Enforced perspective diversity ha
 already been proposed as a remedy for entrenchment \citep{oh2026entrenchment},
 and what we add is the mechanism behind it.
 
-\autoref{tab:design:instruments} states the resulting guidance together with the
-result it rests on, the strength of that evidence, and the quantity that checks
-it. We do not deliver a validated diagnostic tool, and the table should be read
-as a set of hypotheses with their provenance attached rather than as a
-specification. What it does show is that every recommendation here is checkable
-from ordinary interaction logs using a \suitename{} detector that has already
-been tested against a null model on $30{,}000$ repetitions, which is what we mean
-by groundwork for a diagnostic suite rather than the suite itself. Taken together
-the guidance is deflationary, and usefully so. A system whose answer is largely
-fixed before deliberation begins, that cannot manufacture a correct answer absent
-from its inputs, and whose own confidence does not track correctness is one whose
-reliability has to be established upstream in the agents that produce the opening
-positions and externally through verification that does not trust the group,
-rather than through longer or more elaborate debate.
-
 \begin{table}[H]
 \centering
 \small
@@ -252,6 +223,21 @@ that agent's answer
          is not built here, this is the set of instruments it would use.}
 \label{tab:design:instruments}
 \end{table}
+
+\autoref{tab:design:instruments} states the resulting guidance together with the
+result it rests on, the strength of that evidence, and the quantity that checks
+it. We do not deliver a validated diagnostic tool, and the table should be read
+as a set of hypotheses with their sources attached rather than as a
+specification. What it does show is that every recommendation here is checkable
+from ordinary interaction logs using a \suitename{} detector that has already
+been tested against a null model on $30{,}000$ repetitions, which is what we mean
+by groundwork for a diagnostic suite rather than the suite itself. Taken together
+the guidance is sobering, and usefully so. In these systems the answer is mostly
+settled before the debate starts, the group cannot produce a correct answer that
+none of the agents proposed, and its confidence does not reflect whether it is
+right. Reliability therefore has to come from two places: the agents that
+produce the opening positions, and independent verification that does not rely
+on the group. Longer or more elaborate debate will not provide it.
 
 \autoref{fig:design:flow} orders the same guidance by when a practitioner
 encounters it. Panel (a) collects the choices made while building the system:
@@ -375,51 +361,50 @@ debate itself as the reliable source of gains
 \citep{liu2025stopovervaluing, chen2024reconcile} and capability asymmetry as a
 factor in harmful herding \citep{wynn2025talk}.
 
-The second limitation is the reach of the causal evidence. The seeded experiment
-is our only intervention and it was run on GPQA, so the amplifier claim is causal
-there and observational on HiddenBench, where it rests on the association between
-the presence of the ground truth in the opening votes and the final answer. The
-diverse initialisation lever is observational throughout, because we measure that
-the probability of an effective star rises with opening diversity across
-naturally occurring runs rather than manipulating that diversity ourselves, and
-the maximum diversity condition holds only six runs on HiddenBench. The effective
-topology analysis is further confined to fully connected runs, since a leaf in a
-star can only ever be converted by the centre, and its four types are separated
-by thresholds on the share of influence captured by the top one or two agents, so
-the rare types at $2.3\,\%$ and $5.4\,\%$ of runs carry real uncertainty.
-Two interventions would address this. Seeding each agent with a distinct opening
-answer would test the diversity lever directly, and perturbing or removing the
-elected hub would establish whether its influence is causal or whether it proxies
-for question specific expertise.
+The second limitation is how far our causal evidence reaches. The seeded
+experiment is our only intervention, and it was run on GPQA. The amplifier claim
+is therefore causal on GPQA but only observational on HiddenBench, where it rests
+on the link between the ground truth appearing in the opening votes and the final
+answer. The diverse initialisation lever is observational throughout. We did not
+manipulate opening diversity. We only observed that the probability of an
+effective star rises with diversity across naturally occurring runs, and the
+maximum diversity condition has just six runs on HiddenBench. The effective
+topology analysis covers only fully connected runs, because a leaf in a star can
+only be converted by the centre. Its four types are also defined by thresholds on
+the share of influence held by the top one or two agents, so the rare types, at
+$2.3\,\%$ and $5.4\,\%$ of runs, are quite uncertain.
+Two interventions would address this. Giving each agent a distinct opening answer
+would test the diversity lever directly. Perturbing or removing the elected hub
+would show whether its influence is causal or merely reflects expertise on that
+particular question.
 
-The third limitation is what \suitename{} is able to certify. All four detectors
-identify signatures rather than dynamical objects. A positive confidence slope is
-not a proof of a feedback loop, a recurrence test flags periodic structure rather
-than a mathematically certified limit cycle, $N_{\mathrm{eff}}$ counts coexisting
-endpoints rather than a certified attractor landscape, and the dominance index
-records where conversions concentrate rather than who caused them. Two of the
-detectors also have a known direction of error. The self-reinforcement prevalence
-may be inflated, because an agent whose confidence falls is more likely to flip
-its vote and end the segment, which censors negative slopes, and a matched null
-that models the flip hazard would show how much of the excess above the baseline
-is genuine. The dominance graph is built from vote adoptions during the
-\updatephase{} phase, which is precisely where the protocol instructs agents to
-update, so a strong hub to spoke edge may reflect persuasion or merely the
-routing of information. Removal based attribution, which estimates an agent's
+The third limitation is what \suitename{} can actually prove. All four detectors
+find signatures, not confirmed dynamical objects. A positive confidence slope
+does not prove a feedback loop. A recurrence test flags periodic structure, not a
+mathematically certified limit cycle. $N_{\mathrm{eff}}$ counts coexisting
+endpoints, not a certified attractor landscape. The dominance index shows where
+conversions concentrate, not who caused them. Two of the detectors also tend to
+fail in a known direction. The self-reinforcement prevalence may be too high,
+because an agent whose confidence falls is more likely to flip its vote and end
+the segment, which removes negative slopes from the data. A matched null that
+models this flip hazard would show how much of the excess above the baseline is
+genuine. The dominance graph is built from vote adoptions during the
+\updatephase{} phase, which is exactly where the protocol tells agents to update,
+so a strong hub to spoke edge may reflect persuasion or may just reflect how
+information was routed. Removal based attribution estimates an agent's
 contribution by removing it or ignoring its messages
-\citep{agentsthatmatter2026, cui2025introspecloo}, would
-replace the concentration index with an interventional measure of influence and
-is the natural successor to what we report here.
+\citep{agentsthatmatter2026, cui2025introspecloo}. It would replace the
+concentration index with a measure based on intervention, and is the natural next
+step after what we report here.
 
-The fourth limitation concerns what the reported rates describe. The tasks were
-screened for outcome variation across repetitions, so the prevalences we report
-characterise the regime in which the outcome is genuinely contested rather than
-the full distribution of questions. This follows from the objective, which was to
-characterise the dynamics rather than to evaluate the benchmarks, but it does
-mean the rates should not be read as how often each motif would appear in
-arbitrary deployment, and establishing that would require running the unscreened
-task set. The study is also exploratory and reports many tests across twelve
-configuration cells and four motifs, so we have leaned throughout on effect sizes
-and on consistency across cells rather than on isolated significance, and the
-central claims rest on effects that are large and repeated rather than on any
+The fourth limitation concerns what the reported rates describe. We screened the
+tasks for outcome variation across repetitions, so our prevalences describe the
+cases where the outcome is genuinely contested, not the full range of questions.
+This follows from our goal, which was to characterise the dynamics rather than to
+evaluate the benchmarks. It does mean the rates should not be read as how often
+each motif would appear in real deployment, and measuring that would require
+running the unscreened task set. The study is also exploratory and reports many
+tests across twelve configuration cells and four motifs. We therefore relied on
+effect sizes and on consistency across cells rather than on isolated significance
+tests. The central claims rest on effects that are large and repeated, not on any
 single borderline test.

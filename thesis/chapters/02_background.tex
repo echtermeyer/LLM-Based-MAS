@@ -4,7 +4,7 @@ self-organization, and dynamical systems as the formal language for describing
 collective behaviour.
 \autoref{sec:bg:motifs} introduces motifs and the opinion-dynamics models of
 belief updating under repeated interaction. \autoref{sec:bg:mad} explains what is
-meant by an LLM agent and by multi-agent debate, and describes the design space
+meant by an \ac{LLM} agent and by \ac{MAD}, and describes the design space
 of debate systems. The motifs this thesis detects, and the
 methodology used to detect them, are defined later in \autoref{sec:method},
 as this section focuses on the vocabulary they build on.
@@ -174,7 +174,7 @@ each other, those groups settle on different consensus values, which is a group-
 multistability. On contrast, if opinions keep swapping back and forth and the process never settles but cycles
 through a repeating sequence of states, a limit cycle emerges. 
 
-However, the DeGroot model is too simple for LLM debates in three ways, and each has a
+However, the DeGroot model is too simple for \ac{LLM} debates in three ways, and each has a
 standard extension that we use later. Firstly, agents often hold a graded
 internal belief but must commit to a discrete public choice. The
 continuous-opinion, discrete-action (CODA) model \citep{martins2008coda}
@@ -190,15 +190,15 @@ fixed anchor that can pull the group toward its position
 (\autoref{sec:results:seeded}).
 
 
-\subsection{LLM Agents and Multi-Agent Debate}
+\subsection{\texorpdfstring{\acs{LLM}}{LLM} Agents and Multi-Agent Debate}
 \label{sec:bg:mad}
 
-A \emph{large language model} (LLM) is a neural network trained to predict
+A \emph{large language model} is a neural network trained to predict
 the next token in a sequence and aligned to follow instructions through
-supervised fine-tuning and reinforcement learning from human feedback
-\citep{ouyang2022instructgpt}. An \emph{LLM agent} is an LLM placed in a loop
+supervised fine-tuning and \ac{RLHF}
+\citep{ouyang2022instructgpt}. An \emph{\ac{LLM} agent} is an \ac{LLM} placed in a loop
 with tools, environment feedback, or other models. In this thesis, the loop is
-formed by other LLMs. Because an LLM samples its output, two agents given
+formed by other \acp{LLM}. Because an \ac{LLM} samples its output, two agents given
 identical prompts can produce different responses.
 
 The standard single-model inference-time alternatives to multi-agent protocols
@@ -215,23 +215,22 @@ intrinsic self-correction often fails to improve reasoning and can even degrade
 performance \citep{huang2024selfcorrect}, which is one motivation for bringing in other
 agents as a source of critique.
 
-Placing several such agents in a shared loop gives an LLM-based
+Placing several such agents in a shared loop gives an \ac{LLM}-based
 \emph{multi-agent system} \citep{guo2024survey}. Much of this work gives each
 agent a distinct role and splits a task among them, for instance by encoding the
 stages of a software project as standardised operating procedures
 \citep{hong2024metagpt}, or by providing general frameworks from which such
-teams can be assembled \citep{chen2024agentverse}. \emph{Multi-agent debate}
-(MAD) is a special case of this. All agents answer the same question over the same set
+teams can be assembled \citep{chen2024agentverse}. \emph{Multi-agent debate} is a special case of this. All agents answer the same question over the same set
 of possible answers, so their outputs can be compared, contested, and combined
 into a single group answer. The agents first propose answers independently and then
 revise them over several rounds after reading each other's arguments
 \citep{du2024improving}. The term ``debate'' also names a different proposal in
-AI safety, in which two models argue before a human judge to make their
+\ac{AI} safety, in which two models argue before a human judge to make their
 reasoning checkable \citep{irving2018safety}. We follow the collaborative
 variant, which has no separate judge. The agents themselves both argue and
 decide.
 
-MAD is motivated by two ideas. The first is error correction. If agents make
+\ac{MAD} is motivated by two ideas. The first is error correction. If agents make
 partly independent mistakes, discussion lets the group catch them. This gain
 shrinks when the mistakes are correlated, and beyond a certain level of
 correlation the majority loses its advantage over a single individual actor
@@ -356,7 +355,7 @@ correlated.
     \end{scope}
 
   \end{tikzpicture}
-  \caption{Anatomy and design space of multi-agent debate. \textbf{(a)} The
+  \caption{Anatomy and design space of \acs{MAD}. \textbf{(a)} The
     generic round structure shared across debate variants. Braces mark the steps
     governed by the \emph{interaction} and \emph{agreement} dimensions of
     \citet{motger2026taxonomy}; the \emph{participant} dimension concerns the

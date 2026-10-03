@@ -1,10 +1,10 @@
 \subsection{Motivation}
 \label{sec:intro:motivation}
 
-Large language models (LLMs) are increasingly used not as isolated
+Large language models (\acsp{LLM})\acused{LLM} are increasingly used not as isolated
 models but as interacting agents that reason, argue, and decide in groups.
-A prominent instance of this is \emph{multi-agent debate} (MAD), in which
-several LLM instances independently propose answers, exchange their reasoning
+A prominent instance of this is \emph{multi-agent debate} (\acs{MAD})\acused{MAD}, in which
+several \ac{LLM} instances independently propose answers, exchange their reasoning
 over multiple rounds, and revise their positions before the group ends up with a 
 final decision \citep{du2024improving}. Across factual and mathematical
 reasoning tasks, this simple protocol has been reported to improve accuracy
@@ -17,7 +17,7 @@ partially independent errors, and deliberation offers a mechanism for the group
 to identify and correct them.
 
 However, this optimistic reading is almost entirely based on \emph{outcome}
-measurements. The literature evaluates multi-agent systems mostly by
+measurements. The literature evaluates \acp{MAS} mostly by
 final task performance, treating the deliberation itself as an mysterious process
 that either does or does not yield a better answer. Recent critical
 reassessments show that this outcome-centric view is fragile: debate frequently
@@ -27,10 +27,10 @@ comparison with simpler alternatives such as majority voting
 \citep{zhang2025debateorvote} or isolated self-correction
 \citep{bertalanic2026costofconsensus}.
 More troublingly, the failures that do occur are not random noise but exhibit
-structure. When two LLMs debate, both tend to grow \emph{more} confident that
+structure. When two \acp{LLM} debate, both tend to grow \emph{more} confident that
 they have won as the exchange proceeds, with confidence escalating away from a
 rational baseline even when no new supporting evidence is introduced
-\citep{prasad2025certain}. Under distributed information, groups of LLM agents
+\citep{prasad2025certain}. Under distributed information, groups of \ac{LLM} agents
 converge prematurely on the evidence they already share and fail to surface the
 private knowledge needed for the correct answer, so that collective accuracy
 collapses far below what a single agent achieves with complete information
@@ -45,7 +45,7 @@ through entirely different trajectories, one through genuine error correction
 and the other through a confident slide into a shared mistake. Understanding
 \emph{when} and \emph{why} multi-agent deliberation succeeds therefore requires
 a vocabulary for the interaction dynamics themselves. \citet{miehling2025agentic}
-make precisely this argument at a conceptual level, stating that agentic AI
+make precisely this argument at a conceptual level, stating that agentic \ac{AI}
 requires a systems-theoretic lens because a focus on individual model capabilities
 underestimates emergent system-level capabilities and risks. However, 
 their work remains conceptual and offers no empirical instrument for
@@ -64,13 +64,13 @@ initial conditions \citep{feudel2008complex}; and \emph{dominance} is the
 concentration of influence onto a single node \citep{degroot1974consensus,
 jia2015opinion}. Such patterns are studied as \emph{motifs}, which are recurring structural or
 dynamical building blocks whose presence is detectable and informative about a system's behaviour \citep{milo2002network, alon2007network,
-driscoll2024dynamical}. The failure modes documented in the MAD literature read
+driscoll2024dynamical}. The failure modes documented in the \ac{MAD} literature read
 naturally as instances of this vocabulary. For instance, escalating confidence is a
 self-reinforcement signature, premature consensus is a fixed-point attractor
 reached through basin selection, and herding to a confident leader is a
 dominance motif. Thus, the connection has begun to be made.
 \citet{ashery2025conventions} demonstrate the spontaneous emergence of
-universally adopted social conventions in decentralised LLM populations, show
+universally adopted social conventions in decentralised \ac{LLM} populations, show
 that strong collective biases arise even when individual agents exhibit none,
 and find that committed adversarial minorities can impose alternative
 conventions on the majority. \citet{okawa2026biasedconsensus} derives a formal model predicting that once
@@ -80,7 +80,7 @@ However, these studies mainly use coordination tasks in which no option is corre
 They can therefore show that a group converges, but not whether it converges on the correct answer.
 
 This thesis addresses that gap. We construct a controlled cooperative
-multi-agent debate system in which homogeneous LLM agents deliberate over
+\ac{MAD} system in which homogeneous \ac{LLM} agents deliberate over
 multiple rounds on tasks with verifiable ground truth. On top of this system, we
 develop a suite of detectors, each grounded in the complex-systems and
 opinion-dynamics literature, that identify self-reinforcement, limit cycles,
@@ -96,9 +96,9 @@ persist even when the group must correct a shared bias. Throughout, we treat
 motif detection not as a competitor to accuracy but as an explanatory layer
 beneath it. We think of it as a way to characterise the trajectory that produces an outcome, and
 thereby use it to understand which design choices shape the deliberative dynamics of
-LLM collectives.
+\ac{LLM} collectives.
 
-This explanatory layer has a practical purpose. As multi-agent systems are
+This explanatory layer has a practical purpose. As \acp{MAS} are
 deployed in high risk environments, an operator needs to know not only whether a
 configuration tends to produce correct answers but also whether a given deliberation
 is proceeding soundly or in a broken way, whether the group is genuinely
@@ -115,24 +115,24 @@ we provide the groundwork for one, a set of measurable signatures
 characterised across a controlled grid, together with design principles graded by
 how strongly our data supports them.
 In one sentence, the objective of this thesis is to understand \emph{how} a
-cooperative LLM debate arrives at its answer, by measuring the self-organization
+cooperative \ac{LLM} debate arrives at its answer, by measuring the self-organization
 patterns in its trajectory, and to turn that understanding into evidence-based
-guidance for building such MAD systems.
+guidance for building such \ac{MAD} systems.
 
 
 \subsection{Research Questions}
 \label{sec:intro:rqs}
 
 The goal of this thesis is to establish whether the dynamical
-vocabulary of complex systems can be applied empirically to LLM-based
-multi-agent debate, and to characterise the conditions under which
+vocabulary of complex systems can be applied empirically to \ac{LLM}-based
+\ac{MAD}, and to characterise the conditions under which
 self-organization patterns emerge. We split this goal into three research
 questions, ordered by the class of evidence each requires.
 
 \begin{itemize}
   \item[\textbf{RQ1}] \textbf{Measurement.} Can self-organization motifs,
         specifically self-reinforcement, limit cycles, multistability, and
-        dominance, be detected in cooperative LLM-based multi-agent debate using
+        dominance, be detected in cooperative \ac{LLM}-based \ac{MAD} using
         detectors grounded in the complex-systems and opinion-dynamics literature? 
         And which of these motifs actually occur, at what frequency, and with what structure?
 
@@ -163,7 +163,7 @@ not a failure. We report the motifs we do not find as well as those we do.
 This thesis makes three main contributions.
 
 \begin{itemize}
-  \item \textbf{\suitename{}, an instrument for measuring debate dynamics.}
+  \item \textbf{Self-Organization Motif Analysis (\suitename{}), an instrument for measuring debate dynamics.}
         A two-phase debate protocol that logs private beliefs and confidence scores
         separately from public messages (\autoref{sec:exp}), together with four
         motif detectors, each grounded in the complex-systems or
@@ -193,8 +193,8 @@ interaction logs (\autoref{sec:discussion}).
 \paragraph{Structure of this thesis.}
 The thesis follows the order of the three research questions. \emph{Background}
 (\autoref{sec:infsub}) introduces the vocabulary of self-organization and
-dynamical motifs and fixes what we mean by an LLM agent and MAD;
-\emph{Related Work} (\autoref{sec:related}) surveys how multi-agent systems are
+dynamical motifs and fixes what we mean by an \ac{LLM} agent and \ac{MAD};
+\emph{Related Work} (\autoref{sec:related}) surveys how \acp{MAS} are
 currently analysed and locates the gap this thesis addresses. The instrument is
 then built in two steps. Firstly, \emph{System and Experimental Setup}
 (\autoref{sec:exp}) specifies the debate protocol, the two contrasting

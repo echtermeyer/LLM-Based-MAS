@@ -1,4 +1,4 @@
-The premise of this thesis is that a multi-agent debate is a dynamical system
+The premise of this thesis is that a \ac{MAD} is a dynamical system
 whose trajectory carries measurable structure. Turning that premise into empirical
 claims requires a system built as a \emph{measurement instrument}, that is not exclusively 
 focusing on a high-performing pipeline. Thus, the protocol must expose a
@@ -100,7 +100,7 @@ system-level motif detectors of \autoref{sec:method} operate.
 The protocol specifies three things, namely the persistent state each agent carries
 across rounds, the within-round message passing that produces a new state, and
 the memory window controlling how much past history each agent may see. We follow
-the multi-agent debate paradigm of \citet{du2024improving}, in which agents
+the \ac{MAD} paradigm of \citet{du2024improving}, in which agents
 independently answer and then revise over several rounds, but instrument it so
 that the interaction log exposes exactly the quantities the motif detectors
 require.
@@ -326,7 +326,7 @@ correct answer, stays negligible while coverage remains high, and we set $u = 3$
 with a hard cap of $T = 15$. 
 We report the details of this efficiency trade-off in Appendix~\ref{app:knobs}.
 Terminating debate at consensus is standard practice
-in the MAD literature \citep{yin2023eot, yang2025revisiting, kaesberg2025voting}.
+in the \ac{MAD} literature \citep{yin2023eot, yang2025revisiting, kaesberg2025voting}.
 
 When a repetition ends, the system's answer is the \emph{plurality} of the agents' votes
 at the final round, the option held by the most agents. Because a repetition stops
@@ -344,7 +344,7 @@ unresolved instead of trusting the reported majority.
 \label{sec:setup:datasets}
 
 Because this work studies motif emergence rather than task-completion
-performance, our benchmark selection criteria differ from those usual in the MAD
+performance, our benchmark selection criteria differ from those usual in the \ac{MAD}
 literature. A benchmark suitable for motif detection must provide (i) a
 \textbf{discrete shared decision variable}, so that all agents commit to a
 position in the same finite set each round, (ii) \textbf{verifiable ground truth},
@@ -375,7 +375,7 @@ models remain well below, leaving improvement potential using debate.
 GPQA also has direct multi-agent precedent
 \citep{becker2025orchestration, kenton2024debate, wang2025mars}. We
 adopt it as the \textbf{primary} dataset. 
-The main downside is that this benchmark has less cumulative MAD literature compared to MMLU or GSM8K, 
+The main downside is that this benchmark has less cumulative \ac{MAD} literature compared to MMLU or GSM8K, 
 which is however mostly the case as its a more recent benchmark and not because of a methodological change. 
 A second drawback concerns comparability of the accuracy numbers, as published figures
 refer to strong models on the full benchmark, whereas we use
@@ -394,7 +394,7 @@ correct answer is split across agents, so that no single agent can solve the tas
 alone and success requires information pooling. Its value here is as a
 control for a specific confound. Motifs seen only on GPQA-Diamond might be
 artefacts of cooperative reasoning over a reliable individual signal, in which
-RLHF-induced truth-seeking \citep{ouyang2022instructgpt} might amplify convergence.
+\ac{RLHF}-induced truth-seeking \citep{ouyang2022instructgpt} might amplify convergence.
 By contrast, under the hidden-profile condition pre-discussion accuracy is very
 low by construction \citep{li2026hiddenbench}, so any post-discussion improvement
 must come from information transfer rather than from individual model strength.
