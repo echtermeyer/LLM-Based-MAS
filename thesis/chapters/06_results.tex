@@ -45,7 +45,7 @@ $+1.7$\,pp to reach $42.2\,\%$. The oracle bound of $70.6\,\%$ shows that the co
 answer is present among the agents in roughly two-thirds of repetitions. The resulting
 oracle gap \citep{bertalanic2026costofconsensus} is therefore not a knowledge deficit
 but the group's failure to identify and amplify the correct voice.
-HiddenBench is different. Here a shared model bias makes majority voting
+HiddenBench is different as a shared model bias makes majority voting
 actively harmful and drags the round-0 plurality well below chance. Debate partly
 corrects this and reaches $26.1\,\%$, a gain of $+18.5$\,pp. Repetitions that converge
 early lock in the shared wrong answer almost universally, because early consensus
@@ -151,7 +151,7 @@ that \citet{oh2026entrenchment} identify as a root cause of belief fixation, tha
 \citet{estornell2024multillm} derive from response homogeneity, and that
 \citet{cau2026agreementdrift} describe as a selective amplifier of locally consistent
 change. It also mirrors reports that debate confidence rises without new evidence
-\citep{prasad2025certain, bertalanic2026costofconsensus}. The seeded experiment in
+\citep{prasad2025certain}. The seeded experiment in
 \autoref{sec:results:evid} confirms this dependence on the initial composition
 causally.
 
@@ -183,9 +183,8 @@ settle on a unanimous endpoint are included. Three findings follow.
         dynamics admit one equilibrium per available answer option
         \citep{baronchelli2018consensus, ashery2025conventions}, so a four-option
         task can in principle land on any of four attractors. Prior LLM debate
-        studies could not observe this because they report a single run or
-        run-level means per task \citep{cau2026agreementdrift,
-        mehdizadeh2026topologymemory}. Our repeated-runs design makes the full
+        studies do not report which end state each run reaches
+        \citep{cau2026agreementdrift, mehdizadeh2026topologymemory}. Our repeated-runs design makes the full
         attractor landscape visible.
 
   \item \textbf{Multistability helps exactly when the default answer is wrong.} Across
@@ -334,9 +333,8 @@ specified, and the group's answer follows whichever agent wins that election. Ac
 is high when the elected hub started correct, and it suffers when a fixed hub
 entrenches a shared error. This is the structural counterpart to the causal test in
 \autoref{sec:results:evid}, which shows the same dependence on the opening votes by
-direct manipulation. It also mirrors reports that nominally symmetric LLM populations
-develop structural asymmetry on their own, both through preferential-attachment links
-\citep{mehdizadeh2025homophily} and through locally clustered agents coordinating better than high-betweenness bridges
+direct manipulation. It also mirrors reports that LLM agents form hub-like structure through preferential-attachment links
+\citep{mehdizadeh2025homophily} and that locally clustered agents coordinate better than high-betweenness bridges
 \citep{mehdizadeh2026topologymemory}. Per-cell concentration values across all
 configurations are in Appendix~\ref{app:dom:supp}.
 

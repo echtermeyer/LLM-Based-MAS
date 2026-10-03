@@ -1,13 +1,13 @@
-This section provides the conceptual vocabulary needed to follow the rest of
+This section provides the vocabulary needed to follow the rest of
 the thesis. \autoref{sec:bg:complex} introduces complex systems,
 self-organization, and dynamical systems as the formal language for describing
-collective behaviour, including the long-run regimes a system can settle into.
+collective behaviour.
 \autoref{sec:bg:motifs} introduces motifs and the opinion-dynamics models of
-belief updating under repeated interaction. \autoref{sec:bg:mad} fixes what is
-meant by an LLM agent and by multi-agent debate, and lays out the design space
-along which debate systems vary. The exact motifs this thesis detects, and the
-methodology used to detect them, are defined in \autoref{sec:method};
-this section only fixes the vocabulary they build on.
+belief updating under repeated interaction. \autoref{sec:bg:mad} explains what is
+meant by an LLM agent and by multi-agent debate, and describes the design space
+of debate systems. The motifs this thesis detects, and the
+methodology used to detect them, are defined later in \autoref{sec:method},
+as this section focuses on the vocabulary they build on.
 
 
 \subsection{Complex Systems and Self-Organization}
@@ -15,29 +15,29 @@ this section only fixes the vocabulary they build on.
 
 A \emph{complex system} is a collection of many interacting components whose
 collective behaviour cannot be inferred from the properties of the individual
-components alone \citep{anderson1972more, ladyman2013complex}. The behaviour is
-called \emph{emergent}: a stock-market bubble, for instance, is produced by
+components alone \citep{anderson1972more, ladyman2013complex, mitchell2009complexity}. The behaviour is
+called \emph{emergent}. For instance, a stock-market bubble is produced by
 millions of traders acting on local information with no coordinating
 authority, yet the resulting price dynamic is not present in any individual
-trade \citep{mitchell2009complexity}. When such emergent order arises without
+trade. When such emergent order arises without
 any central controller, the system is called \emph{self-organizing}
-\citep{ashby1947principles, camazine2001self}. Four ingredients recur across
-self-organizing systems \citep{camazine2001self}: (i) \emph{positive
-feedback}, which amplifies small deviations and drives the system away from
-uniformity; (ii) \emph{negative feedback}, which prevents runaway growth and
-bounds the system within reachable states; (iii) \emph{fluctuations}, the
-stochastic perturbations that allow the system to explore the state space; and
-(iv) \emph{repeated local interactions}, through which global structure
-accumulates over many iterations from purely local rules. The organising
-principle is encoded entirely in these interactions, not in any single
-component and not in any external authority. The same local rule can
-therefore lead to different long-run outcomes depending on where the system
-starts and which fluctuations it encounters: the interaction rule fixes the
-repertoire of possible end states, while the initial configuration and the
-realised noise jointly select which one is reached.
+\citep{camazine2001self}, a term that goes back to \citet{ashby1947principles}. Four ingredients are shared of
+self-organizing systems \citep{camazine2001self}. \emph{Positive feedback}
+amplifies small changes and drives the system away from uniformity.
+\emph{Negative feedback} prevents runaway growth and bounds the system within
+reachable states. \emph{Fluctuations} are the stochastic perturbations that
+allow the system to explore the state space. \emph{Repeated local
+interactions} let global structure accumulate over many iterations from purely
+local rules. The organising
+principle is fully encoded within these four interactions, not in any single
+component and also not in any external authority. Thus, the same local rule can 
+lead to different long-run outcomes depending on where the system
+starts and which fluctuations occur. The interaction rule determines
+which end states are possible. The starting configuration and the random noise
+then decide which of them the system actually reaches.
 
 To study self-organizing systems rigorously, one needs a language for how
-states evolve over time. That language is \emph{dynamical systems theory}
+states evolve over time. That language is called \emph{dynamical systems theory}
 \citep{strogatz2015nonlinear}. A dynamical system consists of a state, which
 collects everything needed to describe the system at a given moment, and an
 update rule that turns the current state into the next one. The set of all
@@ -49,38 +49,37 @@ probabilities to the possible next states instead of fixing one, so the
 trajectory becomes a Markov chain. In a system with \emph{memory} the next
 state depends on a window of recent states rather than on the current one
 alone. In a \emph{discrete-state} system the state takes one of finitely many
-values, and the rule becomes a table of transitions rather than a differential
-equation. The debate systems studied in this thesis combine all three: the
+values, so that the rule becomes a table of transitions. The debate systems studied in this thesis combine all three: the
 state is discrete, since each agent casts one of finitely many votes; the
 update is stochastic, since agents sample their responses; and it carries
-bounded memory, since each agent conditions on a finite window of recent
+bounded memory, since each agent conditions on a finite context window of recent
 rounds.
 
 The central question in dynamical systems theory is where trajectories end up.
-After an initial transient, most trajectories settle into specific regions of
+After an initial phase, most trajectories settle into specific regions of the
 phase space called \emph{attractors}, towards which nearby trajectories
 converge and in which they then remain. The classical image is a ball rolling
-under gravity on a hilly landscape: wherever the ball starts, friction brings
-it to rest in one of the valleys. Not every resting point is an attractor,
-however. A ball balanced on a hilltop is also at rest, but it is unstable,
-because any small push moves it away rather than back. An attractor is
-\emph{stable}: small deviations from it decay. The set of starting points from
+under gravity on a hilly landscape. Wherever the ball starts, friction brings
+it to rest in one of the valleys. However, not every resting point is an attractor. 
+A ball balanced on a hilltop is also at rest, but it is unstable,
+because any small push moves it away rather than back. Thus, an attractor is
+\emph{stable} if small deviations from it decay. The set of starting points from
 which the system reaches a given attractor is that attractor's \emph{basin of
 attraction}. The simplest and most common long-run regime is
 \emph{fixed-point convergence}, in which the system settles into a single state
 and stays there. A structurally different regime is the \emph{limit cycle}, a
 closed loop of states that the system revisits indefinitely without ever
-settling. A limit cycle is itself attracting: a small perturbation pushes the
-trajectory off the loop only briefly before the dynamics pull it back. In the
+settling. A stable limit cycle is attracting: although a small perturbation pushes the
+trajectory off the loop, the dynamics pull it back shortly afterwards. In the
 stochastic, discrete setting of a debate, these two regimes take the form of
 absorbing states, which are never left once entered, and of sets of states
 that keep being revisited.
 
-A qualitatively richer situation arises when the landscape contains not one
-valley but several, as illustrated in \autoref{fig:doublewell}. A system is
+Things get more interesting when the landscape has several attractors instead of
+only one, as shown in \autoref{fig:doublewell}. A system is
 \emph{multistable} when two or more distinct attractors coexist under the same
 parameters \citep{feudel2008complex}. \autoref{fig:doublewell} shows the
-simplest example, a double-well potential with two stable states separated by
+simplest example, a double-well with two stable states separated by
 an unstable peak. The boundary between the two basins of attraction is the
 \emph{separatrix}. Two runs of the same experiment with identical parameters,
 but starting on opposite sides of the separatrix, end in entirely different
@@ -89,7 +88,7 @@ runs that reach each attractor therefore reflects the relative size of the
 basins. The double-well is deterministic and continuous, whereas the debate we
 study is a finite-state stochastic chain. There, coexisting attractors become
 competing absorbing states, and basin size is no longer a geometric area but a
-probability: the share of repetitions that end in each absorbing state, given
+probability defined by the share of repetitions that end in each absorbing state, given
 how the debate is initialised \citep{menck2013basin}.
 
 \begin{figure}[t]
@@ -111,147 +110,138 @@ how the debate is initialised \citep{menck2013basin}.
 The patterns that arise in dynamical systems are not arbitrary. Across
 biological networks, electronic circuits, social groups, and neural dynamics,
 the same recurring organisational building blocks appear with consistent
-functional properties. Complex-systems research calls these recurring patterns
+functional properties. Complex-systems calls these recurring patterns
 \emph{motifs}. The concept was introduced for networks by
 \citet{milo2002network}, who defined a \emph{structural motif} as a small
 subgraph that appears significantly more often in a real network than in a
-randomly rewired surrogate with the same degree sequence. A classic example is
-the \emph{feed-forward loop}, a three-node pattern in which A influences both B
-and C while B also influences C, whose functional role recurs across
-transcriptional, signalling, and neuronal networks \citep{alon2007network}. A
-complementary concept is the \emph{dynamical motif} \citep{driscoll2024dynamical}:
+randomly rewired surrogate with the same degree sequence. A classic example is 
+the \emph{feed-forward loop}, a three-node pattern in which A influences both 
+B and C, while B also influences C. In transcriptional networks, 
+it filters out brief signals and delays responses, and similar patterns 
+appear in signalling and neuronal networks \citep{alon2007network}. A
+complementary concept is the \emph{dynamical motif} \citep{driscoll2024dynamical}
+which is
 a recurring pattern in the \emph{trajectory} of a system rather than in its
 wiring. Where a structural motif is a statement about who interacts with whom,
 a dynamical motif is a statement about how the system behaves over time. The
 two are related, since structural motifs are studied precisely because each
-generates a characteristic dynamical regime, but they are not equivalent: the
+generates a characteristic dynamical regime, but they are not the same. The
 same structural motif can produce different dynamics under different
 parameters, and the same dynamical pattern can arise from different structural
 configurations.
 
-Positive feedback is a mechanism that links structural and dynamical motifs:
-deviations are amplified rather than corrected, turning an early advantage into
+Positive feedback is a mechanism that links structural and dynamical motifs where
+small changes are amplified rather than corrected, turning an early advantage into
 a self-reinforcing lead. \citet{arthur1989competing} gave the canonical social
 example with technology lock-in, where increasing returns keep an early leader
 ahead even when alternatives are objectively superior. Positive feedback can
-also operate through network structure: a node positioned to receive and relay
-signals from many others accumulates causal weight, concentrating influence
+also operate through network structure. A node positioned to receive and relay
+information from many others accumulates causal weight, concentrating influence
 through its position rather than through any informational advantage.
-Understanding whether such concentration is a property of the prescribed
+Understanding whether such concentration is a property of the
 topology or of the dynamics themselves requires distinguishing structural
-connectivity from effective connectivity \citep{friston2011connectivity}.
+connectivity from effective connectivity.
 \emph{Structural connectivity} is the static graph encoding who is allowed to
-communicate with whom. \emph{Effective connectivity} is the causal influence
-one unit actually exerts on another across a recorded trajectory; it can be
-estimated from the trajectory under a model of how influence operates, even
-when the prescribed wiring is fixed. The same structural graph can give rise
-to very different effective-connectivity patterns depending on which nodes
-happen to speak with authority at critical moments.
+communicate with whom. \emph{Effective connectivity}, in the sense of
+\citet{friston2011connectivity}, is the influence one unit exerts over another,
+understood as the parameter of a model that explains the observed dependencies.
+Here it is how strongly one agent actually affects another during a recorded
+run, estimated from that run with a model of how influence works, even though
+the prescribed wiring stays fixed. The two can therefore differ. In a graph where every agent
+may talk to every other, a few agents can still end up with most of the
+influence, and which ones do depends on how the run unfolds.
 
 For the specific setting of agents forming and updating beliefs through
-repeated local interaction, there is a dedicated family of formal models:
+repeated local interaction, there is a dedicated family of formal models called
 \emph{opinion dynamics}. The models differ in what they assume about the
 opinion variable (continuous or discrete), the update rule (deterministic or
 stochastic), and who listens to whom (all peers, similar others, or no one).
 The foundational DeGroot model \citep{degroot1974consensus} considers $N$
 agents, each holding a real-valued opinion, who at every step replace their
 opinion with a weighted average of the opinions of the agents they trust. The
-model contains no ground truth and no external information. When the trust
-network is strongly connected and aperiodic, the process converges to a
-consensus that is itself a weighted average of the initial opinions; the weight
+model contains no ground truth and no external information. When the trust network is strongly connected and aperiodic, the process converges to a
+consensus that is itself a weighted average of the initial opinions. The weight
 an agent's initial opinion carries in that consensus is its \emph{social power}
 \citep{jia2015opinion}. An agent gains social power by being trusted by other
 high-power agents, not by being correct. The extreme case, in which almost all
 social power rests on a single agent while the others carry almost none, is the
-\emph{autocratic} pole of the model \citep{jia2015opinion}; it is the
+\emph{autocratic} pole of the model \citep{jia2015opinion}. It is the
 opinion-dynamics form of the dominance motif we detect. Convergence to a single
-consensus requires the trust network to be both strongly connected and
-aperiodic, and each condition can fail in a way that maps onto one of our
-motifs. If the network contains two or more closed groups that listen only to
-each other, those groups settle on different consensus values, a group-level
-multistability; if aperiodicity fails, the process never settles but cycles
-through a repeating sequence of states, a limit cycle. Multistability and limit
-cycles are thus the two ways the same convergence guarantee can break down.
+consensus requires the trust network to be strongly connected and opinions
+not to just swap back and forth, and each condition can fail in a way that maps onto one of our
+four motifs. For instance, if the network contains two or more closed groups that listen only to
+each other, those groups settle on different consensus values, which is a group-level
+multistability. On contrast, if opinions keep swapping back and forth and the process never settles but cycles
+through a repeating sequence of states, a limit cycle emerges. 
 
-Three refinements of this basic picture recur in what follows. Agents often
-hold a graded internal belief but must commit to a discrete public choice: the
+However, the DeGroot model is too simple for LLM debates in three ways, and each has a
+standard extension that we use later. Firstly, agents often hold a graded
+internal belief but must commit to a discrete public choice. The
 continuous-opinion, discrete-action (CODA) model \citep{martins2008coda}
-captures exactly this split and is the template for our agent state, whose
-latent confidence evolves continuously while its vote stays discrete
-(\autoref{sec:setup:protocol}).
-When the opinions are discrete labels with no intrinsic ranking, naming-game
-and related discrete-consensus models describe how a population settles on a
-shared convention \citep{baronchelli2018consensus}, the regime our
-multistability analysis appeals to (\autoref{sec:results:multistability}).
-And a stubborn agent that never updates acts as a fixed anchor that can pull
-the group toward its position \citep{friedkin1999social}, precisely the variant
-our devil's advocate probe instantiates (\autoref{sec:results:seeded}).
+captures exactly this split and is the template for our agent state.
+Secondly, the answers in a debate are often discrete labels,
+which cannot be averaged. Naming-game models describe how a population of such
+agents ends up agreeing on a single label \citep{baronchelli2018consensus}.
+Different runs can settle on different labels, which is the behaviour our
+multistability analysis builds on (\autoref{sec:results:multistability}).
+Thirdly, some agents never change their mind. Such a stubborn agent acts as a
+fixed anchor that can pull the group toward its position
+\citep{friedkin1999social}. Our devil's advocate probe is exactly this case
+(\autoref{sec:results:seeded}).
 
 
 \subsection{LLM Agents and Multi-Agent Debate}
 \label{sec:bg:mad}
 
-A \emph{large language model} (LLM) is a neural network, in current practice a
-Transformer \citep{vaswani2017attention}, trained to predict the next token in a
-sequence and aligned to follow instructions through supervised fine-tuning and
-reinforcement learning from human feedback \citep{ouyang2022instructgpt}. In
-the broad sense, ``LLM agent'' covers any system that places an LLM in a loop
-with tools, environment feedback, or other models. In the narrow sense used
-throughout this thesis, an \emph{LLM agent} is an LLM in a message-passing loop
-with other LLMs: it receives a state comprising the task, its prior position,
-and messages from peers; it produces an action consisting of a written argument
-and a vote; and the result is fed back as the next state. Sampling is
-stochastic: temperature controls the sharpness of the output distribution, and
-raising it increases response diversity at the cost of coherence, so two agents
-given identical prompts at a positive temperature can produce different
-responses. An agent's effective state is its context, the accumulated text it
-conditions on, and context length is finite; beyond a certain history depth,
-earlier rounds must be truncated or summarised, which is why the extent of
-retained interaction history is a design parameter with functional
-consequences.
+A \emph{large language model} (LLM) is a neural network trained to predict
+the next token in a sequence and aligned to follow instructions through
+supervised fine-tuning and reinforcement learning from human feedback
+\citep{ouyang2022instructgpt}. An \emph{LLM agent} is an LLM placed in a loop
+with tools, environment feedback, or other models. In this thesis, the loop is
+formed by other LLMs. Because an LLM samples its output, two agents given
+identical prompts can produce different responses.
 
 The standard single-model inference-time alternatives to multi-agent protocols
 are chain-of-thought prompting \citep{wei2022chainofthought}, which improves
-reasoning by eliciting step-by-step intermediate text from one model, and
+reasoning by encouraging step-by-step intermediate text from one model, and
 self-consistency \citep{wang2023selfconsistency}, which samples several
 reasoning paths from a single model and returns the majority answer. Both can
 be applied without additional models or communication rounds and serve as the
 principal baselines against which multi-agent protocols are compared. A third
 alternative is \emph{self-correction}, in which a single model critiques and
 revises its own answer from self-generated feedback
-\citep{madaan2023selfrefine}. Without any external feedback, however, such
+\citep{madaan2023selfrefine}. However, without any external feedback such
 intrinsic self-correction often fails to improve reasoning and can even degrade
-it \citep{huang2024selfcorrect}, which is one motivation for bringing in other
+performance \citep{huang2024selfcorrect}, which is one motivation for bringing in other
 agents as a source of critique.
 
-Placing several such agents in a shared loop yields an LLM-based
-\emph{multi-agent system} \citep{guo2024survey}. Much of this literature assigns
-agents distinct functional roles and divides a task among them, for instance by
-encoding the stages of a software project as standardised operating procedures
-\citep{hong2024metagpt}, or provides general frameworks from which such teams
-can be assembled \citep{chen2024agentverse}. \emph{Multi-agent debate} (MAD) is
-the special case in which all agents address the same question over the same
-answer space, so that their outputs can be compared, contested, and aggregated.
-In MAD, several LLM agents independently propose an answer and then exchange
-and revise their reasoning over multiple rounds before committing to a final
-decision \citep{du2024improving}. Each round typically consists of agents
-reading the current arguments of their peers and producing an updated argument
-and vote in response. The group commits when it reaches sufficient agreement or
-a round limit is hit. The motivating argument is error correction: if agents
-make partially independent mistakes, deliberation lets the group surface and
-correct them. This gain assumes the mistakes are independent, however:
-correlated votes, which social influence itself induces, erode it, and beyond a
-threshold the majority no longer outperforms an individual
-\citep{ladha1992condorcet}. A second motivation concerns what a single model
-cannot do on its own: once a model has settled confidently on an answer,
-reflecting on it alone rarely produces a new line of thought, a failure
-\citet{liang2024encouraging} call \emph{Degeneration-of-Thought}, and peers can
-supply the external challenge that self-reflection lacks. The term ``debate''
-also names a distinct proposal in AI safety where two models argue before a
-human judge in order to make model reasoning checkable
-\citep{irving2018safety}; the collaborative protocol studied here descends from
-the reasoning-improvement line rather than from that one, so there is no
-separate judge and the agents themselves both argue and decide.
+Placing several such agents in a shared loop gives an LLM-based
+\emph{multi-agent system} \citep{guo2024survey}. Much of this work gives each
+agent a distinct role and splits a task among them, for instance by encoding the
+stages of a software project as standardised operating procedures
+\citep{hong2024metagpt}, or by providing general frameworks from which such
+teams can be assembled \citep{chen2024agentverse}. \emph{Multi-agent debate}
+(MAD) is a special case of this. All agents answer the same question over the same set
+of possible answers, so their outputs can be compared, contested, and combined
+into a single group answer. The agents first propose answers independently and then
+revise them over several rounds after reading each other's arguments
+\citep{du2024improving}. The term ``debate'' also names a different proposal in
+AI safety, in which two models argue before a human judge to make their
+reasoning checkable \citep{irving2018safety}. We follow the collaborative
+variant, which has no separate judge. The agents themselves both argue and
+decide.
+
+MAD is motivated by two ideas. The first is error correction. If agents make
+partly independent mistakes, discussion lets the group catch them. This gain
+shrinks when the mistakes are correlated, and beyond a certain level of
+correlation the majority loses its advantage over a single individual actor
+\citep{ladha1992condorcet}. The second idea is that a single model struggles to
+challenge itself. Once it has settled on an answer, reflecting alone rarely
+produces a new line of thought, a failure that \citet{liang2024encouraging} call
+\emph{Degeneration-of-Thought}. Peers can supply the challenge that
+self-reflection lacks. The independence condition matters most for this thesis,
+because social influence between agents is exactly what makes their votes
+correlated.
 
 \begin{figure}[t]
   \centering
@@ -371,8 +361,8 @@ separate judge and the agents themselves both argue and decide.
     governed by the \emph{interaction} and \emph{agreement} dimensions of
     \citet{motger2026taxonomy}; the \emph{participant} dimension concerns the
     agents themselves and applies throughout. \textbf{(b)} Three communication
-    topologies for four agents; in the star, all communication passes through
-    the shaded hub. \textbf{(c)} A memory window of $W = 2$: at round $t$, each
+    topologies for four agents. In the star, all communication passes through
+    the shaded hub. \textbf{(c)} A memory window of $W = 2$. At round $t$, each
     agent sees only the two preceding rounds. The specific protocol used in this
     thesis, which instantiates these steps, is shown in \autoref{fig:protocol}.}
   \label{fig:mad}
@@ -380,14 +370,14 @@ separate judge and the agents themselves both argue and decide.
 
 Across its many variants, a debate can be described by a common sequence of
 steps (\autoref{fig:mad}a). In \emph{initialisation}, each agent answers the
-question without seeing the others; in \emph{exchange}, each agent receives some
-subset of its peers' outputs; and in \emph{revision}, it produces an updated
+question without seeing the others. In \emph{exchange}, each agent receives some
+subset of its peers' outputs. In \emph{revision}, it produces an updated
 argument and vote. \emph{Termination} decides whether another round of exchange
 and revision follows, and \emph{aggregation} combines the individual votes into
 a group answer. Every design choice in a debate system fixes how one of these
 steps is carried out. A recent systematic review of 141 debate studies
-organises these choices along three dimensions \citep{motger2026taxonomy}: who
-takes part (\emph{participants}), how information flows between them
+organises these choices along three dimensions \citep{motger2026taxonomy}. These
+are who takes part (\emph{participants}), how information flows between them
 (\emph{interaction}), and how the group reaches its answer (\emph{agreement}).
 
 \paragraph{Participants.}
@@ -401,9 +391,10 @@ less likely to share the same errors.
 
 \paragraph{Interaction.}
 The \emph{communication topology} fixes who reads whom (\autoref{fig:mad}b). In
-a fully-connected group every agent sees every other; in a star, peripheral
-agents communicate only through a central hub; and sparser arrangements such as
-a ring restrict each agent to a few neighbours \citep{li2024sparsetopology}.
+a fully-connected group every agent sees every other. In a star, peripheral
+agents communicate only through a central hub. Sparser arrangements such as
+neighbour-connected graphs, in which each agent reads only a few peers, restrict
+communication \citep{li2024sparsetopology}.
 These topologies are usually fixed in advance, but the communication graph can
 also be optimised \citep{zhuge2024gptswarm} or adapted while the debate runs
 \citep{liu2024dylan}. Within a round, agents can speak sequentially in a fixed
@@ -414,7 +405,7 @@ controlling the influence of earlier rounds on current decisions.
 
 \paragraph{Agreement.}
 The \emph{decision protocol} fixes how individual votes are aggregated into a
-group answer: by majority vote, by a vote weighted by each agent's stated
+group answer, for example by majority vote, by a vote weighted by each agent's stated
 confidence \citep{chen2024reconcile}, by a judge \citep{liang2024encouraging},
 or by requiring consensus \citep{kaesberg2025voting}. Tied to it is the
 \emph{stopping rule}, which runs the debate for a fixed number of rounds or ends
@@ -422,8 +413,8 @@ it early once the group agrees or its answers stabilise
 \citep{yin2023eot, hu2025stabilitydetection}.
 
 The same review finds that the field has converged on a narrow default of
-static, fully-connected topologies, verbatim exchange, short-term memory, and
-vote-based resolution, adopted by convention rather than through systematic
+static, fully-connected topologies, agents sharing their full messages, short-term
+memory, and vote-based resolution, adopted by convention rather than through systematic
 comparison \citep{motger2026taxonomy}. The system studied in this thesis
 (\autoref{sec:exp}) stays close to this default, so that its dynamics speak to
 debate as it is commonly deployed. It departs from it where measurement

@@ -107,9 +107,8 @@ and, we think, for much of the disagreement in the literature about whether
 debate works. On GPQA the agents usually begin with the correct option present,
 the plurality of the opening votes already reaches $40.5\,\%$, there is little
 room above that baseline, and debate adds under two percentage points. On
-HiddenBench the shared model bias drives the opening plurality below chance,
-because the errors are correlated in the way that biased information sampling
-produces in human hidden profile groups
+HiddenBench the shared evidence favours a wrong option and drives the opening plurality below chance,
+as biased information sampling does in human hidden profile groups
 \citep{stasser1985pooling, li2026hiddenbench}, and the same widening recovers
 $18.5$ percentage points. The two benchmarks are not an easy and a hard version
 of one task, they are the two sides of the crossing point where the
@@ -152,7 +151,7 @@ confident wrong answer instead.
 
 The motivation for this thesis was that outcome metrics tell a practitioner
 whether a configuration worked but never why, and give no way to separate a
-healthy deliberation from a pathological one \citep{miehling2025agentic}. The
+healthy deliberation from a pathological one. The
 negative half of our answer is that the signals an operator would naturally reach
 for instead are uninformative or inverted. Confidence rises monotonically across
 rounds whether the final answer is correct or not, so a confident group is not a
@@ -374,7 +373,7 @@ distinction stops mattering. Agent heterogeneity is the axis the critical
 literature considers decisive, since it identifies model diversity rather than
 debate itself as the reliable source of gains
 \citep{liu2025stopovervaluing, chen2024reconcile} and capability asymmetry as a
-driver of harmful herding \citep{wynn2025talk}.
+factor in harmful herding \citep{wynn2025talk}.
 
 The second limitation is the reach of the causal evidence. The seeded experiment
 is our only intervention and it was run on GPQA, so the amplifier claim is causal
@@ -407,7 +406,7 @@ is genuine. The dominance graph is built from vote adoptions during the
 \updatephase{} phase, which is precisely where the protocol instructs agents to
 update, so a strong hub to spoke edge may reflect persuasion or merely the
 routing of information. Removal based attribution, which estimates an agent's
-contribution by masking its messages
+contribution by removing it or ignoring its messages
 \citep{agentsthatmatter2026, cui2025introspecloo}, would
 replace the concentration index with an interventional measure of influence and
 is the natural successor to what we report here.

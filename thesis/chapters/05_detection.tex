@@ -1,36 +1,3 @@
-% ============================================================
-% CHAPTER 5: DETECTION METHODOLOGY
-%
-% Structure (matches ToC):
-%   5.1  Shared Measurement Conventions
-%   5.2  Self-Reinforcement
-%   5.3  Multistability
-%   5.4  Dominance
-%   5.5  Limit Cycles          (subsubsections collapsed)
-%
-% Every detector subsection follows the same five moves:
-%   Concept -> Measurement -> Detection -> Worked example -> Limitations
-% Split rule: Measurement is what we compute from the log; Detection is
-% the null it is tested against and the rule that flags the motif.
-%
-% Notation is unified with Chapter 4:
-%   t = round index, r = repetition, N = agents (=4), M = options
-%   v_i^t = vote, c_i^t = confidence, s_t = macrostate.
-% Recurrence-matrix positions are indexed by (a,b) to avoid clashing
-% with the agent index i.
-%
-% REMOVED LABELS (redirect any \autoref pointing at them to
-% \autoref{sec:method:lc}):
-%   sec:method:lc:agent
-%   sec:method:lc:system
-%
-% Persuasiveness and message alignment are retained (commented out at
-% the end of this file) for later reference but are no longer part of
-% the methodology. Per-detector implementation notes and the list of
-% future motifs are moved to the appendix.
-% ============================================================
-
-
 Each of the four motifs defined in this section is a hypothesis about the
 underlying debate dynamics. If the system self-organizes in the way a
 complex-systems reading predicts, then confidence should reinforce within a held
@@ -48,13 +15,10 @@ front. Firstly, each detector reads only from ordinary interaction logs, the vot
 and confidence channels defined in \autoref{sec:exp}, which is what later lets us
 propose the same detectors as diagnostic instruments. And secondly, each detects a
 \emph{signature}, not a certified dynamical object. Thus, we add a
-``Limitations'' paragraph to each detector which makes explicit what the
-corresponding statistic can and cannot claim.
+paragraph stating the limitations to each detector which makes explicit what the
+corresponding detector can and cannot claim.
 
 
-% ------------------------------------------------------------
-% 5.1 SHARED MEASUREMENT CONVENTIONS
-% ------------------------------------------------------------
 \subsection{Shared Measurement Conventions}
 \label{sec:method:vocab}
 
@@ -63,27 +27,25 @@ Four things recur across every subsection below: the shape those subsections tak
 the classification of the motifs themselves, the macrostate the system-level
 detectors read from, and the nesting of the data that constrains every comparison.
 
-The four subsections each make the same five moves, in the same order.
+The four subsections each make the same five parts, in the same order.
 \emph{Concept} states the motif in dynamical-systems terms and names the quantity
 in a debate that plays the role of the state variable. \emph{Measurement} defines
-the \emph{measurement primitive}, the lowest-level object the detector scores, and
-the statistic computed from it. \emph{Detection} gives the null model that
-statistic is tested against and the rule that flags the motif. \emph{Worked
-example} runs the detector by hand on a small case, and \emph{Limitations} states
-what the resulting statistic cannot claim. The division between the second and
-third move is the one worth holding on to, since it recurs throughout: measurement
-is what we compute from the log, detection is what we compare it against. So that
+the \emph{measurement primitive}, the lowest-level object the detector identfies, and
+the statistic computed from it. \emph{Detection} specifies the null model
+against which that statistic is tested, and the rule for flagging the motif. 
+\emph{Worked example} runs the detector by hand on a small case, and \emph{Limitations} states
+what the resulting statistic cannot claim. Furthermore, so that
 the four worked examples can be read against one another, they share a single
 running scenario, one task with $N = 4$ agents and $M = 4$ options labelled $A$ to
 $D$ of which $A$ is correct, and they write an agent's state as its option with its
-confidence as a subscript, so that $D_8$ is a vote for $D$ held at confidence $8$.
+confidence as a subscript, so that $D_8$ is a vote for $D$ with a confidence score of $8$.
 
 The motifs those subsections detect are preselected rather than exhaustively
-enumerated, each motivated by a documented failure mode of LLM-based debate.
+enumerated and each is motivated by a documented failure mode of LLM-based debate.
 \autoref{tab:method:motifs} lists them together with their classification and the
-section in which each detector is defined. Further motifs that fall within the same
-structural-dynamical framework but lie outside the scope of this study are catalogued
-in Appendix~\ref{app:future_motifs}.
+section in which each detector is defined. Further motifs that fit the same
+framework but fall outside this study are shown in
+Appendix~\ref{app:future_motifs}.
 
 \begin{table}[H]
 \centering
@@ -107,12 +69,11 @@ agent trajectories, the collective macrostate, or both).}
 What the table calls the \emph{level} of a motif decides where its detector reads
 from. Self-reinforcement, the only agent-level motif, reads directly from
 per-agent vote and confidence trajectories. The three system-level readings
-instead operate on the agent-anonymised macrostate $s_t$ defined in
-\autoref{sec:setup:notation}, whose key property is that composition retains more
-information than a plain vote count: a $3$--$1$ split and a $2$--$2$ split are
-distinct macrostates, and options remain labelled because one is correct and they
-are not interchangeable. Each of the three takes a different slice of that record,
-however. Multistability reads only the locked-in endpoint, dominance reads the
+instead operate on the macrostate $s_t$ defined in \autoref{sec:setup:notation}.
+It forgets which agent holds which vote but keeps how the votes are split across
+the options. A $3$--$1$ split therefore differs from a $2$--$2$ split, and a vote
+for the correct option differs from a vote for a wrong one. However, each of the three motifs 
+takes a different slice of that record. Multistability reads only the locked-in endpoint, dominance reads the
 emergent influence graph, which is built relationally and therefore needs
 within-repetition agent identity, and the system-level limit-cycle test reads the
 full sequence $s_0, \ldots, s_T$.
@@ -127,203 +88,192 @@ and $\text{dataset} \in \{\text{GPQA}, \text{HiddenBench}\}$, and that nesting
 constrains what may be compared with what. Because agents interact within a
 repetition, their trajectories are not independent, so the repetition is the
 independent unit of replication and agent-level trajectories are never pooled as
-if they were separate observations (pseudoreplication). For the same reason GPQA
+if they were separate observations. For the same reason GPQA
 and HiddenBench are always analysed separately and never pooled, and memory-window
 comparisons are made within a fixed topology and dataset, since cells from
 different configs are not exchangeable.
 
-A last property is shared by all four detectors, and it bounds every claim they
-make: each is phenomenological rather than causal. We detect a trajectory or
-influence \emph{signature}, not a certified attractor, cycle, or causal hub, and
-separating the signature from its underlying cause requires dedicated perturbation
-experiments, which we leave to future work. Under the cooperative,
-convergence-forced design we also expect several detectors to return sparse or
-near-null results, which is why each detection paragraph below names the baseline
-its statistic is compared against rather than testing it against zero.
+All four detectors share the limitation that they are descriptive and not causal. 
+They find a
+\emph{signature} in the trajectories or influence graph, not a proven attractor,
+cycle, or causal hub. Telling the two apart would need perturbation experiments,
+which we leave to future work. Because the debates are cooperative and forced to
+converge, we also expect several detectors to find little or nothing. This is why
+each detection paragraph below compares its statistic against a named baseline
+rather than against zero.
 
 
-% ------------------------------------------------------------
-% 5.2 SELF-REINFORCEMENT
-% ------------------------------------------------------------
 \subsection{Self-Reinforcement}
 \label{sec:method:sr}
 
 \paragraph{Concept.}
-In complex systems, self-reinforcement is \emph{positive feedback}: the current
-level of a state variable raises the drive toward more of the same, so deviations
+In complex systems, self-reinforcement is \emph{positive feedback} reinforcing itself. 
+The current
+level of a state variable raises the drive toward more of the same, so small changes
 are amplified rather than damped \citep{arthur1989competing}. At the motif level
 this is positive autoregulation, a node that augments its own production
-\citep{milo2002network, alon2007network}. For us the state variable is an agent's
+\citep{alon2007network}. For us the state variable is an agent's
 expressed \emph{confidence}. Self-reinforcement is then the tendency of an agent
 to push its own confidence upward while it holds a position, driven by
-accumulating commitment rather than by what the incoming information warrants. The
-pattern is already documented: in multi-turn LLM debate, confidence tends to rise
-across rounds in an anti-Bayesian fashion, even where no new information justifies
+accumulating commitment rather than by new incoming information. The
+pattern is already documented as in multi-turn LLM debate, confidence tends to rise
+across rounds even where no new information justifies
 the rise \citep{prasad2025certain}.
 
-For the detection of self-reinforcement a rising confidence trajectory is on its
-own necessary but not sufficient, since rational updating and peer conformity also
-push confidence up. We therefore measure two signatures that go beyond it.
-\emph{Directional drift} is the tendency of confidence to increase rather than
-decrease while a position is held. \emph{Strength scaling} is the prediction that
-this drift grows with how strongly an agent is re-exposed to its own prior
-commitments, which the memory window $W$ controls directly. A third signature,
-\emph{endogeneity}, would establish that the rise comes from the agent's own
-commitment rather than from new information, but it cannot be separated from peer
-effects using trajectory data alone.
+Rising confidence alone is not enough to show self-reinforcement, since rational
+updating and peer conformity also raise confidence. We therefore measure two
+further signatures. \emph{Directional drift} is confidence tending to rise rather
+than fall while an agent holds its position. \emph{Strength scaling} is this drift
+growing the more an agent is re-exposed to its own earlier commitments, which the
+memory window $W$ controls directly. A third signature, \emph{endogeneity}, would
+show that the rise comes from the agent's own commitment rather than from new
+information, but trajectory data cannot separate it from peer effects.
 
 \paragraph{Measurement.}
-The primitive is the \emph{vote-stable segment}: a maximal block of consecutive
-rounds over which agent $i$'s vote does not change, running from its start $t_s$
-to its end $t_e$, so that $v_i^t = v_i^{t_s}$ for all $t \in \{t_s, \ldots, t_e\}$.
-Writing $L = t_e - t_s + 1$ for its length in rounds, a segment is retained only if
-$L \geq 3$. Two rounds would already define a slope, but that slope would be a
-single confidence difference with no residual degrees of freedom, so its sign would
-turn on one integer step; three rounds give two steps for the least-squares fit to
-average over. An agent might contribute several segments if it flips and one long
-segment if it locks in early. Agents are exchangeable, so segments are pooled
-within a config and never matched across repetitions.
-Within a retained segment we regress confidence on the round index by ordinary
+The primitive is the \emph{vote-stable segment} which is the longest block of consecutive
+rounds, from $t_s$ to $t_e$, in which agent $i$ keeps the same vote, so that
+$v_i^t = v_i^{t_s}$ for all $t \in \{t_s, \ldots, t_e\}$.
+With $L = t_e - t_s + 1$ as its length in rounds, we keep a segment only if
+$L \geq 3$. Three rounds give two steps for the
+least-squares fit to average over. An agent that flips can contribute several
+segments, and one that locks in early contributes a single long one. Agents are
+exchangeable, so we pool segments within a config and never match them across
+repetitions.
+Within each kept segment we fit the confidence on the round index by ordinary
 least squares,
 \begin{equation}
   c_i^t = \beta_0 + \beta_{\mathrm{seg}}\, t + \varepsilon_t,
   \qquad t \in \{t_s, \ldots, t_e\},
 \end{equation}
 and keep the slope $\beta_{\mathrm{seg}}$, in confidence points per round. Its sign
-feeds the prevalence test below, and its signed value feeds the mean slope
-$\bar{\beta}$ used in the $W$ comparison.
+enters the prevalence test below, and its value enters the mean slope $\bar{\beta}$
+used in the $W$ comparison.
 
 \paragraph{Detection.}
-With the segments in hand, the question is whether their slopes lean upward more
-often than chance allows. We read them in two ways, both conditioned on the
-config.
-The first is a presence test for directional drift. Writing $n_{\mathrm{seg}}$ for
-the number of retained segments in a config-task pair, the prevalence of upward
-segments is
+To detect self-reinforcement we ask whether segment slopes point upward more often than chance would allow.
+We read them in two ways, both within a single config.
+The first is a presence test for directional drift. Let $n_{\mathrm{seg}}$ be the
+number of kept segments in a config-task pair. The share of upward segments is
 \begin{equation}
   \hat{p}_{\mathrm{SR}}
   = \frac{\bigl|\{\text{seg}: \beta_{\mathrm{seg}} > 0\}\bigr|}{n_{\mathrm{seg}}},
 \end{equation}
-so flat segments ($\beta_{\mathrm{seg}} = 0$) sit in the denominator but never in
-the numerator. Under a no-feedback ``wobble'' null an upward and a downward
-segment are equally likely, so with a fraction $f$ of flat segments
-$P(\beta_{\mathrm{seg}} > 0) = \tfrac{1}{2}(1-f) \leq 0.5$. Thus, self-reinforcement is
-indicated when $\hat{p}_{\mathrm{SR}} > 0.5$. Both the flat segments and the
-confidence ceiling, since a segment already at the top of the scale cannot drift
-further up, make a positive result conservative.
-The second reading uses the memory window to discriminate between mechanisms.
-Letting $\bar{\beta}$ be the mean segment slope in a config, an \emph{endogenous}
-reading predicts that re-reading one's own prior commitments across a longer
-window amplifies the internal drive,
+so flat segments ($\beta_{\mathrm{seg}} = 0$) count in the denominator but never in
+the numerator. Under a no-feedback ``wobble'' null, an upward and a downward
+segment are equally likely. With a fraction $f$ of flat segments this gives
+$P(\beta_{\mathrm{seg}} > 0) = \tfrac{1}{2}(1-f) \leq 0.5$. We therefore take
+$\hat{p}_{\mathrm{SR}} > 0.5$ as an indicator of self-reinforcement. Flat segments and
+the confidence ceiling both make a positive result harder to get, because a
+segment already at the top of the scale cannot drift further up.
+The second reading uses the memory window to tell the mechanisms apart.
+Let $\bar{\beta}$ be the mean segment slope in a config. An \emph{endogenous}
+reading predicts that re-reading the own earlier messages over a longer
+window strengthens the held position,
 \begin{equation}
   \bar{\beta}(W{=}5) > \bar{\beta}(W{=}2) > \bar{\beta}(W{=}1),
 \end{equation}
-whereas under a \emph{peer-conformity} reading a longer window mainly adds peer
-content, and the ordering may be absent or reversed. 
+whereas a \emph{peer-conformity} reading expects a longer window to mainly add
+peer content, so the ordering may be missing or reversed.
 
-Both readings are reported per config-task and then summarised across tasks,
-for example ``above $0.5$ in $k$ of $50$ tasks'', so that an effect is shown to be
-broad rather than driven by one task.
+We report both readings per config-task and then summarise them across tasks, for
+example ``above $0.5$ in $k$ of $50$ tasks''. This shows whether an effect is broad
+or driven by a single task.
 
 \paragraph{Worked example.}
 In the running scenario, suppose agent~$0$ holds option~$A$ for five rounds with
 confidences $c = (5, 6, 6, 8, 9)$. This is one vote-stable segment of length
-$L = 5$, and regressing confidence on the round index gives
-$\beta_{\mathrm{seg}} = +1.0$ confidence points per round: an upward segment,
-counting toward $\hat{p}_{\mathrm{SR}}$. Had the agent instead drifted
+$L = 5$. Regressing confidence on the round index gives
+$\beta_{\mathrm{seg}} = +1.0$ confidence points per round, so the segment is
+upward and counts toward $\hat{p}_{\mathrm{SR}}$. Had the agent instead drifted
 $c = (7, 7, 6, 6, 5)$, the slope would be $-0.5$ and the segment would count
 against it. A segment that never moved, $c = (6,6,6,6,6)$, has
-$\beta_{\mathrm{seg}} = 0$: retained in the denominator but not counted as upward,
-which is what makes the $0.5$ reference conservative. Under the strength-scaling
-reading, the average of such slopes should grow as the window widens from
-$W{=}1$ to $W{=}5$.
+$\beta_{\mathrm{seg}} = 0$. It stays in the denominator but is not counted as
+upward, which is what makes the $0.5$ reference conservative. Under the
+strength-scaling reading, the average of such slopes should grow as the window
+widens from $W{=}1$ to $W{=}5$.
 
 \paragraph{Limitations.}
-Beyond the shared phenomenological caveat, two points bound the claim.
-\emph{Endogeneity is not isolated}: an upward segment is equally consistent with
-peer copying and with a peer surfacing genuinely new information in a later round,
-and rising confidence alone cannot tell these apart. The $W$ ordering narrows the
+Beyond the shared problem that the detectors are descriptive, two points limit the
+detection.
+First, \emph{endogeneity is not isolated} as an upward segment fits equally well with peer
+copying and with a peer adding genuinely new information in a later round, and
+rising confidence alone cannot tell these apart. The $W$ ordering narrows this
 ambiguity but does not settle it, since a longer window also re-exposes more peer
-content. \emph{Convergence is a confound}: on easier tasks fast agreement can
-itself raise confidence, which is why prevalence is reported per task and never as
-a single pooled figure.
+content. Second, \emph{convergence is a confound} as on easier tasks, fast agreement can
+itself raise confidence. This is why we report prevalence per task and not as a
+single pooled figure.
 
 
-% ------------------------------------------------------------
-% 5.3 MULTISTABILITY
-% ------------------------------------------------------------
 \subsection{Multistability}
 \label{sec:method:multistability}
 
 \paragraph{Concept.}
 In dynamical systems, \emph{multistability} is the coexistence of two or more
-stable attractors for one fixed parameter set. Into which attractor the system settles
-into is decided by the basin of attraction containing the initial condition
-\citep{feudel2008complex, pisarchik2014control}. At the motif level this is the dynamical signature of positive
-feedback with a symmetry: the same interaction rules admit several self-consistent
-outcomes \citep{milo2002network, alon2007network}. For us the state variable is
-the macrostate $s_t$, and multistability is read off the \emph{locked-in endpoint}:
-for a fixed task, the debate converges to different consensus answers on different
-repetitions, and which one is reached is selected by the initial vote
-configuration rather than by the task's correct option. This is the structural
-reading of unreliable correction: on a task where the model carries a systematic
-bias, a wrong-consensus and a right-consensus attractor can coexist, and the
-group's fate is basin competition decided at round $0$, which self-reinforcement
-then amplifies and locks in. For the motif detection, seeing more than one final answer is necessary but
-not sufficient, as a task may simply be noisy. Thus, genuine multistability
+stable attractors for one fixed parameter set. Which attractor the system settles
+into depends on the basin of attraction that contains the initial condition
+\citep{feudel2008complex, pisarchik2014control}. At the motif level this is the
+dynamical signature of positive feedback with a symmetry. The same interaction
+rules allow several self-consistent outcomes.
+For us the state variable is the macrostate $s_t$, and multistability is read off
+the \emph{locked-in endpoint}. For a fixed task, the debate converges to different
+consensus answers on different repetitions, and the initial vote configuration,
+rather than the task's correct option, decides which one is reached. This is the
+structural reading of unreliable correction. On a task where the model carries a
+systematic bias, a wrong-consensus and a right-consensus attractor can coexist.
+The group's fate is then a competition between basins decided at round $0$, which
+self-reinforcement amplifies and locks in. Seeing more than one final answer is
+necessary but not sufficient, as a task may simply be noisy. Genuine multistability
 additionally requires that the initial condition \emph{predicts} the endpoint
 \citep{pisarchik2014control}.
 
 \paragraph{Measurement.}
-The primitive and independent unit is the repetition, characterised by its initial
+The primitive and independent unit is the repetition, described by its initial
 vote composition $s_0 = (n_1^0,\ldots,n_M^0)$ and its final macrostate. A
-repetition is converged if its final macrostate is unanimous, regardless
-of whether that unanimity was reached via early stopping or at the round cap $T$.
-We restrict the multistability analysis to converged repetitions because a stable
-non-unanimous endpoint reflects a failure to reach collective agreement rather than
-a genuine attractor. The endpoint attractor $A^{(r)}$ of a converged repetition is
-the winning option, so there are at most $M$ distinct attractors per task.
-Repetitions that end in a non-unanimous state are excluded.
-Scoring is per task-config cell with $n_c$ denoting the number of converged
-repetitions in that cell. The cell's \emph{dominant attractor} is the most
-frequent endpoint option, and each repetition's start is summarised by
+repetition is converged if its final macrostate is unanimous, whether that was
+reached by early stopping or at the round cap $T$. We analyse only converged
+repetitions, because a stable non-unanimous endpoint means the group failed to
+agree and is not a genuine attractor. Repetitions that end without unanimity are
+excluded. The endpoint attractor $A^{(r)}$ of a converged repetition is the
+winning option, so each task has at most $M$ distinct attractors.
+We score each task-config cell separately, with $n_c$ the number of converged
+repetitions in that cell. The cell's \emph{dominant attractor} is its most
+frequent endpoint option. Each repetition's start is summarised by
 \begin{equation}
   g(s_0) \in \{0, 1, \ldots, N\},
 \end{equation}
 the number of agents whose round-$0$ vote is on the dominant option.
 From these we compute the empirical basin distribution over endpoint attractors,
-$\hat{P}(A = k) = \tfrac{1}{n_c}\sum_r \mathbf{1}[A^{(r)} = k]$, a basin-stability
-estimate of relative basin volumes under the model's own initial distribution
-\citep{menck2013basin}. The effective number of coexisting attractors is the
-inverse Simpson (Hill) index \citep{hill1973diversity},
+$\hat{P}(A = k) = \tfrac{1}{n_c}\sum_r \mathbf{1}[A^{(r)} = k]$. This is a
+basin-stability estimate of relative basin volumes under the model's own initial
+distribution \citep{menck2013basin}. The effective number of coexisting attractors
+is the inverse Simpson (Hill) index \citep{hill1973diversity},
 \begin{equation}
   N_{\mathrm{eff}} = \frac{1}{\sum_k \hat{P}(A = k)^2} \in [1, M].
 \end{equation}
-$N_{\mathrm{eff}} \approx 1$ is a single attractor, $\approx 2$ two coexisting
-attractors, and so on, so $N_{\mathrm{eff}}$ reports \emph{how many} attractors
-coexist. Because attractors are unanimous options, it is bounded by $M$. Since $M$
-varies across tasks, we report $N_{\mathrm{eff}}$ raw and compare it only within a
-fixed $M$. In practice GPQA is entirely $M = 4$; only HiddenBench
-mixes $M = 3$ and $M = 4$, so its $N_{\mathrm{eff}}$ summaries are reported
-separately by option count.
+A value of $N_{\mathrm{eff}} \approx 1$ means a single attractor, $\approx 2$ means
+two coexisting attractors, and so on. Attractors are unanimous options, so
+$N_{\mathrm{eff}}$ is bounded by $M$. Since $M$ varies across tasks, we report
+$N_{\mathrm{eff}}$ raw and compare it only within a fixed $M$. GPQA always has
+$M = 4$, while HiddenBench mixes $M = 3$ and $M = 4$, so we report its
+$N_{\mathrm{eff}}$ summaries separately by option count.
 
 \paragraph{Detection.}
-Coexistence alone does not establish multistability; the initial condition must
+Coexistence alone does not establish multistability. The initial condition must
 also \emph{select} the attractor \citep{feudel2008complex, pisarchik2014control},
-and it is that association which carries the inferential claim. We measure it
-between $g(s_0)$ and the endpoint $A$ with Cram\'er's $V$
+and this association carries the inferential claim. We measure it between
+$g(s_0)$ and the endpoint $A$ with Cram\'er's $V$
 \citep{cramer1946mathematical} on their contingency table,
 \begin{equation}
   V = \sqrt{\frac{\chi^2 / n_c}{\min(R_{\mathrm{tab}} - 1,\, C_{\mathrm{tab}} - 1)}} \in [0, 1],
 \end{equation}
 where $\chi^2$ is the Pearson statistic and $R_{\mathrm{tab}}, C_{\mathrm{tab}}$
 are the table's numbers of rows (distinct $g(s_0)$, at most $N+1$) and columns
-(distinct endpoints, at most $M$). $V \approx 0$ means the start is irrelevant;
-$V$ near $1$ means the start deterministically selects the endpoint. The null
-shuffles the pairing of $g(s_0)$ and $A$ across the $n_c$ repetitions, preserving
-both marginals while destroying the start-to-endpoint link
-\citep{theiler1992surrogate}; for $B = 1000$ surrogates the add-one one-sided
-$p$-value flags basin selection when $p < 0.05$.
+(distinct endpoints, at most $M$). A value of $V \approx 0$ means the start is
+irrelevant, and $V$ near $1$ means the start fully determines the endpoint. The
+null shuffles the pairing of $g(s_0)$ and $A$ across the $n_c$ repetitions. This
+keeps both marginals but destroys the link between start and endpoint
+\citep{theiler1992surrogate}. With $B = 1000$ surrogates, we flag basin selection
+when the add-one one-sided $p$-value is below $0.05$.
 
 The two readings combine into a single cell label,
 \begin{equation}
@@ -334,12 +284,12 @@ The two readings combine into a single cell label,
     \text{stochastic (not multistable)} & N_{\mathrm{eff}} \geq 1.5 \ \wedge\ p \geq 0.05,
   \end{cases}
 \end{equation}
-with the degree of multistability read from $N_{\mathrm{eff}}$ and capped at $M$.
-The cutoff $1.5$ is a reporting threshold, not a test; the inferential claim rests
-on $p$. The third case is the essential guard: coexistence without basin selection
-is scatter, not multistability. Because per-cell power is limited, results lean on
-the across-task distribution of $N_{\mathrm{eff}}$ and $V$ rather than any single
-cell.
+and we read the degree of multistability from $N_{\mathrm{eff}}$, capped at $M$.
+The cutoff $1.5$ is a reporting threshold and not a test, so the inferential claim
+rests on $p$. The third case is the essential guard, because coexistence without
+basin selection is scatter and not multistability. Per-cell power is limited, so
+we rely on the distribution of $N_{\mathrm{eff}}$ and $V$ across tasks rather than
+on any single cell.
 
 \paragraph{Worked example.}
 In the running scenario, take a cell with $n_c = 30$ converged repetitions whose
@@ -348,106 +298,105 @@ endpoint distribution, and the label depends on whether the start predicts it.
 \begin{itemize}
   \item \textbf{Monostable.} Endpoints $28 \times A$, $2 \times B$ give
         $\hat{P} = (0.933, 0.067)$ and
-        $N_{\mathrm{eff}} = 1/(0.933^2 + 0.067^2) \approx 1.14 < 1.5$: one valley.
+        $N_{\mathrm{eff}} = 1/(0.933^2 + 0.067^2) \approx 1.14 < 1.5$, so there is
+        one valley.
   \item \textbf{Multistable.} Endpoints $15 \times A$, $15 \times B$ give
         $N_{\mathrm{eff}} = 2.0$. If repetitions starting with more agents on $A$
         (high $g(s_0)$) end on $A$ and those starting with few end on $B$, then
-        $V \approx 1$, $p < 0.05$: two basins selected by the start.
+        $V \approx 1$ and $p < 0.05$, so the start selects between two basins.
   \item \textbf{Tristable.} Endpoints $10 \times A$, $10 \times B$, $10 \times C$
-        with the start predicting each give $N_{\mathrm{eff}} \approx 3.0$,
-        $p < 0.05$ (the maximal degree for $M = 3$).
+        with the start predicting each give $N_{\mathrm{eff}} \approx 3.0$ and
+        $p < 0.05$, the maximal degree for $M = 3$.
   \item \textbf{Stochastic.} Endpoints $15 \times A$, $15 \times B$ again give
-        $N_{\mathrm{eff}} = 2.0$, but if $g(s_0)$ is unrelated to the endpoint then
-        $V \approx 0$, $p \gg 0.05$: coexistence without basin selection, correctly
-        \emph{not} labelled multistable.
+        $N_{\mathrm{eff}} = 2.0$. If $g(s_0)$ is unrelated to the endpoint, then
+        $V \approx 0$ and $p \gg 0.05$. This is coexistence without basin
+        selection and is correctly \emph{not} labelled multistable.
 \end{itemize}
 
 \paragraph{Limitations.}
-First,
-classical basin stability draws initial conditions uniformly
+First, classical basin stability draws initial conditions uniformly
 \citep{menck2013basin}, whereas our starts come from the model's own round-$0$
-distribution, so $\hat{P}(A)$ estimates \emph{effective} basin volume under that
-distribution, not geometric volume. Second, because $g(s_0)$ counts agents already
-on the eventual dominant option, a high $V$ is consistent both with genuine basin
-selection and with ordinary majority-vote persistence; the test detects
-start-to-endpoint dependence but does not by itself separate these two mechanisms,
-so we read the association as necessary but not mechanistically decisive.
+distribution. $\hat{P}(A)$ therefore estimates the \emph{effective} basin volume
+under that distribution and not the geometric volume. Second, $g(s_0)$ counts
+agents already on the eventual dominant option, so a high $V$ fits both genuine
+basin selection and ordinary persistence of the initial majority. The test detects
+dependence of the endpoint on the start but cannot separate these two mechanisms.
+We therefore treat the association as necessary but not decisive.
 
 
-% ------------------------------------------------------------
-% 5.4 DOMINANCE
-% ------------------------------------------------------------
 \subsection{Dominance}
 \label{sec:method:dominance}
 
 \paragraph{Concept.}
 Dominance is the concentration of directed influence onto a single node, an
-\emph{emergent hub} which is a structural motif \citep{milo2002network, alon2007network}
+\emph{emergent hub}. This is a structural motif \citep{milo2002network, alon2007network}
 read at the system level, since it is a property of the whole influence
 distribution. Its formal home is opinion dynamics. In the DeGroot model
 \citep{degroot1974consensus} and its social-power extension, an agent's influence
-equals its network centrality, and the group is \emph{autocratic} when these are
-maximally nonuniform and \emph{democratic} when uniform \citep{jia2015opinion}.
+tracks its network centrality. The group is \emph{autocratic} when influence is
+maximally uneven and \emph{democratic} when it is uniform \citep{jia2015opinion}.
 Dominance is the autocratic side. For us the state variable is the distribution of
-influence across the four agents, and dominance is the tendency of that
-distribution to concentrate on one of them rather than to spread evenly. When it
-does, a single overconfident agent can pull the rest of the group toward its answer
-\citep{chen2023consensus, cho2025herd}, degrading collective accuracy even when
-the majority would otherwise be correct \citep{wynn2025talk}. To avoid attributing concentration that is simply an artefact of the wiring, we
-measure influence for each topology separately. The result is a
-concentration signature rather than proof of causation, since an adoption edge
-cannot distinguish genuine influence from coincidental agreement.
+influence across the four agents, and dominance is the tendency of this
+distribution to concentrate on one agent rather than spread evenly. When it does,
+a single stubborn, confident agent can pull the rest of the group toward its answer
+\citep{chen2023consensus, cho2025herd}, which lowers collective accuracy even when
+stronger models outnumber weaker ones \citep{wynn2025talk}. Concentration can
+also come from the wiring alone, so we measure influence for each topology
+separately. The result is a concentration signature and not proof of causation,
+since an adoption edge cannot distinguish genuine influence from coincidental
+agreement.
 
 \paragraph{Measurement.}
 The primitive and independent unit is the per-repetition influence graph, which
-requires within-repetition agent identity.
-Dominance is defined over agents and their conversions, so it is independent of
-the option count $M$. A \emph{conversion} occurs when agent $j$ adopts, at
-round $t{+}1$, a vote that a disagreeing neighbour $i$ held at round $t$. The
-directed edge $i \to j$ accumulates the confidence-weighted conversions of $j$ onto
-$i$'s vote, with credit split among the neighbours already holding the target vote,
+requires agent identity within a repetition. Dominance is defined over agents and
+their conversions, so it does not depend on the option count $M$. A
+\emph{conversion} occurs when agent $j$ adopts, at round $t{+}1$, a vote that a
+disagreeing neighbour $i$ held at round $t$. The directed edge $i \to j$ collects
+the confidence-weighted conversions of $j$ onto $i$'s vote. Credit is split among
+the neighbours that already held the target vote,
 \begin{equation}
   w_{ij} = \sum_{t} \frac{1}{m_j^t}\,
            \mathbf{1}\!\left[v_j^{t+1} = v_i^{t} \neq v_j^{t}\right] c_j^{t},
   \qquad
   m_j^t = \bigl|\{k \in \mathcal{N}(j) : v_k^{t} = v_j^{t+1}\}\bigr|,
 \end{equation}
-where $c_j^t$ is the converting agent's confidence, $\mathcal{N}(j)$ its
-topological neighbourhood, and the factor $1/m_j^t$ shares credit equally among
+where $c_j^t$ is the converting agent's confidence, $\mathcal{N}(j)$ is its
+neighbourhood in the topology, and the factor $1/m_j^t$ shares credit equally among
 all eligible sources. Per-agent influence is the weighted out-strength
 $\sigma_i = \sum_j w_{ij}$. We use out-strength rather than eigenvector centrality
 \citep{bonacich1972factoring}, which is undefined or degenerate on
 non-strongly-connected and acyclic graphs \citep{newman2010networks} and
-hub-localises \citep{martin2014localization}. Our graphs are tiny and sparse, 
-making out-strength the only always-defined node score.
+concentrates on a few nodes \citep{martin2014localization}. Our graphs are tiny and
+sparse, which makes out-strength the only node score that is always defined.
 
-The statistic is the concentration of the resulting influence-share vector
-$p_i = \sigma_i / \sum_k \sigma_k$, measured by the normalised Herfindahl index
+The statistic is the concentration of the influence-share vector
+$p_i = \sigma_i / \sum_k \sigma_k$, measured by the normalised Herfindahl--Hirschman index
 \citep{hirschman1964paternity},
 \begin{equation}
   D = \frac{\sum_i p_i^2 - \tfrac{1}{N}}{1 - \tfrac{1}{N}} \in [0, 1].
 \end{equation}
-$D = 0$ is democratic as the agents have equal influence, and $D = 1$ is a single pure hub. $D$ is
-undefined when $\sum_k \sigma_k = 0$, that is when no conversion occurs at all,
-and such repetitions are excluded.
+A value of $D = 0$ is democratic, with equal influence for all agents, and $D = 1$
+is a single pure hub. $D$ is undefined when $\sum_k \sigma_k = 0$, meaning no
+conversion occurs at all, and we exclude such repetitions.
 
 \paragraph{Detection.}
-A high $D$ in the star is uninformative on its own, since the centre is the only
-agent a leaf can be converted by and the wiring alone forces concentration. The
-null is therefore keyed to topology: it asks how concentrated $D$ would be if, on
-this same wiring and these same conversion events, influence were assigned at
-random. We use a constrained shuffle in the spirit of Theiler's ``Algorithm~0''
-\citep{theiler1992surrogate} that keeps the converting agent, the round, the
-weight, and the number of eligible sources fixed, and redraws only the source
+A high $D$ in the star topology says little on its own. The centre is the only
+agent a leaf can be converted by, so the wiring alone forces concentration. We
+therefore key the null to the topology. It asks how concentrated $D$ would be if
+influence were assigned at random on the same wiring and the same conversion
+events. We use a constrained shuffle in the spirit of Theiler's ``Algorithm~0''
+\citep{theiler1992surrogate}. It keeps the converting agent, the round, the weight,
+and the number of eligible sources fixed, and redraws only the source
 \emph{identity}, uniformly among $\mathcal{N}(j)$.
-In the fully-connected topology every agent has three neighbours, so the shuffle can reassign any
-conversion to any of them and the resulting null is symmetric; concentration above
-it is emergent. However, for the star topology a leaf has exactly one neighbour, so a leaf
-conversion has only one possible source and the shuffle leaves it unchanged. Where
-a repetition is made up of such conversions, every surrogate reproduces the
-observed graph and the test can never flag. This makes the star null degenerate, so emergent concentration is identified only in
-the fully-connected topology. Raw $D$ is still reported for both, but in the star
-it describes the wiring rather than the behaviour.
+In the fully-connected topology every agent has three neighbours, so the shuffle
+can reassign any conversion to any of them and the null is symmetric. Any
+concentration above it is therefore emergent. In the star topology, however, a
+leaf has exactly one neighbour, so a leaf conversion has only one possible source
+and the shuffle leaves it unchanged. When a repetition consists of such
+conversions, every surrogate reproduces the observed graph and the test can never
+flag. The star null is thus degenerate, and we identify emergent concentration only
+in the fully-connected topology. We still report raw $D$ for both topologies, but
+in the star it describes the wiring and not the behaviour.
 
 A repetition is concentrated when its observed $D$ falls in the upper tail of its
 own surrogate distribution. With $B = 1000$ surrogates the add-one one-sided
@@ -456,13 +405,13 @@ $p$-value is
   p = \frac{1 + \#\{\,b : D^{(b)} \geq D\,\}}{1 + B},
 \end{equation}
 and we flag the repetition when $p < 0.05$. For the fully-connected topology we
-report the standardised excess
-$z_r = (D_r - \mu_{\mathrm{null}})/\sigma_{\mathrm{null}}$ and the flag rate
-against the $5\,\%$ the threshold produces by chance, each summarised per task and
-then counted across tasks. As for self-reinforcement, an entrenching hub predicts
-that concentration strengthens as the memory window widens at fixed topology, and
-we separately report whether the hub's vote matches the final consensus and how
-often it capitulates.
+also report the standardised excess
+$z_r = (D_r - \mu_{\mathrm{null}})/\sigma_{\mathrm{null}}$ and compare the flag
+rate with the $5\,\%$ that the threshold produces by chance. We summarise each per
+task and then count across tasks. As for self-reinforcement, an entrenching hub
+predicts that concentration grows as the memory window widens at fixed topology.
+We also report whether the hub's vote matches the final consensus and how often the
+hub capitulates.
 
 \paragraph{Worked example.}
 In the running scenario with the fully-connected topology, agent~$0$ opens at
@@ -477,98 +426,93 @@ t & \text{agent}_0 & \text{agent}_1 & \text{agent}_2 & \text{agent}_3\\\hline
 3 & D_9 & D_7 & D_6 & D_5
 \end{array}
 \]
-Three conversions occur. At round~$1$, agent~$1$ flips to $D$; only agent~$0$
+Three conversions occur. At round~$1$, agent~$1$ flips to $D$. Only agent~$0$
 held $D$ at round~$0$, so the full weight of agent~$1$'s confidence goes to
-edge $0 \to 1$, giving $w_{01} = 6$. At round~$2$, agent~$2$ flips to $D$; both
+edge $0 \to 1$, giving $w_{01} = 6$. At round~$2$, agent~$2$ flips to $D$. Both
 agents~$0$ and $1$ held $D$ at round~$1$, so credit splits equally, giving
-$w_{02} = w_{12} = 2.5$. At round~$3$, agent~$3$ flips to $D$; all three of
+$w_{02} = w_{12} = 2.5$. At round~$3$, agent~$3$ flips to $D$. All three of
 agents~$0$, $1$, and $2$ held $D$ at round~$2$, so credit splits three ways,
 giving $w_{03} = w_{13} = w_{23} = \tfrac{5}{3}$.
 The out-strengths are therefore $\sigma = (\tfrac{61}{6},\, \tfrac{25}{6},\,
-\tfrac{5}{3},\, 0)$, and the influence shares $p \approx (0.635,\, 0.260,\, 0.104,\,
+\tfrac{5}{3},\, 0)$, the influence shares are $p \approx (0.635,\, 0.260,\, 0.104,\,
 0)$, and $D = (0.482 - 0.25)/0.75 \approx 0.31$. Agent~$0$ accounts for $64\,\%$
-of influence yet $D$ is well below $1$ because the credit-splitting rule makes
-each early adopter a co-source for all later conversions, so staggered convergence
-never produces a pure hub. $D = 1$ would require every conversion to trace back to
-a single agent, which is only possible when every other agent flips simultanously.
+of influence, yet $D$ is well below $1$. The credit-splitting rule makes each early
+adopter a co-source of all later conversions, so staggered convergence never
+produces a pure hub. $D = 1$ would require every conversion to trace back to a
+single agent, which is only possible when every other agent flips simultaneously.
 
 \paragraph{Limitations.}
-First, with four agents the four shares and a discrete null bound the minimum
-$p$, so per-repetition power is low and the signal lives in the aggregate. Second,
-a single-conversion repetition gives $D = 1$ trivially, which is controlled by
-aggregation and the topology null rather than by discarding. Third, as noted
-above, the degeneracy of the star null means the emergent-excess test is
-identified only in the fully-connected topology, so any claim about emergent
-concentration in the star rests on raw $D$ and its $W$ ordering rather than on the
-null comparison.
+First, with four agents the four shares and a discrete null limit how small $p$ can
+get. Per-repetition power is therefore low and the signal lives in the aggregate.
+Second, a repetition with a single conversion gives $D = 1$ trivially. We handle
+this through aggregation and the topology null and do not discard such
+repetitions. Third, as noted above, the star null is degenerate, so the test for
+emergent excess is identified only in the fully-connected topology. Any claim about
+emergent concentration in the star rests on raw $D$ and its $W$ ordering and not on
+the null comparison.
 
 
-% ------------------------------------------------------------
-% 5.5 LIMIT CYCLES
-% ------------------------------------------------------------
 \subsection{Limit Cycles}
 \label{sec:method:lc}
 
 \paragraph{Concept.}
-In dynamical systems a limit cycle is an isolated closed orbit, a self-sustained
-periodic oscillation that requires no external forcing
+In dynamical systems, a limit cycle is an isolated closed orbit, a self-sustained
+periodic oscillation that needs no external forcing
 \citep{strogatz2015nonlinear}. At the motif level, sustained oscillation is the
-dynamical signature of feedback loops, which is the complementary case to the positive
-autoregulation behind self-reinforcement \citep{milo2002network, alon2007network}.
-This is the only one of our selected motifs that lives at both agent and system level, 
-so there are two state variables
-rather than one. At the agent level the state variable is the agent's vote
-$v_i^t \in \{1,\ldots,M\}$, and
-a limit cycle is an agent that keeps cycling through votes (for example
-$A, B, A, B, \ldots$) without ever settling. At the system level it is the
-macrostate $s_t$, and a limit cycle is a collective configuration that cycles
-without settling. Neither implies the other, so both are detected and both are
-reported. This matters because convergence to consensus is one system fate,
-whereas a sustained oscillation is a qualitatively different one, periodic
+dynamical signature of feedback loops, the complement of the positive
+autoregulation behind self-reinforcement \citep{alon2007network}.
+This is the only one of our motifs that lives at both agent and system level, so
+it has two state variables. At the agent level the state variable is the agent's
+vote $v_i^t \in \{1,\ldots,M\}$, and a limit cycle is an agent that keeps cycling
+through votes (for example $A, B, A, B, \ldots$) without ever settling. At the
+system level it is the macrostate $s_t$, and a limit cycle is a collective
+configuration that cycles without settling. Neither implies the other, so we detect
+and report both. This matters because convergence to consensus is one possible
+fate of the system, while sustained oscillation is a different one, a periodic
 disagreement that never resolves. Detecting it tests whether cooperative debate can
-become dynamically trapped in a cycle rather than at a point. With only a handful
-of symbols in our setting, states repeat by chance and a transient fluctuation that later converges is
-not a cycle, so the definition requires both that the oscillation is
-\emph{self-sustained}, so that the sequence does not converge, and that its periodic
-structure \emph{beats a chance baseline}. We measure both, though the isolation and
-stability of a true limit cycle cannot be certified from one observed trajectory
-and are not claimed.
+become trapped in a cycle and not at a point. With only a few symbols, states repeat
+by chance, and a transient fluctuation that later converges is not a cycle. The
+definition therefore requires two things. The oscillation must be
+\emph{self-sustained}, meaning the sequence does not converge, and its periodic
+structure must \emph{beat a chance baseline}. We measure both. The isolation and
+stability of a true limit cycle cannot be certified from one observed trajectory,
+and we do not claim them.
 
 \paragraph{Measurement.}
 The primitive depends on the level. At the agent level it is the per-agent vote
-sequence within a repetition, $v = (v_0, v_1, \ldots, v_T)$, taking the committed
+sequence within a repetition, $v = (v_0, v_1, \ldots, v_T)$, using the committed
 \updatephase{} vote at each round. At the system level it is the per-repetition
-composition sequence $s = (s_0, s_1, \ldots, s_T)$, in which case the repetition is
-both the measurement primitive and the independent unit. Everything that follows
-applies unchanged to either, so we write $x = (x_0, \ldots, x_{L-1})$ for whichever
+composition sequence $s = (s_0, s_1, \ldots, s_T)$, so the repetition is both the
+measurement primitive and the independent unit. Everything that follows applies
+unchanged to either level, so we write $x = (x_0, \ldots, x_{L-1})$ for whichever
 symbolic sequence is being scored.
 
-A sequence that converges is not a limit cycle, so converged sequences are excluded
-before anything is computed. A sequence counts as converged when it ends in a
+A sequence that converges is not a limit cycle, so we exclude converged sequences
+before computing anything. A sequence counts as converged when it ends in a
 constant run of at least $u = 3$ symbols, the settling criterion already used in
-\autoref{sec:method:multistability}. The judgement is made on the sequence itself
-rather than on the debate, which matters twice over: an agent can settle while the
-debate around it continues, and a debate that deadlocks at a $3$--$1$ or $2$--$2$
-split holds that composition to the cap $T$, which is a fixed point even though no
-consensus was reached. Whatever survives is a limit-cycle candidate,
-subject to a guard $L \geq 4$ that leaves room for one repeat of the shortest
-possible, period-2, cycle. Converged sequences are dropped whole rather than
-trimmed, since a trailing constant run cannot be separated into cycle-internal
-repeats and genuine convergence.
+\autoref{sec:method:multistability}. We judge this on the sequence itself and not on
+the debate, for two reasons. An agent can settle while the debate around it
+continues. A debate that deadlocks at a $3$--$1$ or $2$--$2$ split holds that
+composition until the cap $T$, which is a fixed point even though no consensus was
+reached. Every remaining sequence is a limit-cycle candidate, provided it passes a
+guard $L \geq 4$ that leaves room for one repeat of the shortest possible cycle,
+which has period~2. We drop converged sequences whole instead of trimming them,
+since a trailing constant run cannot be separated into cycle-internal repeats and
+genuine convergence.
 
-Periodicity in the surviving candidates is quantified with categorical recurrence
+We quantify periodicity in the remaining candidates with categorical recurrence
 quantification analysis \citep{cocodale2014crqa}. For sequence positions $a, b$ the
-recurrence matrix records where the sequence revisits a symbol,
+recurrence matrix \citep{eckmann1987recurrence} records where the sequence revisits a symbol,
 \begin{equation}
   R(a,b) = \mathbb{1}[\,x_a = x_b\,], \qquad a \neq b,
 \end{equation}
-excluding the main diagonal, which is trivially all ones
-\citep{eckmann1987recurrence}. The pattern of ones distinguishes the cases:
-a periodic orbit produces diagonal lines parallel to the main diagonal and equally
-spaced by the period, a fixed point produces a solid block, and scattered points
-mean no periodicity at all \citep{marwan2007recurrence}. Two quantities summarise
-it. \emph{Determinism} is the fraction of recurrence points lying on diagonal lines
-of length $l \geq l_{\min} = 2$ \citep{zbilut1992embeddings, webber1994dynamical},
+and excludes the main diagonal, which is trivially all ones
+\citep{cocodale2014crqa}. The pattern of ones tells the cases apart. A
+periodic orbit produces diagonal lines parallel to the main diagonal, spaced equally
+by the period. A fixed point produces a solid block, and scattered points mean no
+periodicity at all \citep{marwan2007recurrence}. Two quantities summarise this.
+\emph{Determinism} is the fraction of recurrence points on diagonal lines of length
+$l \geq l_{\min} = 2$ \citep{zbilut1992embeddings, webber1994dynamical},
 \begin{equation}
   DET = \frac{\sum_{l \geq l_{\min}} l\,P(l)}{\sum_{l \geq 1} l\,P(l)},
 \end{equation}
@@ -578,20 +522,19 @@ is the lag at which recurrence is densest,
   RR(\tau) = \frac{1}{L-\tau}\sum_{a=0}^{L-1-\tau} R(a, a+\tau),
   \qquad \hat{P} = \arg\max_{\tau \geq 1} RR(\tau).
 \end{equation}
-Both are needed, because $DET$ alone cannot separate persistence from periodicity:
-a solid block and equally-spaced diagonals inflate it equally, so a single stray
-symbol in an otherwise constant sequence can reach a high $DET$ while oscillating
-not at all. We therefore require $\hat{P} \geq 2$, and cap it at
-$\hat{P} \leq \lfloor L/2 \rfloor$, since a longer period cannot recur twice
-within the window.
+We need both, because $DET$ alone cannot separate persistence from periodicity. A
+solid block and equally spaced diagonals raise it equally, so a single stray symbol
+in an otherwise constant sequence can reach a high $DET$ without oscillating at
+all. We therefore require $\hat{P} \geq 2$ and cap it at
+$\hat{P} \leq \lfloor L/2 \rfloor$, since a longer period cannot recur twice within
+the window.
 
 \paragraph{Detection.}
-The null uses random-shuffle surrogates, that is,
-random permutations of the sequence's own symbol multiset
-\citep{theiler1992surrogate}. Shuffling destroys temporal order while preserving
-the symbol frequencies, so the chance-match rate implied by the alphabet is built
-into the null automatically. For $B = 1000$ surrogates we compute $DET^{(b)}$ and
-the add-one one-sided $p$-value \citep{phipson2010permutation}
+The null uses random-shuffle surrogates, which are random permutations of the
+sequence's own symbols \citep{theiler1992surrogate}. Shuffling destroys temporal
+order but keeps the symbol frequencies, so the chance-match rate implied by the
+alphabet is built into the null. For $B = 1000$ surrogates we compute $DET^{(b)}$
+and the add-one one-sided $p$-value \citep{phipson2010permutation}
 \begin{equation}
   p = \frac{1 + \#\{\,b : DET^{(b)} \geq DET\,\}}{1 + B},
 \end{equation}
@@ -599,17 +542,18 @@ and flag a limit cycle when
 \begin{equation}
   p < 0.05 \quad\text{and}\quad 2 \leq \hat{P} \leq \lfloor L/2 \rfloor .
 \end{equation}
-We report a binary flag per candidate, prevalence per config-task as the flagged
-share among eligible candidates, and summaries across tasks per topology and $W$.
+We report a binary flag per candidate, the prevalence per config-task as the
+flagged share of eligible candidates, and summaries across tasks per topology and
+$W$.
 
 The two levels share this machinery and differ only in power. The macrostate space
 has $\binom{N + M - 1}{M - 1}$ compositions, $15$ for $M = 3$ and $35$ for
-$M = 4$, against only $M$ raw vote symbols, so chance recurrence is lower and
-$DET$ cleaner at the system level. Against that, there is one sequence per
-repetition rather than one per agent, so candidates are far fewer.
+$M = 4$, against only $M$ raw vote symbols. Chance recurrence is therefore lower
+and $DET$ cleaner at the system level. On the other hand, there is one sequence per
+repetition and not one per agent, so there are far fewer candidates.
 
 \paragraph{Worked example.}
-In the running scenario, suppose agent~$2$ fails to settle, cycling
+In the running scenario, suppose agent~$2$ fails to settle and cycles
 $v = (A, B, A, B, A, B)$ across $L = 6$ rounds. It never ends in a constant run, so
 it is a candidate, and $L \geq 4$. The recurrence matrix (main diagonal excluded)
 is
@@ -623,31 +567,31 @@ is
     0 & 1 & 0 & 1 & 0 & \cdot
   \end{pmatrix}.
 \]
-The ones lie on diagonals equally spaced by $2$, giving $RR(1) = 0$, $RR(2) = 1$
+The ones lie on diagonals spaced by $2$, giving $RR(1) = 0$, $RR(2) = 1$
 and $RR(3) = 0$, so $\hat{P} = 2$, which satisfies the guard
 $2 \leq \hat{P} \leq \lfloor 6/2 \rfloor = 3$. The offset-2 diagonal carries a line
 of length $4$ and the offset-4 diagonal a line of length $2$, so
 $DET = (4 + 2)/(4 + 2) = 1.0$.
 The null shows why length matters. The multiset $\{3A, 3B\}$ has
 $\binom{6}{3} = 20$ arrangements, and only the two perfectly alternating ones reach
-$DET = 1$, so $p = 2/20 = 0.10$: at $L = 6$ even a perfect period-2 cycle cannot
+$DET = 1$, so $p = 2/20 = 0.10$. At $L = 6$ even a perfect period-2 cycle cannot
 clear $0.05$. The same pattern over a full-length candidate ($L \approx 16$) is
-flagged decisively, so only long, non-converged sequences are informative. The two
-exclusions are equally concrete: $(A,B,A,B,B,B,B)$ ends in a
-constant run and is dropped as a fixed point, while $(A,B,B,B,B,B,B)$ reaches a
-high $DET$ but has $\hat{P} = 1$ and is rejected by the period guard as
-persistence rather than oscillation.
-The same scenario shows why the two levels are reported separately. If agents~$0$
+flagged decisively, so only long, non-converged sequences are informative. Two
+exclusions make this concrete. The sequence $(A,B,A,B,B,B,B)$ ends in a constant
+run and is dropped as a fixed point. The sequence $(A,B,B,B,B,B,B)$ reaches a high
+$DET$ but has $\hat{P} = 1$, so the period guard rejects it as persistence and not
+oscillation.
+The same scenario shows why we report the two levels separately. Suppose agents~$0$
 and $1$ swap $A \leftrightarrow B$ each round while agents~$2$ and $3$ hold their
-votes, every $s_t$ is identical. The agent-level test flags two period-2 cycles
-while the system-level test sees a fixed point and excludes the repetition
+votes. Every $s_t$ is then identical. The agent-level test flags two period-2
+cycles, while the system-level test sees a fixed point and excludes the repetition
 entirely. Conversely, a rotating majority can cycle $s_t$ with no single agent
 being periodic.
 
 \paragraph{Limitations.}
-First, the alphabet is small at the agent level, which inflates
-the chance recurrence rate, and at both levels the sequence length caps the
-detectable period at $\lfloor L/2 \rfloor$. Second, the shuffle null controls the
-chance-recurrence inflation, but the period guard makes the test conservative, so a
-small nonzero flag rate remains under a chance baseline. We compare observed
-prevalence against this floor rather than against zero.
+First, the alphabet is small at the agent level, which inflates the chance
+recurrence rate, and at both levels the sequence length caps the detectable period
+at $\lfloor L/2 \rfloor$. Second, the shuffle null accounts for chance recurrence,
+but the period guard makes the test conservative, so a small nonzero flag rate
+remains under a chance baseline. We compare observed prevalence against this floor
+and not against zero.

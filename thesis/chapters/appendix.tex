@@ -39,12 +39,12 @@ outright. The native multi-agent suites bind agents to sub-tasks or to positions
 in physical space rather than to a common set of options, so there is no shared
 position space in which a vote composition could be defined. REALM-Bench
 \citep{geng2025realmbench} assigns agents to specific machines and its
-communication is a notification cascade rather than a deliberation; MARBLE
+communication is event-driven coordination rather than a deliberation; MARBLE
 \citep{zhu2025multiagentbench} gives each agent a different root cause to
 diagnose; PARTNR \citep{chang2024partnr} hard-codes heterogeneous capabilities and
-is dyadic by design; Collab-Overcooked \citep{sun2025collaboverco} splits chef and
+is run with two agents; Collab-Overcooked \citep{sun2025collaboverco} splits chef and
 assistant into distinct action spaces. In BattleAgentBench
-\citep{wang2024battleagentbench} an agent's state is a discrete grid position, and in SPIN-Bench \citep{yao2025spinbench} only the Diplomacy
+\citep{wang2024battleagentbench} an agent's state is a coordinate position on a map, and in SPIN-Bench \citep{yao2025spinbench} only the Diplomacy
 environment approaches deliberation, where a position is a spatial supply-centre
 configuration and the authors report coordination degrading sharply beyond two or
 three agents.
@@ -54,7 +54,7 @@ The socially framed benchmarks come closer without quite fitting. SOTOPIA
 since dominance requires at least three agents and multistability requires
 competing factions. LLM-Deliberation \citep{abdelnabi2024cooperation} is genuinely
 multi-agent at up to six parties, with a private scratchpad and a public answer, and native adversarial variants,
-but it carries no per-agent correctness signal and its deal space is too sparse
+but it has no shared ground-truth answer and its deal space is too sparse
 for equality-based agreement metrics, which makes it the strongest candidate for a
 future mixed-motive extension rather than a correctness benchmark here.
 HiddenBench \citep{li2026hiddenbench} is the exception: it formalises the
@@ -67,13 +67,12 @@ work.
 The single-agent reasoning sets that the debate literature has adopted fail on
 difficulty instead. \citet{du2024improving} established the methodology on GSM8K
 \citep{cobbe2021gsm8k} and MMLU \citep{hendrycks2021mmlu}, both of which are
-effectively solved by frontier models \citep{achiam2023gpt4}, so the typical
+near ceiling for frontier models \citep{achiam2023gpt4}, so the typical
 trajectory is immediate unanimous agreement and there is no dynamical signal to
-detect; critical reassessments confirm that debate on saturated benchmarks
-frequently fails to beat single-agent baselines \citep{liu2025stopovervaluing,
-zhang2025debateorvote}. MATH \citep{hendrycks2021math} retains difficulty but
-requires non-trivial answer normalisation and inflates token cost through long
-solutions. GPQA-Diamond \citep{rein2024gpqa} is the instance of this lineage that
+detect; critical reassessments report that debate frequently fails to beat
+single-agent baselines \citep{liu2025stopovervaluing} and that majority voting
+accounts for most of its gains \citep{zhang2025debateorvote}. MATH \citep{hendrycks2021math} retains difficulty but
+requires non-trivial answer normalisation. GPQA-Diamond \citep{rein2024gpqa} is the instance of this lineage that
 still leaves headroom, which is why we adopt it as primary. Two further systems
 are cited elsewhere in this thesis but were never candidates as substrates:
 AgentVerse \citep{chen2024agentverse} is a framework rather than a benchmark, and
@@ -112,10 +111,9 @@ trajectory statistics at $R = 50$. The canonical baseline is $N = 3$
 
 \paragraph{Number of rounds (fix at $T = 15$ with $u = 3$).}
 $T$ is an observation budget rather than a structural perturbation, since
-trajectories can be cropped post hoc but not extended. Accuracy-level convergence
-is reported within a few rounds \citep{li2024sparsetopology}, but limit-cycle
+trajectories can be cropped post hoc but not extended. Limit-cycle
 detection requires $T \geq 2 \cdot \text{period}$ and the period is unknown a
-priori, which sets the cap well above the convergence horizon. The early-stopping
+priori, which calls for a generous cap. The early-stopping
 threshold $u$ then trades efficiency against reliability: on the pilot repetitions
 $u = 3$ saves roughly $50\,\%$ of runtime per repetition, while the harmful case,
 in which stopping would have pre-empted a later recovery to the correct answer,
@@ -125,11 +123,10 @@ was rare in the pilot data.
 A single homogeneous model isolates topology and memory effects from
 capability-asymmetry effects, which otherwise produce dominance-like dynamics
 attributable to conformity rather than to structure \citep{wynn2025talk}. Mixed
-teams within one capability tier do not systematically outperform their best
-member and show comparable modal sycophancy rates
+teams often underperform their best homogeneous member
 \citep{bertalanic2026costofconsensus}, so heterogeneity alone would not dissolve
-the dynamics under study. On temperature, deterministic decoding collapses debate
-into voting among identical samples \citep{zhu2026demystifying}.
+the dynamics under study. On temperature, deterministic decoding would remove the only
+source of response diversity among identical agents \citep{zhu2026demystifying}.
 
 \paragraph{Framing and execution (fix).}
 \citet{liang2024encouraging} locate the operational sweet spot between pure
