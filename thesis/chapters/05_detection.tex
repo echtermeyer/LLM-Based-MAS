@@ -18,7 +18,6 @@ propose the same detectors as diagnostic instruments. And secondly, each detects
 paragraph stating the limitations to each detector which makes explicit what the
 corresponding detector can and cannot claim.
 
-
 \subsection{Shared Measurement Conventions}
 \label{sec:method:vocab}
 
@@ -30,7 +29,7 @@ detectors read from, and the nesting of the data that constrains every compariso
 The four subsections each make the same five parts, in the same order.
 \emph{Concept} states the motif in dynamical-systems terms and names the quantity
 in a debate that plays the role of the state variable. \emph{Measurement} defines
-the \emph{measurement primitive}, the lowest-level object the detector identfies, and
+the \emph{measurement primitive}, the lowest-level object the detector identifies, and
 the statistic computed from it. \emph{Detection} specifies the null model
 against which that statistic is tested, and the rule for flagging the motif. 
 \emph{Worked example} runs the detector by hand on a small case, and \emph{Limitations} states
@@ -67,7 +66,7 @@ agent trajectories, the collective macrostate, or both).}
 \end{table}
 
 What the table calls the \emph{level} of a motif decides where its detector reads
-from. Self-reinforcement, the only agent-level motif, reads directly from
+from. Self-reinforcement the only agent-level motif, reads directly from
 per-agent vote and confidence trajectories. The three system-level readings
 instead operate on the macrostate $s_t$ defined in \autoref{sec:setup:notation}.
 It forgets which agent holds which vote but keeps how the votes are split across
@@ -80,9 +79,10 @@ full sequence $s_0, \ldots, s_T$.
 
 Whichever slice a detector takes, it inherits the same nesting of the data,
 \begin{equation}
-  \text{agent} \subset \text{repetition} \subset \text{task} \subset
-  \text{config } (W \times \text{topology}) \subset \text{dataset},
+  \text{agent} \subset \text{repetition} \subset
+  (\text{task} \times \text{config}) \subset \text{dataset},
 \end{equation}
+where tasks are crossed with configurations, $\text{config} = W \times \text{topology}$,
 with $W \in \{1,2,5\}$, $\text{topology} \in \{\text{fc}, \text{star}\}$, $N = 4$,
 and $\text{dataset} \in \{\text{GPQA}, \text{HiddenBench}\}$, and that nesting
 constrains what may be compared with what. Because agents interact within a
@@ -102,7 +102,6 @@ converge, we also expect several detectors to find little or nothing. This is wh
 each detection paragraph below compares its statistic against a named baseline
 rather than against zero.
 
-
 \subsection{Self-Reinforcement}
 \label{sec:method:sr}
 
@@ -116,9 +115,8 @@ this is positive autoregulation, a node that augments its own production
 expressed \emph{confidence}. Self-reinforcement is then the tendency of an agent
 to push its own confidence upward while it holds a position, driven by
 accumulating commitment rather than by new incoming information. The
-pattern is already documented as in multi-turn \ac{LLM} debate, confidence tends to rise
-across rounds even where no new information justifies
-the rise \citep{prasad2025certain}.
+pattern is already documented in multi-turn \ac{LLM} debate, where confidence tends to rise
+across rounds even in the face of opposing arguments \citep{prasad2025certain}.
 
 Rising confidence alone is not enough to show self-reinforcement, since rational
 updating and peer conformity also raise confidence. We therefore measure two
@@ -130,7 +128,7 @@ show that the rise comes from the agent's own commitment rather than from new
 information, but trajectory data cannot separate it from peer effects.
 
 \paragraph{Measurement.}
-The primitive is the \emph{vote-stable segment} which is the longest block of consecutive
+The primitive is the \emph{vote-stable segment} which is the maximal block of consecutive
 rounds, from $t_s$ to $t_e$, in which agent $i$ keeps the same vote, so that
 $v_i^t = v_i^{t_s}$ for all $t \in \{t_s, \ldots, t_e\}$.
 With $L = t_e - t_s + 1$ as its length in rounds, we keep a segment only if
@@ -201,7 +199,6 @@ ambiguity but does not settle it, since a longer window also re-exposes more pee
 content. Second, \emph{convergence is a confound} as on easier tasks, fast agreement can
 itself raise confidence. This is why we report prevalence per task and not as a
 single pooled figure.
-
 
 \subsection{Multistability}
 \label{sec:method:multistability}
@@ -305,7 +302,7 @@ endpoint distribution, and the label depends on whether the start predicts it.
         $V \approx 1$ and $p < 0.05$, so the start selects between two basins.
   \item \textbf{Tristable.} Endpoints $10 \times A$, $10 \times B$, $10 \times C$
         with the start predicting each give $N_{\mathrm{eff}} \approx 3.0$ and
-        $p < 0.05$, the maximal degree for $M = 3$.
+        $p < 0.05$, the maximal degree when three of the four options attract endpoints.
   \item \textbf{Stochastic.} Endpoints $15 \times A$, $15 \times B$ again give
         $N_{\mathrm{eff}} = 2.0$. If $g(s_0)$ is unrelated to the endpoint, then
         $V \approx 0$ and $p \gg 0.05$. This is coexistence without basin
@@ -313,8 +310,8 @@ endpoint distribution, and the label depends on whether the start predicts it.
 \end{itemize}
 
 \paragraph{Limitations.}
-First, classical basin stability draws initial conditions uniformly
-\citep{menck2013basin}, whereas our starts come from the model's own round-$0$
+First, basin stability is usually estimated with uniformly drawn initial
+conditions \citep{menck2013basin}, whereas our starts come from the model's own round-$0$
 distribution. $\hat{P}(A)$ therefore estimates the \emph{effective} basin volume
 under that distribution and not the geometric volume. Second, $g(s_0)$ counts
 agents already on the eventual dominant option, so a high $V$ fits both genuine
@@ -322,24 +319,25 @@ basin selection and ordinary persistence of the initial majority. The test detec
 dependence of the endpoint on the start but cannot separate these two mechanisms.
 We therefore treat the association as necessary but not decisive.
 
-
 \subsection{Dominance}
 \label{sec:method:dominance}
 
 \paragraph{Concept.}
 Dominance is the concentration of directed influence onto a single node, an
-\emph{emergent hub}. This is a structural motif \citep{milo2002network, alon2007network}
-read at the system level, since it is a property of the whole influence
-distribution. Its formal home is opinion dynamics. In the DeGroot model
+\emph{emergent hub}. It is the structural member of our four motifs, but not a
+motif in the subgraph sense of \citet{milo2002network}, whose degree-preserving
+null conserves hubs by construction. It is read at the system level instead, since
+it is a property of the whole influence distribution. Its formal home is opinion dynamics. In the DeGroot model
 \citep{degroot1974consensus} and its social-power extension, an agent's influence
 tracks its network centrality. The group is \emph{autocratic} when influence is
 maximally uneven and \emph{democratic} when it is uniform \citep{jia2015opinion}.
 Dominance is the autocratic side. For us the state variable is the distribution of
 influence across the four agents, and dominance is the tendency of this
 distribution to concentrate on one agent rather than spread evenly. When it does,
-a single stubborn, confident agent can pull the rest of the group toward its answer
-\citep{chen2023consensus, cho2025herd}, which lowers collective accuracy even when
-stronger models outnumber weaker ones \citep{wynn2025talk}. Concentration can
+a single stubborn agent can pull the rest of the group toward its answer
+\citep{chen2023consensus}, and agents conform more readily to peers who appear
+confident \citep{cho2025herd}. Conformity of this kind can lower collective
+accuracy even when stronger models outnumber weaker ones \citep{wynn2025talk}. Concentration can
 also come from the wiring alone, so we measure influence for each topology
 separately. The result is a concentration signature and not proof of causation,
 since an adoption edge cannot distinguish genuine influence from coincidental
@@ -359,7 +357,9 @@ the neighbours that already held the target vote,
   \qquad
   m_j^t = \bigl|\{k \in \mathcal{N}(j) : v_k^{t} = v_j^{t+1}\}\bigr|,
 \end{equation}
-where $c_j^t$ is the converting agent's confidence, $\mathcal{N}(j)$ is its
+where $c_j^t$ is the converting agent's confidence before the switch, so that a switch
+away from a confidently held vote counts as stronger evidence of influence than one
+away from a hesitant vote, $\mathcal{N}(j)$ is its
 neighbourhood in the topology, and the factor $1/m_j^t$ shares credit equally among
 all eligible sources. Per-agent influence is the weighted out-strength
 $\sigma_i = \sum_j w_{ij}$. We use out-strength rather than eigenvector centrality
@@ -383,8 +383,8 @@ A high $D$ in the star topology says little on its own. The centre is the only
 agent a leaf can be converted by, so the wiring alone forces concentration. We
 therefore key the null to the topology. It asks how concentrated $D$ would be if
 influence were assigned at random on the same wiring and the same conversion
-events. We use a constrained shuffle in the spirit of Theiler's ``Algorithm~0''
-\citep{theiler1992surrogate}. It keeps the converting agent, the round, the weight,
+events. We use a constrained shuffle in the spirit of the random-shuffle surrogates of
+\citet{theiler1992surrogate}. It keeps the converting agent, the round, the weight,
 and the number of eligible sources fixed, and redraws only the source
 \emph{identity}, uniformly among $\mathcal{N}(j)$.
 In the fully-connected topology every agent has three neighbours, so the shuffle
@@ -438,18 +438,18 @@ The out-strengths are therefore $\sigma = (\tfrac{61}{6},\, \tfrac{25}{6},\,
 of influence, yet $D$ is well below $1$. The credit-splitting rule makes each early
 adopter a co-source of all later conversions, so staggered convergence never
 produces a pure hub. $D = 1$ would require every conversion to trace back to a
-single agent, which is only possible when every other agent flips simultaneously.
+single agent, which in the fully-connected topology with at least two conversions typically
+requires every other agent to flip simultaneously.
 
 \paragraph{Limitations.}
 First, with four agents the four shares and a discrete null limit how small $p$ can
 get. Per-repetition power is therefore low and the signal lives in the aggregate.
-Second, a repetition with a single conversion gives $D = 1$ trivially. We handle
+Second, a repetition with a single conversion from a single source gives $D = 1$ trivially. We handle
 this through aggregation and the topology null and do not discard such
 repetitions. Third, as noted above, the star null is degenerate, so the test for
 emergent excess is identified only in the fully-connected topology. Any claim about
 emergent concentration in the star rests on raw $D$ and its $W$ ordering and not on
 the null comparison.
-
 
 \subsection{Limit Cycles}
 \label{sec:method:lc}
@@ -458,7 +458,7 @@ the null comparison.
 In dynamical systems, a limit cycle is an isolated closed orbit, a self-sustained
 periodic oscillation that needs no external forcing
 \citep{strogatz2015nonlinear}. At the motif level, sustained oscillation is the
-dynamical signature of feedback loops, the complement of the positive
+dynamical signature of composite negative feedback loops, the complement of the positive
 autoregulation behind self-reinforcement \citep{alon2007network}.
 This is the only one of our motifs that lives at both agent and system level, so
 it has two state variables. At the agent level the state variable is the agent's
@@ -505,10 +505,10 @@ recurrence matrix \citep{eckmann1987recurrence} records where the sequence revis
   R(a,b) = \mathbb{1}[\,x_a = x_b\,], \qquad a \neq b,
 \end{equation}
 and excludes the main diagonal, which is trivially all ones
-\citep{cocodale2014crqa}. The pattern of ones tells the cases apart. A
+\citep{marwan2007recurrence}. The pattern of ones tells the cases apart. A
 periodic orbit produces diagonal lines parallel to the main diagonal, spaced equally
-by the period. A fixed point produces a solid block, and scattered points mean no
-periodicity at all \citep{marwan2007recurrence}. Two quantities summarise this.
+by the period. A fixed point produces a solid block, and scattered isolated points indicate no
+sustained recurrence \citep{marwan2007recurrence}. Two quantities summarise this.
 \emph{Determinism} is the fraction of recurrence points on diagonal lines of length
 $l \geq l_{\min} = 2$ \citep{zbilut1992embeddings, webber1994dynamical},
 \begin{equation}
@@ -520,6 +520,7 @@ is the lag at which recurrence is densest,
   RR(\tau) = \frac{1}{L-\tau}\sum_{a=0}^{L-1-\tau} R(a, a+\tau),
   \qquad \hat{P} = \arg\max_{\tau \geq 1} RR(\tau).
 \end{equation}
+Ties go to the smallest lag.
 We need both, because $DET$ alone cannot separate persistence from periodicity. A
 solid block and equally spaced diagonals raise it equally, so a single stray symbol
 in an otherwise constant sequence can reach a high $DET$ without oscillating at
@@ -576,8 +577,8 @@ $DET = 1$, so $p = 2/20 = 0.10$. At $L = 6$ even a perfect period-2 cycle cannot
 clear $0.05$. The same pattern over a full-length candidate ($L \approx 16$) is
 flagged decisively, so only long, non-converged sequences are informative. Two
 exclusions make this concrete. The sequence $(A,B,A,B,B,B,B)$ ends in a constant
-run and is dropped as a fixed point. The sequence $(A,B,B,B,B,B,B)$ reaches a high
-$DET$ but has $\hat{P} = 1$, so the period guard rejects it as persistence and not
+run and is dropped as a fixed point. The sequence $(A,A,A,A,A,A,B)$ does not end in a
+constant run of three, reaches a high $DET$, but has $\hat{P} = 1$, so the period guard rejects it as persistence and not
 oscillation.
 The same scenario shows why we report the two levels separately. Suppose agents~$0$
 and $1$ swap $A \leftrightarrow B$ each round while agents~$2$ and $3$ hold their

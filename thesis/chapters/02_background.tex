@@ -9,26 +9,26 @@ of debate systems. The motifs this thesis detects, and the
 methodology used to detect them, are defined later in \autoref{sec:method},
 as this section focuses on the vocabulary they build on.
 
-
 \subsection{Complex Systems and Self-Organization}
 \label{sec:bg:complex}
 
 A \emph{complex system} is a collection of many interacting components whose
 collective behaviour cannot be inferred from the properties of the individual
-components alone \citep{anderson1972more, ladyman2013complex, mitchell2009complexity}. The behaviour is
+components alone \citep{anderson1972more, mitchell2009complexity}; see
+\citet{ladyman2013complex} for a critical survey of such definitions. The behaviour is
 called \emph{emergent}. For instance, a stock-market bubble is produced by
 millions of traders acting on local information with no coordinating
 authority, yet the resulting price dynamic is not present in any individual
 trade. When such emergent order arises without
 any central controller, the system is called \emph{self-organizing}
-\citep{camazine2001self}, a term that goes back to \citet{ashby1947principles}. Four ingredients are shared of
+\citep{camazine2001self}, a term that goes back to \citet{ashby1947principles}. Four ingredients are shared by
 self-organizing systems \citep{camazine2001self}. \emph{Positive feedback}
 amplifies small changes and drives the system away from uniformity.
 \emph{Negative feedback} prevents runaway growth and bounds the system within
 reachable states. \emph{Fluctuations} are the stochastic perturbations that
 allow the system to explore the state space. \emph{Repeated local
 interactions} let global structure accumulate over many iterations from purely
-local rules. The organising
+local rules. The organizing
 principle is fully encoded within these four interactions, not in any single
 component and also not in any external authority. Thus, the same local rule can 
 lead to different long-run outcomes depending on where the system
@@ -94,7 +94,7 @@ how the debate is initialised \citep{menck2013basin}.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6\textwidth]{plots/bg/double_well.pdf}
-  \caption{The potential $V(x) = (x^2 - 1)^2$ has two stable attractors at
+  \caption[Double-well potential with two attractors and their basins of attraction]{The potential $V(x) = (x^2 - 1)^2$ has two stable attractors at
     $x = \pm 1$, separated by an unstable fixed point at $x = 0$. The shaded
     regions are the two basins of attraction. Initial conditions in Basin A
     converge to the left attractor; those in Basin B converge to the right
@@ -103,14 +103,13 @@ how the debate is initialised \citep{menck2013basin}.
   \label{fig:doublewell}
 \end{figure}
 
-
 \subsection{Motifs and Opinion Dynamics}
 \label{sec:bg:motifs}
 
 The patterns that arise in dynamical systems are not arbitrary. Across
-biological networks, electronic circuits, social groups, and neural dynamics,
-the same recurring organisational building blocks appear with consistent
-functional properties. Complex-systems calls these recurring patterns
+biological networks, electronic circuits, food webs, and neural dynamics,
+the same recurring organizational building blocks appear with consistent
+functional properties. Complex-systems research calls these recurring patterns
 \emph{motifs}. The concept was introduced for networks by
 \citet{milo2002network}, who defined a \emph{structural motif} as a small
 subgraph that appears significantly more often in a real network than in a
@@ -168,11 +167,11 @@ social power rests on a single agent while the others carry almost none, is the
 \emph{autocratic} pole of the model \citep{jia2015opinion}. It is the
 opinion-dynamics form of the dominance motif we detect. Convergence to a single
 consensus requires the trust network to be strongly connected and opinions
-not to just swap back and forth, and each condition can fail in a way that maps onto one of our
-four motifs. For instance, if the network contains two or more closed groups that listen only to
-each other, those groups settle on different consensus values, which is a group-level
-multistability. On contrast, if opinions keep swapping back and forth and the process never settles but cycles
-through a repeating sequence of states, a limit cycle emerges. 
+not to just swap back and forth, and each condition can fail. If the network contains two or more
+closed groups that listen only to each other, those groups settle on different consensus values
+within a single run, a stable split that is distinct from the across-run multistability we study.
+In contrast, if opinions keep swapping back and forth and the process never settles but cycles
+through a repeating sequence of states, a limit cycle emerges, which is one of our four motifs. 
 
 However, the DeGroot model is too simple for \ac{LLM} debates in three ways, and each has a
 standard extension that we use later. Firstly, agents often hold a graded
@@ -188,7 +187,6 @@ Thirdly, some agents never change their mind. Such a stubborn agent acts as a
 fixed anchor that can pull the group toward its position
 \citep{friedkin1999social}. Our devil's advocate probe is exactly this case
 (\autoref{sec:results:seeded}).
-
 
 \subsection{\texorpdfstring{\acs{LLM}}{LLM} Agents and Multi-Agent Debate}
 \label{sec:bg:mad}
@@ -261,9 +259,6 @@ correlated.
       panel/.style={font=\fontsize{9.5}{11}\selectfont, anchor=west, inner sep=0pt},
     ]
 
-    % ------------------------------------------------------------------
-    % (a) Anatomy of one debate
-    % ------------------------------------------------------------------
     \node[panel] at (0, 1.45) {\textbf{(a)} Anatomy of a debate};
 
     \node[io]                        (q)    at (0.5,0) {question};
@@ -283,7 +278,6 @@ correlated.
     \draw[flow] (term.north) -- ++(0,0.45) -| (exch.north);
     \node[tag, above] at ($(exch.north)!0.5!(term.north) + (0,0.45)$) {no: next round};
 
-    % dimension braces (all on one common baseline, so they stay horizontal)
     \coordinate (base) at ([yshift=-1.5mm]init.south);
     \draw[decorate, decoration={brace, mirror, amplitude=4pt}, draw=black!55]
       (exch.west |- base) -- (rev.east |- base)
@@ -296,13 +290,9 @@ correlated.
       (init.west |- base2) -- (agg.east |- base2)
       node[midway, below=4pt, tag]{participants: who the agents are (model, persona, role)};
 
-    % ------------------------------------------------------------------
-    % (b) Communication topology, N = 4
-    % ------------------------------------------------------------------
     \begin{scope}[yshift=-3.6cm]
       \node[panel] at (0, 0.75) {\textbf{(b)} Communication topology};
 
-      % fully connected
       \begin{scope}[xshift=0.6cm, yshift=-0.35cm]
         \node[agent] (f1) at (0,0.45) {}; \node[agent] (f2) at (0.9,0.45) {};
         \node[agent] (f3) at (0.9,-0.45) {}; \node[agent] (f4) at (0,-0.45) {};
@@ -310,7 +300,6 @@ correlated.
         \node[tag] at (0.45,-0.9) {fully connected};
       \end{scope}
 
-      % star
       \begin{scope}[xshift=3.0cm, yshift=-0.35cm]
         \node[hub]   (s0) at (0.45,0) {};
         \node[agent] (s1) at (0,0.45) {}; \node[agent] (s2) at (0.9,0.45) {};
@@ -319,7 +308,6 @@ correlated.
         \node[tag] at (0.45,-0.9) {star};
       \end{scope}
 
-      % ring
       \begin{scope}[xshift=5.4cm, yshift=-0.35cm]
         \node[agent] (r1) at (0,0.45) {}; \node[agent] (r2) at (0.9,0.45) {};
         \node[agent] (r3) at (0.9,-0.45) {}; \node[agent] (r4) at (0,-0.45) {};
@@ -328,9 +316,6 @@ correlated.
       \end{scope}
     \end{scope}
 
-    % ------------------------------------------------------------------
-    % (c) Memory window
-    % ------------------------------------------------------------------
     \begin{scope}[xshift=8.3cm, yshift=-3.6cm]
       \node[panel] at (0, 0.75) {\textbf{(c)} Memory window $W$};
 
@@ -355,7 +340,7 @@ correlated.
     \end{scope}
 
   \end{tikzpicture}
-  \caption{Anatomy and design space of \acs{MAD}. \textbf{(a)} The
+  \caption[Anatomy and design space of \acs{MAD}]{Anatomy and design space of \acs{MAD}. \textbf{(a)} The
     generic round structure shared across debate variants. Braces mark the steps
     governed by the \emph{interaction} and \emph{agreement} dimensions of
     \citet{motger2026taxonomy}; the \emph{participant} dimension concerns the
@@ -375,7 +360,7 @@ argument and vote. \emph{Termination} decides whether another round of exchange
 and revision follows, and \emph{aggregation} combines the individual votes into
 a group answer. Every design choice in a debate system fixes how one of these
 steps is carried out. A recent systematic review of 141 debate studies
-organises these choices along three dimensions \citep{motger2026taxonomy}. These
+organizes these choices along three dimensions \citep{motger2026taxonomy}. These
 are who takes part (\emph{participants}), how information flows between them
 (\emph{interaction}), and how the group reaches its answer (\emph{agreement}).
 

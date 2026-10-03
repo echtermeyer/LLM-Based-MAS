@@ -7,30 +7,31 @@ from. Section~\ref{sec:discussion:design} asks what a practitioner can
 \emph{do} about it. Finally, Section~\ref{sec:discussion:limitations} states the limitations on
 all three together with potential future work.
 
-
 \subsection{The Missing Ingredient}
 \label{sec:results:synthesis}
 
 This subsection answers why the system behaves as it does, and it does so by
 returning to the definition of self-organization rather than by adding new
-measurements. Previously, in \autoref{sec:bg:complex} introduced the four ingredients that Camazine and
+measurements. \autoref{sec:bg:complex} introduced the four ingredients that Camazine and
 colleagues identify as recurring in self-organizing systems, which are positive
 feedback, negative feedback, fluctuations, and repeated local interaction. Three
 of the four are clearly present in our results. Positive feedback is self-reinforcement,
 which appears in every one of the twelve combinations of dataset, topology, and
 memory window at a prevalence between $0.733$ and $0.883$ against a null of
-$0.5$, and which is the engine that makes the debate settle, since tasks with
+$0.5$, and which goes with faster settling of the debate, since tasks with
 steeper confidence slopes reach consensus in fewer rounds in every combination we
 tested. Fluctuations are visible as multistability, since $76\,\%$ of the $600$
 task and configuration cells admit more than one stable outcome across
 repetitions of the same question. Repeated local interaction is the debate
-protocol itself. Thus, the second ingredient, negative feedback, is the one that is missing. 
+protocol itself. Thus, the second ingredient, negative feedback, is the one that is largely missing.
+It appears only weakly in the star topology, where it produces cycles rather than
+correction.
 Nothing in the protocol bounds an early lead. No agent is rewarded for holding out, the group
 pays no cost for converging quickly, and confidence climbs fastest in exactly
 those repetitions where the debate has least to resolve, which are the ones that
 never change their votes and the ones that start unanimous.
 
-That absence is the finding. A system with amplification and no damping does not
+That near-absence is the finding. A system with amplification and little damping does not
 deliberate its way to an answer, it magnifies whatever asymmetry it starts with.
 This also shows that \suitename{} divides the problem in a useful way, because the four detectors turn out to measure not four phenomena but one mechanism seen from four angles.
 Self-reinforcement is the view within a stable segment, where an agent
@@ -64,7 +65,6 @@ tested against a null that destroys the pattern and leaves everything else
 intact, so a practitioner can check which regime a system is in rather than
 having to assume it.
 
-
 \subsection{A Lossy Amplifier}
 \label{sec:discussion:interpretation}
 
@@ -79,14 +79,17 @@ does so in almost every individual task. Set against what a plurality vote at
 round $0$ would already deliver, the pattern is not a uniform gain. Where the
 correct answer starts behind, the debate helps, since a lone correct agent faces
 a plurality baseline of zero and still wins a quarter of the time, and an even
-split of two against two improves on a baseline of $38\,\%$. Where the correct
+split of two against two resolves correctly more often than the coin flip that
+plurality voting would need to break the tie. Where the correct
 answer starts ahead, the debate erodes it, since a correct supermajority of three
 that plurality voting would preserve with certainty is talked out of the right
 answer in roughly one repetition in seven.
 
 Debate is therefore better described not as majority voting with reasoning
 attached but as a transformation that widens the distribution around the opening
-signal. It moves outcomes away from the initial plurality in both directions,
+signal. It sits between neutral copying, under which an option wins as often as its
+opening share, and plurality voting, which always backs the opening leader. It
+moves outcomes away from the initial plurality in both directions,
 which is useful exactly when that plurality is unreliable and harmful when it is
 already good. This one property accounts for the two operating regimes we observe
 and, we think, for much of the disagreement in the literature about whether
@@ -113,7 +116,8 @@ against a dominant attractor that is wrong, while on GPQA the relationship is
 weakly negative and not significant, which is what we would expect where the
 single dominant basin is already the right one. Dominance reverses in the same
 way. When the debate elects its own hub in a fully connected run, that hub
-started correct far more often than a random agent does, and effective star runs
+started correct more often than a random agent does, and far more often on
+HiddenBench, and effective star runs
 reach the highest accuracy of the four structural types on both benchmarks. When
 the hub is imposed by the wiring instead, the fixed centre is no more likely to
 be correct than anyone else, so it spreads the shared bias rather than correcting
@@ -125,12 +129,11 @@ condition with an agent that keeps arguing for a wrong option throughout
 collapses accuracy from $63.7\,\%$ to $10.0\,\%$, in every task, and leaves the
 group below what a single correct agent with no adversary achieves. Two correct
 agents out of four are not enough to hold the line against one that never moves.
-The amplifier responds to persistence, and since a cooperative agent that is
+The amplifier responds to persistence and forceful argument, and since a cooperative agent that is
 right and an adversarial agent that is committed produce the same observable
 signal, the protocol has no basis on which to tell them apart. Whatever lift
 truth seeding provides is equally available to anyone willing to supply a
 confident wrong answer instead.
-
 
 \subsection{What to Measure Instead}
 \label{sec:discussion:design}
@@ -142,17 +145,17 @@ negative half of our answer is that the signals an operator would naturally reac
 for instead are uninformative or inverted. Confidence rises monotonically across
 rounds whether the final answer is correct or not, so a confident group is not a
 reliable one. Unanimity is worse than uninformative on HiddenBench, where
-repetitions that stop early lock in the shared wrong answer almost universally
-and reach only $2.5\,\%$, because early consensus forecloses the exchange that the
-benchmark requires. Debate length carries no signal either, since longer debates
+repetitions in which all agents start on the same answer lock in the shared
+wrong answer almost universally and reach only $2.5\,\%$, because a unanimous
+start leaves nothing for the exchange that the benchmark requires. Debate length is no reassurance either, since longer debates
 are no more accurate. The same holds for the two structural knobs the literature
 most often tunes \citep{li2024sparsetopology, mehdizadeh2026topologymemory}. Neither
 topology nor memory window has an accuracy effect that survives correction for
 multiple comparisons, and both are clearly visible in the dynamics, since the
 star needs more rounds on both benchmarks, is the sole source of genuine limit
 cycles, and concentrates influence by construction. Network type having no main
-effect on coordination in an eight topology factorial
-\citep{mehdizadeh2026topologymemory} and communication density failing to lift
+effect on coordination in a factorial over eight topologies grouped as centralised
+versus decentralised \citep{mehdizadeh2026topologymemory} and communication density failing to lift
 accuracy above a non communicative baseline \citep{bertalanic2026costofconsensus}
 point the same way, and the dissociation explains why topology tuning results in
 the literature are mixed.
@@ -166,7 +169,8 @@ the debate can select anyone. Whether that election happens depends on how
 diverse the opening votes are, since stars almost never form when all four agents
 start on the same option and roughly one run in five becomes a star when all four
 start on different ones. Diverse initialisation is therefore the one lever in our
-grid that touches accuracy, and it does so because it acts on the input to the
+grid that touches accuracy, as long as it splits the wrong answers rather than
+displacing correct ones, and it does so because it acts on the input to the
 amplifier rather than on the amplifier itself. Enforced perspective diversity has
 already been proposed as a remedy for entrenchment \citep{oh2026entrenchment},
 and what we add is the mechanism behind it.
@@ -181,7 +185,7 @@ Guidance & Evidence & Observable & How a builder checks it \\
 Invest in the process that generates the opening votes rather than in tuning the
 debate
   & Causal, seeded dose response (\autoref{sec:results:evid})
-  & $P(\text{GT present})$, opening plurality
+  & $P$(ground truth present), opening plurality
   & Log the opening vote profile and relate it to the outcome across repetitions \\
 \addlinespace
 Use the system as a filter over candidate answers, not as a way to discover one
@@ -192,12 +196,12 @@ no agent holds
 \addlinespace
 Do not gate trust on the group's confidence, its unanimity, or the length of the
 debate
-  & Every cell, self-reinforcement and early stop analyses
+  & Every cell, self-reinforcement and unanimous-start analyses
     (\autoref{sec:results:sr})
-  & Confidence gain by outcome, accuracy of early stops
+  & Confidence gain by outcome, accuracy of unanimous starts
   & Check confidence calibration against held out truth \\
 \addlinespace
-Seed distinct opening positions on tasks with four or more options
+Encourage diverse opening positions, but do not force every agent onto a different option, since with four options this leaves only one agent on the correct answer
   & Observational, effective topology analysis
   & Opening vote diversity, effective topology type
   & Track how often an effective star forms as opening diversity rises \\
@@ -249,7 +253,7 @@ unresolved, a final answer that no agent held at $t=0$ lies outside the
 amplifier's normal behaviour, and an outcome that follows a single agent that
 never changed its vote is only as reliable as that agent. A debate that passes
 all three checks is accepted only provisionally, because neither its
-confidence, its unanimity, nor its length indicates whether it is correct. Like
+confidence, its unanimity, nor a long debate indicates that it is correct. Like
 the table, the figure states hypotheses grounded in our results rather than a
 validated procedure.
 
@@ -274,13 +278,10 @@ validated procedure.
       panel/.style={font=\fontsize{9.5}{11}\selectfont, anchor=west, inner sep=0pt},
     ]
 
-    % ------------------------------------------------------------------
-    % (a) Design time
-    % ------------------------------------------------------------------
     \node[panel] at (0, 1.25) {\textbf{(a)} Designing the system};
 
     \node[design] (d1) at (2.05,0)
-      {\textbf{Opening votes}\\[2pt]\fontsize{7.5}{9}\selectfont invest in how agents produce them; seed distinct opening positions};
+      {\textbf{Opening votes}\\[2pt]\fontsize{7.5}{9}\selectfont invest in how agents produce them; encourage diverse opening positions};
     \node[design, right=7mm of d1] (d2)
       {\textbf{Deliberation}\\[2pt]\fontsize{7.5}{9}\selectfont choose topology and memory by cost and worst case};
     \node[design, right=7mm of d2] (d3)
@@ -288,9 +289,6 @@ validated procedure.
     \draw[flow] (d1) -- (d2);
     \draw[flow] (d2) -- (d3);
 
-    % ------------------------------------------------------------------
-    % (b) Run-time audit of one debate
-    % ------------------------------------------------------------------
     \node[panel] at (0, -1.85) {\textbf{(b)} Auditing one debate from its log};
 
     \node[start] (log) at (4.2,-2.6) {interaction log of one repetition};
@@ -356,8 +354,8 @@ spoke in a star can reconstruct the whole exchange from accumulated hub
 summaries, at which point the structural difference between the topologies
 largely disappears, so extending $W$ upward would locate the point at which the
 distinction stops mattering. Agent heterogeneity is the axis the critical
-literature considers decisive, since it identifies model diversity rather than
-debate itself as the reliable source of gains
+literature considers decisive, since it finds model diversity to be the dominant
+source of gains
 \citep{liu2025stopovervaluing, chen2024reconcile} and capability asymmetry as a
 factor in harmful herding \citep{wynn2025talk}.
 

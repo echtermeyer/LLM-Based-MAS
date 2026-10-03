@@ -1,13 +1,11 @@
 The premise of this thesis is that a \ac{MAD} is a dynamical system
 whose trajectory carries measurable structure. Turning that premise into empirical
-claims requires a system built as a \emph{measurement instrument}, that is not exclusively 
-focusing on a high-performing pipeline. Thus, the protocol must expose a
+claims requires a system built as a \emph{measurement instrument}, rather than only as a high-performing pipeline. Thus, the protocol must expose a
 discrete vote and a confidence score per agent and per round, with private belief
 cleanly separated from public message, so that the interaction log is a
 record of the underlying dynamics. Furthermore, the two structural axes, communication topology and 
 memory window, must be treated as \emph{controlled perturbation axes}
-so that we can ask which dynamiscs they cause rather than only observe.
-
+so that we can ask which dynamics they cause rather than only observe.
 
 \subsection{Notation and System Model}
 \label{sec:setup:notation}
@@ -90,9 +88,8 @@ agents on each option,
 \end{equation}
 where $n_k^{t}$ is the number of agents voting for option $k$ at round $t$. The
 number of agents $N$ and the number of options $M$ are independent: $N = 4$ throughout, with $(4,0,0,0)$, $(3,1,0,0)$, $(2,2,0,0)$,
-$(2,1,1,0)$, $(1,1,1,1)$ as the possible macrostates for $M = 4$ tasks. This macrostate is the object on which the
+$(2,1,1,0)$, $(1,1,1,1)$ as the possible macrostates for $M = 4$ tasks, up to relabelling of the options. This macrostate is the object on which the
 system-level motif detectors of \autoref{sec:method} operate.
-
 
 \subsection{Debate Protocol}
 \label{sec:setup:protocol}
@@ -128,8 +125,8 @@ consisting of a \textbf{defense} (one concrete reason the current vote is
 correct), a \textbf{challenge} (a dispute of a specific peer claim, or a
 concession), and a \textbf{question} (a targeted query to a named peer). The
 argument is visible to neighbours at the start of the \updatephase{} phase but does not itself change
-any vote. These fields structure the deliberation but are not themselves used
-quantitatively, but helped constructing a system of higher debate intensity. 
+any vote. These fields structure the deliberation and are not themselves used
+quantitatively, but they help to construct a system of higher debate intensity. 
 
 Together, the committed state and the argument define the round structure.
 Each round consists of two sequential phases. Within each phase all agents act in
@@ -182,13 +179,11 @@ first three rounds.
 \coordinate (Lsep) at (-3.8, 0);
 \coordinate (Rsep) at (11.8, 0);
 
-% Question box
 \node[draw, rounded corners=3pt, fill=gray!10, align=center,
       inner sep=6pt, text width=11.2cm] (Q) at (4.0, 2.7) {
   \textbf{Question $q$ + Options ($M$ choices)}
 };
 
-% r=0 --- Phase B only
 \node[phB] (B0i1) at (0, 0) {
   \textbf{Agent $1$\,\textbullet\,\updatephase{} phase}\\[2pt]
   $v_1^{0}$ (vote)\\[2pt]
@@ -210,7 +205,6 @@ first three rounds.
 \path (B0i1.south) +(0,-0.35) coordinate (sep01);
 \draw[dashed, gray!45, thin] (Lsep |- sep01) -- (Rsep |- sep01);
 
-% r=1 --- Phase A
 \node[phA, below=0.7cm of B0i1] (Ar1i1) {
   \textbf{Agent $1$\,\textbullet\,\arguephase{} phase}\\[2pt]
   $\text{argument}_1^{1}$ \textit{defense, challenge, question}
@@ -223,7 +217,6 @@ first three rounds.
 \draw[parr] (B0i1.south) -- (Ar1i2.north);
 \draw[parr] (B0i2.south) -- (Ar1i1.north);
 
-% r=1 --- Phase B
 \node[phB, below=0.5cm of Ar1i1] (Br1i1) {
   \textbf{Agent $1$\,\textbullet\,\updatephase{} phase}\\[2pt]
   $v_1^{1},\ c_1^{1},\ \text{priv}_1^{1},\ \text{pub}_1^{1}$
@@ -238,7 +231,6 @@ first three rounds.
 \path (Br1i1.south) +(0,-0.35) coordinate (sep12);
 \draw[dashed, gray!45, thin] (Lsep |- sep12) -- (Rsep |- sep12);
 
-% r=2 --- Phase A
 \node[phA, below=0.7cm of Br1i1] (Ar2i1) {
   \textbf{Agent $1$\,\textbullet\,\arguephase{} phase}\\[2pt]
   $\text{argument}_1^{2}$ \textit{defense, challenge, question}
@@ -251,7 +243,6 @@ first three rounds.
 \draw[parr] (Br1i1.south) -- (Ar2i2.north);
 \draw[parr] (Br1i2.south) -- (Ar2i1.north);
 
-% r=2 --- Phase B
 \node[phB, below=0.5cm of Ar2i1] (Br2i1) {
   \textbf{Agent $1$\,\textbullet\,\updatephase{} phase}\\[2pt]
   $v_1^{2},\ c_1^{2},\ \text{priv}_1^{2},\ \text{pub}_1^{2}$
@@ -263,7 +254,6 @@ first three rounds.
 \draw[darr] (Ar2i1.south) -- (Br2i2.north);
 \draw[darr] (Ar2i2.south) -- (Br2i1.north);
 
-% Legend
 \coordinate (legX) at (4.0, 0);
 \path (Br2i1.south) +(0,-1.15) coordinate (legY);
 \node[draw, rounded corners=3pt, fill=gray!5, align=left, inner sep=6pt]
@@ -292,7 +282,7 @@ round as a one-phase synchronous protocol could not achieve this without a
 two-round lag. For the dynamical analysis, only the committed \updatephase{} state is
 treated as the system state at round $t$ and the arguments mainly function as message memory and debate facilitator. 
 All outputs are returned as structured JSON and no problems with malformed responses were observed. 
-The complete prompt templates are shown in \autoref{app:prompts}.
+The complete prompt templates are shown in Appendix~\ref{app:prompts}.
 
 \label{sec:setup:protocol:memory}%
 One aspect of the round structure left unspecified so far is how much history each
@@ -324,7 +314,7 @@ shrink. Analysing pilot repetitions we find that the harmful case,
 in which stopping would have prevented a later recovery to the
 correct answer, stays negligible while coverage remains high, and we set $u = 3$
 with a hard cap of $T = 15$. 
-We report the details of this efficiency trade-off in Appendix~\ref{app:knobs}.
+This efficiency trade-off is summarised in Appendix~\ref{app:knobs}.
 Terminating debate at consensus is standard practice
 in the \ac{MAD} literature \citep{yin2023eot, yang2025revisiting, kaesberg2025voting}.
 
@@ -333,12 +323,11 @@ at the final round, the option held by the most agents. Because a repetition sto
 only after $u = 3$ consecutive unanimous rounds, every converged repetition ends
 with all $N$ agents on one option, so the plurality is unambiguous and equals that
 option. A tie can therefore only happen in runs that hit the hard
-cap $T = 15$ without converging, which is about $3.8\,\%$ of repetitions.
+cap $T = 15$ without converging, which happens in about $3.8\,\%$ of repetitions.
 In a tie, one of the tied options is chosen at random. This label is not a real
 group decision, since it only reflects where the unresolved run happened to end.
 \autoref{sec:results:lc} therefore recommends flagging these repetitions as
 unresolved instead of trusting the reported majority.
-
 
 \subsection{Datasets}
 \label{sec:setup:datasets}
@@ -358,13 +347,13 @@ datasets such as GSM8K and MMLU leave no room for deliberation dynamics, while n
 multi-agent benchmarks are largely incompatible, being either role-specialised
 or defined over spatial rather than categorical positions. 
 A full survey of the candidates we considered and the reason each was
-rejected is given in \autoref{app:benchmarks}. Two benchmarks satisfy all four
+rejected is given in Appendix~\ref{app:benchmarks}. Two benchmarks satisfy all four
 criteria and are complementary, so we use them throughout this study.
 
 \paragraph{GPQA-Diamond.}
 \label{sec:setup:datasets:gpqa}
 GPQA-Diamond \citep{rein2024gpqa} is a graduate-level science
-question-answering benchmark of 198 questions in biology, physics, and
+ques\-tion-an\-swer\-ing benchmark of 198 questions in biology, physics, and
 chemistry, written by domain experts and validated through a ``Google-proof''
 protocol that resists retrieval-based shortcuts. It satisfies all four criteria
 directly. Four-option multiple choice ($M = 4$) provides the discrete decision
@@ -376,7 +365,7 @@ GPQA also has direct multi-agent precedent
 \citep{becker2025orchestration, kenton2024debate, wang2025mars}. We
 adopt it as the \textbf{primary} dataset. 
 The main downside is that this benchmark has less cumulative \ac{MAD} literature compared to MMLU or GSM8K, 
-which is however mostly the case as its a more recent benchmark and not because of a methodological change. 
+which is however mostly the case as it is a more recent benchmark and not because of a methodological change. 
 A second drawback concerns comparability of the accuracy numbers, as published figures
 refer to strong models on the full benchmark, whereas we use
 a mid-tier model on only a screened task subset.
@@ -407,9 +396,7 @@ $M \in \{3, 4\}$. The agent count $N$ and the option count $M$ are therefore
 independent quantities and should not be confused. This is why every
 option-indexed quantity in \autoref{sec:method} is defined over the task's actual
 $M$ options.
-Extension to mixed-motive negotiation datasetes is left to future work.
-
-
+Extension to mixed-motive negotiation datasets is left to future work.
 
 \subsection{Experimental Design}
 \label{sec:setup:design}
@@ -418,18 +405,23 @@ The system exposes many tunable components. We classify each as \textbf{scan} (a
 primary perturbation axis), \textbf{fix} (held constant), or \textbf{defer} (out
 of scope). \autoref{tab:knob-summary} summarises the classification and the
 literature supporting it, and the detailed per-knob justification is deferred to
-\autoref{app:knobs}.
+Appendix~\ref{app:knobs}.
 
 Of these components, two are varied as primary perturbation axes, chosen because they
 are the canonical levers for network-motif analysis:
 \begin{itemize}
   \item \textbf{Memory window} $W \in \{1, 2, 5\}$, with $W = 1$ the near-Markov
         baseline. Memory content is an established driver of debate behaviour
-        \citep{du2024improving, mehdizadeh2026topologymemory, marandi2026protocols}.
+        \citep{mehdizadeh2026topologymemory, marandi2026protocols}, and already in
+        the original debate setup, summarising rather than passing on the full
+        history changes outcomes \citep{du2024improving}.
   \item \textbf{Topology} $\in \{\textsc{fc}, \textsc{star}\}$. The fully-connected topology
-        serves as the symmetric baseline, while the star tests for hub-induced dominance,
-        following evidence that centralised structures concentrate influence
-        \citep{conformitydynamics2026, chen2023consensus, liu2025problemsolving}.
+        serves as the symmetric baseline, while the star tests for hub-induced dominance.
+        It is motivated by evidence that biased hubs shift accuracy in scale-free
+        networks \citep{liu2025problemsolving}, that the outcome of a hub-centred
+        structure is capped by the hub's competence \citep{conformitydynamics2026},
+        and that directed leader-follower structure lets a single agent dominate
+        \citep{chen2023consensus}.
 \end{itemize}
 Their product gives $3 \times 2 = 6$ configurations per task. The dataset (GPQA
 or HiddenBench) is classified as a scanned condition in \autoref{tab:knob-summary}
@@ -440,8 +432,8 @@ therefore spans $6 \times 2 = 12$ configuration--dataset cells.
 All remaining components are held constant to isolate the effect of the two scan
 axes:
 \begin{itemize}
-  \item \textbf{Agents} $N = 4$, the smallest value at which the two
-        topologies are structurally distinct and multi-way splits can occur.
+  \item \textbf{Agents} $N = 4$, the smallest value at which
+        two-against-two factions can form.
   \item \textbf{Rounds} $T = 15$ (hard cap) with early stopping $u = 3$, where $T$ is
         an observation budget rather than a structural knob, since trajectories
         can be cropped post hoc but not extended.
@@ -459,10 +451,10 @@ axes:
 
 Finally, selecting which tasks to run completes the design. Motifs are per-task properties, and running the full grid at high $R$ on every
 question is infeasible, since at roughly $25$\,s per repetition, the full GPQA-Diamond
-set across six configurations would take approximately $17.2$ days ($413$\,h) at the
+set across six configurations would take approximately $17.2$ days ($412$\,h) at the
 final $R = 50$, whereas a two-phase design that uses an initial screening process 
 reduces this to approximately $4.5$ days ($108$\,h). 
-It begins with a shallow \emph{screening} pass, which runs every task once at a
+It begins with a shallow \emph{screening} pass, which runs every task three times at a
 single baseline configuration (\textsc{fc}, $W = 1$, $R = 3$). Only tasks where
 debate actually occurs \emph{and} the final answer varies across repetitions are
 kept, because only for these tasks do the dynamics, rather than the model's prior,
@@ -476,11 +468,11 @@ if every repetition ends in the same answer, or if there is no real disagreement
 \toprule
 \textbf{Knob} & \textbf{Verdict} & \textbf{Value} & \textbf{Key references} \\
 \midrule
-Memory $W$ & scan & $\{1, 2, 5\}$ & \citep{du2024improving, mehdizadeh2026topologymemory, marandi2026protocols} \\
+Memory $W$ & scan & $\{1, 2, 5\}$ & \citep{mehdizadeh2026topologymemory, marandi2026protocols, du2024improving} \\
 Topology & scan & fc, star & \citep{conformitydynamics2026, chen2023consensus, liu2025problemsolving} \\
 Agents $N$ & fix & $4$ & \citep{du2024improving, li2026hiddenbench} \\
 Rounds $T$ & fix & $15$ (cap), $u=3$ & \citep{kaesberg2025voting, yang2025revisiting} \\
-Output structure & fix & full \arguephase{}/\updatephase{} & \citep{he2025dimo} \\
+Output structure & fix & full \arguephase{}/\updatephase{} & own design; cf.\ \citet{he2025dimo} \\
 Framing & fix & cooperative & \citep{liang2024encouraging} \\
 Synchrony & fix & parallel-synchronous & \citep{chan2024chateval} \\
 Model & fix & \texttt{mistral-medium-instruct} & \citep{liu2025stopovervaluing, wynn2025talk} \\
@@ -490,7 +482,7 @@ Tool access & defer & none & \citep{rein2024gpqa} \\
 \bottomrule
 \end{tabular}
 \caption[Classification of tunable components]{Classification of tunable components. Full justification per knob is
-given in \autoref{app:knobs}.}
+given in Appendix~\ref{app:knobs}.}
 \label{tab:knob-summary}
 \end{table}
 

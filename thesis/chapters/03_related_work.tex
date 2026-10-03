@@ -28,7 +28,7 @@ a correct or wrong answer shift accuracy substantially \citep{liu2025problemsolv
 fixes how much interaction history each agent retains. The two were recently
 crossed in a single setup by \citet{mehdizadeh2026topologymemory}, who find
 no main effect of topology on coordination success but a strong interaction with
-memory. Longer memory slows convergence in decentralised networks and accelerates
+memory. Longer memory slows settling in decentralised networks and accelerates
 it in centralised networks, so the same parameter pushes the system in opposite
 directions depending on the structure of the network. Faster settling in the centralised
 case means locking into a fragmented plateau rather than reaching
@@ -68,7 +68,6 @@ its \emph{final outcome}. They largely ignore the deliberative process behind th
 outcome, and whether two systems with the same accuracy reach it through
 different dynamics.
 
-
 \subsection{Interaction Dynamics in \texorpdfstring{\acs{LLM}}{LLM} Collectives}
 \label{sec:related:dynamics}
 
@@ -81,8 +80,8 @@ itself a motif but the input on which they all act.
 \paragraph{Rising confidence.}
 \citet{prasad2025certain} stage repeated adversarial debates and find pervasive
 miscalibration. Models begin overconfident, grow \emph{more} confident that they
-are winning as the exchange proceeds even without new supporting evidence, and
-frequently both claim victory at once, which is a logically impossible. 
+are winning as the exchange proceeds even in the face of opposing arguments, and
+frequently both claim victory at once, which is logically impossible. 
 These are zero-sum debates, where winning is not determined by correctness.
 \citet{bertalanic2026costofconsensus} show that an agent's confidence before
 communication barely predicts whether it is right, and that peer exchange even
@@ -109,7 +108,7 @@ expose.
 \paragraph{Premature lock-in.}
 \citet{chuang2025debate} report that role-playing \ac{LLM} groups converge more
 strongly than human groups do, indicating a systematic bias toward
-premature agreement. Purely cooperative framings furhter sharpen this, since with no dissenting
+premature agreement. Purely cooperative framings further sharpen this, since with no dissenting
 pressure a group can collapse into a mutually reinforcing echo chamber. A
 structurally sharper version is captured by HiddenBench
 \citep{li2026hiddenbench}, which adapts the hidden-profile paradigm from social
@@ -157,7 +156,6 @@ that a collective norm emerges once conformity passes a threshold, although at t
 small group sizes typical of debate this threshold is smoothed into a gradual
 transition.
 
-
 \subsection{Ways of Analysing Multi-Agent Systems}
 \label{sec:related:lenses}
 
@@ -178,19 +176,23 @@ worked, not \emph{why}.
 \paragraph{Model internals and transcript reading.}
 Opening the models is the wrong level for our question. Consensus, oscillation,
 and influence concentration are properties of the \emph{group} trajectory, not of
-any single forward pass \citep{miehling2025agentic}, and the internals of
+any single forward pass \citep[cf.][]{miehling2025agentic}, and the internals of
 \ac{API}-served models are inaccessible anyway. Reading transcripts is more
 informative, and we use it informally to examine flagged limit-cycle cases
 (\autoref{sec:results:lc}). However, on its own it is subjective, does not scale
 to tens of thousands of repetitions, and cannot be tested against a null.
 
 \paragraph{Influence attribution.}
-Another approach measures how strongly agents influence one another. This is done
-either with transfer entropy, which tracks how much one agent's messages
-predict another's \citep{infodynamics2026}, or by removing agents and observing
-how the outcome changes \citep{agentsthatmatter2026, cui2025introspecloo}. Both
-give stronger estimates of influence than the adoption-based signature we use,
-but they require access to the model or repeated re-runs. We return to this
+Another approach measures how strongly agents influence one another.
+Information-theoretic measures such as semantic transfer entropy track how much
+one speaker's messages predict another's. They were developed for human dialogue
+but could be applied to debate transcripts, given any language model that exposes
+log-probabilities \citep{infodynamics2026}. Removal-based attribution instead
+removes or ignores an agent and observes how the outcome changes
+\citep{agentsthatmatter2026}, or approximates this with one extra introspective
+prompting round \citep{cui2025introspecloo}. Both give stronger estimates of
+influence than the adoption-based signature we use, but they cost additional
+model calls, either for scoring or for re-runs. We return to this
 trade-off in \autoref{sec:conclusion:future}.
 
 \paragraph{Learned diagnostics from logs.}
@@ -198,8 +200,8 @@ A very recent approach trains a predictor on features taken from model outputs
 or debate logs. It is used either to decide whether a question needs debate at all
 \citep{fan2026imad} or to decide when a majority vote should be overturned
 \citep{minoritysentinel2026}. This shows that ordinary outputs and logs contain enough signal
-to support useful decisions. However, such predictors do not explain what is
-happening. They learn that certain feature patterns precede failure, but do not
+to support useful decisions. However, such predictors do not characterise the
+dynamics behind their decisions. They learn that certain feature patterns precede failure, but do not
 say which dynamical regime the system is in, and they need labelled outcomes for
 training.
 
@@ -219,7 +221,6 @@ approach because it is the only one that can name and measure the failure modes
 documented above while remaining applicable to black-box models. We keep its
 limitations in mind when interpreting every result (\autoref{sec:discussion:limitations}).
 
-
 \subsection{Research Gap}
 \label{sec:related:gap}
 
@@ -229,7 +230,7 @@ only measures where a deliberation ends and ignores how it got there. The
 dynamics literature does look at the trajectory, but documents one failure mode
 at a time (overconfidence, herding, premature consensus) and explains each
 through a shared cause such as sycophancy, not through the motifs they resemble.
-None of these findings is tested against a null model that shows what the same
+Few of these findings are tested against a null model that shows what the same
 statistic looks like by chance, so a detection rate alone could simply reflect
 the small, discrete state space.
 
@@ -250,9 +251,9 @@ questions of \autoref{sec:intro:rqs}. For \emph{measurement}, we define detector
 for self-reinforcement, multistability, dominance, and limit cycles. Each is
 grounded in the literature and has its own null model. We run each configuration
 many times, which makes it possible to compute attractor statistics across
-repetitions. Prior work repeats each configuration but studies an opinion scale rather than
-truth-valued tasks \citep{cau2026agreementdrift}, or does not report the
-distribution of end states across runs \citep{mehdizadeh2026topologymemory}, so
+repetitions. Prior work studies an opinion scale rather than
+truth-valued tasks \citep{cau2026agreementdrift}, or does not report which end
+state each run reaches \citep{mehdizadeh2026topologymemory}, so
 it does not measure multistability. For \emph{characterisation},
 we apply the detectors to tasks with a correct answer, so that every dynamical
 quantity can be split by correctness, across two different information regimes.

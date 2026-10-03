@@ -18,18 +18,18 @@ to identify and correct them.
 
 However, this optimistic reading is almost entirely based on \emph{outcome}
 measurements. The literature evaluates \acp{MAS} mostly by
-final task performance, treating the deliberation itself as an mysterious process
+final task performance, treating the deliberation itself as a mysterious process
 that either does or does not yield a better answer. Recent critical
 reassessments show that this outcome-centric view is fragile: debate frequently
 fails to outperform simple single-agent baselines such as chain-of-thought and
-self-consistency \citep{liu2025stopovervaluing}, and collapses under controlled
-comparison with simpler alternatives such as majority voting
+self-consistency \citep{liu2025stopovervaluing}, and does not reliably beat
+simpler alternatives such as majority voting
 \citep{zhang2025debateorvote} or isolated self-correction
 \citep{bertalanic2026costofconsensus}.
 More troublingly, the failures that do occur are not random noise but exhibit
 structure. When two \acp{LLM} debate, both tend to grow \emph{more} confident that
 they have won as the exchange proceeds, with confidence escalating away from a
-rational baseline even when no new supporting evidence is introduced
+rational baseline even in the face of opposing arguments
 \citep{prasad2025certain}. Under distributed information, groups of \ac{LLM} agents
 converge prematurely on the evidence they already share and fail to surface the
 private knowledge needed for the correct answer, so that collective accuracy
@@ -99,7 +99,7 @@ thereby use it to understand which design choices shape the deliberative dynamic
 \ac{LLM} collectives.
 
 This explanatory layer has a practical purpose. As \acp{MAS} are
-deployed in high risk environments, an operator needs to know not only whether a
+deployed in high-risk environments, an operator needs to know not only whether a
 configuration tends to produce correct answers but also whether a given deliberation
 is proceeding soundly or in a broken way, whether the group is genuinely
 correcting an error or just confidently converging on a shared mistake, and whether it
@@ -118,7 +118,6 @@ In one sentence, the objective of this thesis is to understand \emph{how} a
 cooperative \ac{LLM} debate arrives at its answer, by measuring the self-organization
 patterns in its trajectory, and to turn that understanding into evidence-based
 guidance for building such \ac{MAD} systems.
-
 
 \subsection{Research Questions}
 \label{sec:intro:rqs}
@@ -156,7 +155,6 @@ votes repeat and influence concentrates by chance alone. Thus, the null models s
 what chance looks like, so a motif with a very low frequency is still a result,
 not a failure. We report the motifs we do not find as well as those we do.
 
-
 \subsection{Contributions \& Structure}
 \label{sec:intro:contributions}
 
@@ -170,11 +168,12 @@ This thesis makes three main contributions.
         opinion-dynamics literature and tested against its own null model
         (\autoref{sec:method}).
 
-  \item \textbf{A repeated-run characterisation at scale.} 30{,}000 debates
+  \item \textbf{A repeated-run characterisation at scale.} 30{,}000 debates in the main grid
         across twelve configurations and two contrasting
         benchmarks, with $R = 50$ repetitions per task and configuration, which
         makes across-repetition attractor statistics measurable in the first
-        place (\autoref{sec:results}).
+        place, plus $14{,}250$ further debates in the follow-up experiments
+        (\autoref{sec:results}).
 
   \item \textbf{A controlled intervention on the opening votes.} A
         seeded-initialisation experiment and an adversarial probe that
@@ -183,7 +182,7 @@ This thesis makes three main contributions.
 \end{itemize}
 
 \noindent All four motifs describe a single mechanism. The debate has positive
-feedback but no negative feedback, so it acts as a selective but lossy amplifier
+feedback but little negative feedback, so it acts as a selective but lossy amplifier
 of its opening votes. It strengthens what the agents already
 hold, rarely produces an answer none of them started with, and can destroy a
 correct majority. From this we derive evidence-graded design guidance, mapping
@@ -204,7 +203,7 @@ null model each is tested against. \emph{Results} (\autoref{sec:results}) then a
 the instrument, reporting accuracy and efficiency, the four motifs in turn, the
 emergent influence topology, and the seeded-initialisation experiment.
 \emph{Discussion} (\autoref{sec:discussion}) continues by interpreting the motifs as one
-amplifier mechanism, traces it to the absence of negative feedback, and derives
+amplifier mechanism, traces it to the near-absence of negative feedback, and derives
 evidence-based design principles. It also states the limits of our claims and
 the future work they imply. \emph{Conclusion} (\autoref{sec:conclusion}) closes
 by answering the three research questions in turn and showing how the

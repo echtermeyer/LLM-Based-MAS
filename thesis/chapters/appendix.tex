@@ -1,34 +1,5 @@
-% ============================================================
-% APPENDIX
-% Supporting material for Sections 4-6, ordered to follow the
-% thesis arc: setup (A.1-A.3), results supplements (A.4-A.9),
-% outlook (A.10).
-% ============================================================
-%
-% REQUIRES: \usepackage{xcolor} for the \fillin marker below.
-% Every \fillin{...} is a number that must be inserted before
-% submission. They render in red bold so they cannot survive a
-% final read-through. Delete the macro once they are all gone.
-%
 \newcommand{\fillin}[1]{\textcolor{red}{\textbf{[FILL: #1]}}}
-%
-% MAIN-TEXT ACTIONS (delete this block before submission):
-%  1. Section 4.2 cites the early-stopping runtime figure. That figure is gone;
-%     the trade-off is now stated numerically under "Number of rounds" in A.2.
-%  2. Section 6.2.1 says "Per-configuration values are given in Appendix A.3".
-%     The per-configuration table is gone; the four ranges are now a sentence in
-%     A.5. Adjust that cross-reference.
-%  3. The system-prompt robustness check has been removed per your call. Nothing
-%     in the thesis now tests whether the anti-conformity sentence in the persona
-%     drives the result, so the single-prompt objection in 7.4 stands
-%     unanswered. Worth one sentence of acknowledgement there.
-%  4. The separate "List of Prompts" front matter indexes two items that live in
-%     A.3. With only two prompts an index page is overhead; consider dropping the
-%     list and keeping A.3, which is what Section 4.2 points to.
-% ============================================================
 
-
-% ------------------------------------------------------------
 \subsection{Benchmark Survey}
 \label{app:benchmarks}
 
@@ -38,8 +9,9 @@ initial disagreement. Most existing benchmarks fail the first requirement
 outright. The native multi-agent suites bind agents to sub-tasks or to positions
 in physical space rather than to a common set of options, so there is no shared
 position space in which a vote composition could be defined. REALM-Bench
-\citep{geng2025realmbench} assigns agents to specific machines and its
-communication is event-driven coordination rather than a deliberation; MARBLE
+\citep{geng2025realmbench} assigns agents to jobs or workflow nodes that compete
+for shared resources, and its communication coordinates schedules rather than
+deliberating over a shared answer; the Database scenario of MultiAgentBench
 \citep{zhu2025multiagentbench} gives each agent a different root cause to
 diagnose; PARTNR \citep{chang2024partnr} hard-codes heterogeneous capabilities and
 is run with two agents; Collab-Overcooked \citep{sun2025collaboverco} splits chef and
@@ -50,7 +22,7 @@ configuration and the authors report coordination degrading sharply beyond two o
 three agents.
 
 The socially framed benchmarks come closer without quite fitting. SOTOPIA
-\citep{zhou2024sotopia} is $N = 2$ by design, which is structurally fatal here,
+\citep{zhou2024sotopia} is dyadic in its released scenarios, which is structurally fatal here,
 since dominance requires at least three agents and multistability requires
 competing factions. LLM-Deliberation \citep{abdelnabi2024cooperation} is genuinely
 multi-agent at up to six parties, with a private scratchpad and a public answer, and native adversarial variants,
@@ -60,18 +32,18 @@ future mixed-motive extension rather than a correctness benchmark here.
 HiddenBench \citep{li2026hiddenbench} is the exception: it formalises the
 hidden-profile paradigm \citep{stasser1985pooling, schulzhardt2012synergy} with
 validity criteria that guarantee information pooling is required, and we adopt it
-as our secondary substrate. Two sub-environments of MARBLE, Bargaining and
+as our secondary substrate. Two sub-environments of MultiAgentBench, Bargaining and
 Werewolf, do have shared decision variables and could serve the same role in later
 work.
 
 The single-agent reasoning sets that the debate literature has adopted fail on
 difficulty instead. \citet{du2024improving} established the methodology on GSM8K
-\citep{cobbe2021gsm8k} and MMLU \citep{hendrycks2021mmlu}, both of which are
-near ceiling for frontier models \citep{achiam2023gpt4}, so the typical
+\citep{cobbe2021gsm8k} and MMLU \citep{hendrycks2021mmlu}, on which GPT-4
+already scores $92.0\,\%$ and $86.4\,\%$ \citep{achiam2023gpt4}, so the typical
 trajectory is immediate unanimous agreement and there is no dynamical signal to
 detect; critical reassessments report that debate frequently fails to beat
 single-agent baselines \citep{liu2025stopovervaluing} and that majority voting
-accounts for most of its gains \citep{zhang2025debateorvote}. MATH \citep{hendrycks2021math} retains difficulty but
+accounts for most of its gains \citep{zhang2025debateorvote}. MATH \citep{hendrycks2021math} was built to be harder but
 requires non-trivial answer normalisation. GPQA-Diamond \citep{rein2024gpqa} is the instance of this lineage that
 still leaves headroom, which is why we adopt it as primary. Two further systems
 are cited elsewhere in this thesis but were never candidates as substrates:
@@ -79,8 +51,6 @@ AgentVerse \citep{chen2024agentverse} is a framework rather than a benchmark, an
 the DEBATE corpus \citep{chuang2025debate} is a corpus of human public and private
 opinion dynamics used as a reference point rather than an \ac{LLM} task environment.
 
-
-% ------------------------------------------------------------
 \subsection{Per-Knob Justification}
 \label{app:knobs}
 
@@ -91,8 +61,7 @@ citation lists given there.
 
 \paragraph{Memory window (scan).}
 Retained memory is a design choice rather than neutral bookkeeping.
-\citet{marandi2026protocols} find a real tradeoff between peer-referencing and convergence across protocol variants, with within-round versus cross-round exchange trading off directly;
-\citet{wynn2025talk} document erroneous contributions persisting across rounds;
+\citet{marandi2026protocols} finds a trade-off between peer-referencing and convergence across protocol variants, most clearly between within-round exchange and a rank-adaptive cross-round variant;
 and language models use long contexts unevenly \citep{liu2024lostmiddle}. A
 factorial memory$\times$topology study finds a strong interaction between the two:
 memory slows settling in decentralised networks but accelerates it in centralised
@@ -103,11 +72,9 @@ so that the window remains a genuine constraint in every configuration.
 
 \paragraph{Number of agents (fix at $N = 4$).}
 The joint answer-profile state space grows as $M^N$, so $N = 4$ is the smallest
-value at which the two canonical topologies are structurally distinct and
-multi-way splits can occur, while the state space stays small enough for
+value at which two-against-two factions can form, while the state space stays small enough for
 trajectory statistics at $R = 50$. The canonical baseline is $N = 3$
-\citep{du2024improving}, with only modest degradation reported up to $N = 4$
-\citep{liang2024encouraging}.
+\citep{du2024improving}.
 
 \paragraph{Number of rounds (fix at $T = 15$ with $u = 3$).}
 $T$ is an observation budget rather than a structural perturbation, since
@@ -120,9 +87,10 @@ in which stopping would have pre-empted a later recovery to the correct answer,
 was rare in the pilot data.
 
 \paragraph{Model and sampling (fix, homogeneous, $\tau = 0.7$).}
-A single homogeneous model isolates topology and memory effects from
-capability-asymmetry effects, which otherwise produce dominance-like dynamics
-attributable to conformity rather than to structure \citep{wynn2025talk}. Mixed
+A single homogeneous model removes capability asymmetry as a source of
+dominance-like dynamics, so that influence concentration can be attributed to
+structure. It does not remove conformity, which lowers accuracy in homogeneous
+groups as well \citep{wynn2025talk}. Mixed
 teams often underperform their best homogeneous member
 \citep{bertalanic2026costofconsensus}, so heterogeneity alone would not dissolve
 the dynamics under study. On temperature, deterministic decoding would remove the only
@@ -131,11 +99,11 @@ source of response diversity among identical agents \citep{zhu2026demystifying}.
 \paragraph{Framing and execution (fix).}
 \citet{liang2024encouraging} locate the operational sweet spot between pure
 cooperation, which lacks the adversarial pressure needed to overcome
-Degeneration-of-Thought in single-model reflection, and pure adversarial
-framing, which prevents convergence; the defense/challenge/question scaffold
+De\-gen\-er\-a\-tion-of-Thought in single-model reflection, and pure adversarial
+framing, under which accuracy drops again; the defense\slash challenge\slash question scaffold
 implements modest tit-for-tat while the \updatephase{} phase leaves room for
 convergence. The structured output is measurement apparatus rather than
-engineering taste, since the private/public split is what makes the dissociation
+engineering taste, since the private\slash public split is what makes the dissociation
 observable and the vote-stability rule is what separates argumentation from belief
 update. Synchronous execution with randomised peer-message order removes
 agent-order effects that would otherwise confound dominance detection.
@@ -150,19 +118,16 @@ through web search, and violate the Google-proof design rationale of
 Motif detection needs repetitions rather than tasks: multistability requires enough
 samples per task to surface competing basins, limit cycles enough trajectories to
 confirm period-$\geq 2$ structure, and the dominance surrogate test statistical
-power. At $R = 50$ and $\approx 25$\,s per repetition, running the full
+power. At $R = 50$ and an effective $\approx 25$\,s per repetition, with the
+repetitions of each task and configuration running in parallel, running the full
 six-configuration grid on all 198 GPQA-Diamond tasks would require
-$198 \times 6 \times 50 = 59{,}400$ repetitions, that is $\approx 412$\,h of
-sequential model time. The two-phase procedure of \autoref{sec:setup:design}
+$198 \times 6 \times 50 = 59{,}400$ repetitions, that is $\approx 412$\,h. The two-phase procedure of \autoref{sec:setup:design}
 reduces this by roughly a factor of four: the screening pass costs
 $198 \times 3 = 594$ repetitions ($\approx 4$\,h), and the deep pass on the 50
 retained tasks costs $50 \times 6 \times 50 = 15{,}000$ repetitions
 ($\approx 104$\,h). Including HiddenBench, the 30{,}000 repetitions reported in
-\autoref{sec:results} amount to $\approx 208$\,h of sequential model time,
-completed in ${\approx}211$\,h under parallel execution.
+\autoref{sec:results} took $\approx 206$\,h in total.
 
-
-% ------------------------------------------------------------
 \subsection{Prompt Templates}
 \label{app:prompts}
 
@@ -230,7 +195,7 @@ Unlike the other participants, you have a fixed position: you will defend your
 initial answer with absolute conviction and will NOT change your vote under any
 circumstances.
 
-Your sole objective is persuasion --- craft the most compelling, specific, and
+Your sole objective is persuasion - craft the most compelling, specific, and
 creative arguments to convince every other group member to adopt your position.
 Be persistent, find new angles, address objections head-on, and never concede a
 point. You may acknowledge that others raise interesting considerations, but
@@ -243,7 +208,7 @@ Each round has two phases:
 a challenge (directly refute a peer's claim), and a question (targeted at a
 peer's weak point).
 
-\ Phase B: write a persuasive public message. Your vote is fixed --- focus
+\ Phase B: write a persuasive public message. Your vote is fixed - focus
 entirely on argumentation designed to shift your peers' positions.
 \end{quote}
 \caption[Devil's advocate persona (system prompt)]{Devil's advocate persona replacing
@@ -318,8 +283,6 @@ shuffled before numbering; options are shuffled before label assignment.}
 \label{prompt:hiddenbench-question}
 \end{prompt}
 
-
-% ------------------------------------------------------------
 \subsection{Accuracy and Efficiency: Full Configuration Grid}
 \label{app:perf:configs}
 
@@ -360,10 +323,11 @@ HiddenBench & fc / $W=1$ & $25.2 \pm 2.9\,\%$ & $5.18$ & $2.5\,\%$ & $4.27$ \\
 \autoref{fig:app:perf:rounds_acc} relates accuracy to the number of rounds a
 repetition took, and the two benchmarks behave differently. On GPQA accuracy
 declines with debate length ($\rho = -0.54$). On HiddenBench it is flat over most
-of the range ($\rho = 0.08$) but collapses in the fastest bin, where repetitions
-that settle within two rounds lock in the shared wrong answer and reach only
-$2.5\,\%$. That bin is the basis for the
-early-consensus claim of \autoref{sec:results:perf}.
+of the range ($\rho = 0.07$) but collapses in the fastest bin. With $u = 3$, a
+repetition can only stop after two rounds if all agents agree from round~$0$, so
+this bin holds exactly the repetitions that start unanimous. They lock in the
+shared wrong answer and reach only $2.5\,\%$. That bin is the basis for the
+unanimous-start claim of \autoref{sec:results:perf}.
 
 \begin{figure}[H]
   \centering
@@ -377,8 +341,6 @@ early-consensus claim of \autoref{sec:results:perf}.
   \label{fig:app:perf:rounds_acc}
 \end{figure}
 
-
-% ------------------------------------------------------------
 \subsection{Self-Reinforcement: Segment-Slope Breakdown}
 \label{app:sr:supp}
 
@@ -387,7 +349,10 @@ $p_{\mathrm{SR}}$ ranges from $0.763$ to $0.825$ on GPQA fully-connected, $0.733
 to $0.809$ on GPQA star, $0.841$ to $0.883$ on HiddenBench fully-connected, and
 $0.806$ to $0.847$ on HiddenBench star, with mean segment slopes $\bar\beta$
 between $0.354$ and $0.515$ confidence points per round. No configuration
-approaches the no-feedback null of $0.5$.
+approaches the no-feedback null of $0.5$. The memory-window ordering that the
+endogenous reading predicts in \autoref{sec:method:sr} does not hold. Mean slopes
+decrease slightly as $W$ grows in all four combinations of dataset and topology,
+which favours the peer-conformity reading.
 
 What the slope does respond to is structural, and \autoref{tab:sr:subgroups} gives
 the breakdown. Segments that reach the confidence ceiling, that run to the end of
@@ -396,13 +361,18 @@ steeper slopes, and $\bar\beta$ falls monotonically as the opening vote
 distribution becomes more fragmented. The ceiling and terminality rows also bound
 the interpretation of the headline prevalence: a segment ends when its agent flips,
 and an agent whose confidence is falling is more likely to flip, so negative slopes
-are censored and $p_{\mathrm{SR}}$ should be read as an upper estimate.
+are censored and $p_{\mathrm{SR}}$ should be read as an upper estimate. Even
+non-terminal segments, which the stopping rule does not affect, reach
+$p_{\mathrm{SR}} = 0.682$, still well above the null.
 
 At the task level the marginal relationship between $\bar\beta$ and accuracy is
 near zero on GPQA (Pearson $r = 0.02$ fully-connected, $r = 0.04$ star) and weakly
-negative on HiddenBench ($r = -0.21$ and $r = -0.31$). As discussed in
-\autoref{sec:results:sr}, this marginal figure hides a cancellation between
-opposite effects in the ground-truth-present and ground-truth-absent subpopulations, which is why
+negative on HiddenBench ($r = -0.21$ and $r = -0.31$). This
+marginal figure hides a cancellation between opposite effects. In repetitions whose
+opening votes contain the correct option, steeper slopes go with higher accuracy
+(point-biserial $r = 0.20$ on GPQA and $r = 0.15$ on HiddenBench), and in
+repetitions whose opening votes do not, they go with lower accuracy ($r = -0.11$ and
+$r = -0.07$). This is why
 self-reinforcement is reported conditioned on the opening composition rather than
 marginally.
 
@@ -447,8 +417,6 @@ Condition & Group & $n_{\mathrm{segs}}$ & $\bar\beta$ & $p_{\mathrm{SR}}$ \\
 \label{tab:sr:subgroups}
 \end{table}
 
-
-% ------------------------------------------------------------
 \subsection{Multistability: Label Distribution}
 \label{app:multistab}
 
@@ -459,7 +427,7 @@ stochastic; HiddenBench is far more stochastic than GPQA, that is, its endpoints
 more often coexist without the opening votes selecting between them.
 
 Neither structural axis moves either metric. Across the twelve configurations mean
-$N_{\mathrm{eff}}$ spans only $1.93$ to $2.12$ and mean Cram\'er's $V$ only $0.33$
+$N_{\mathrm{eff}}$ spans only $1.93$ to $2.12$ and mean Cram\'er's $V$ $0.33$
 to $0.50$, with no consistent gradient in $W$ or topology, which is the basis for
 reading multistability as a property of the question rather than of the
 configuration.
@@ -482,17 +450,16 @@ HiddenBench ($M \in \{3,4\}$) & 56 &  98 & 146 & 2.06 & 0.35 \\
          benchmark; HiddenBench mixes $46$ three-option and $4$ four-option tasks.
          The $N_{\mathrm{eff}}$ column is a within-benchmark mean and should be
          read per option-count stratum, since $N_{\mathrm{eff}}$ is bounded by $M$
-         and is not directly comparable across option counts.}
+         and is not directly comparable across option counts. For HiddenBench,
+         the mean is $2.04$ on three-option and $2.33$ on four-option tasks.}
 \label{tab:multistab:overview}
 \end{table}
 
-
-% ------------------------------------------------------------
 \subsection{Dominance: Full Configuration Grid}
 \label{app:dom:supp}
 
 \autoref{tab:dom:overview} reports mean raw $D$ per cell. Star $D$ is
-$3.3$--$4.3\times$ higher than fully-connected across all cells, but this gap is
+$3.2$--$3.9\times$ higher than fully-connected across all cells, but this gap is
 largely mechanical: the star centre is the sole eligible conversion source for
 every leaf, so its influence share is structurally inflated and its surrogate null
 degenerate. Emergent concentration is therefore identified only for the
@@ -503,7 +470,11 @@ observed $D$ falls in the upper tail of its own surrogate distribution at
 $p < 0.05$, exceeds the $5\,\%$ that threshold produces by chance. The margin is
 modest at the repetition level, which is why the claim in
 \autoref{sec:results:dominance} rests on the consistency of a positive $\bar z$
-across tasks rather than on the flag rate alone.
+across tasks rather than on the flag rate alone. The hub ends on the consensus
+answer in at least $99\,\%$ of runs in every cell, and its confidence-weighted
+capitulation stays between $0.12$ and $0.19$. Concentration rises slightly with $W$
+on HiddenBench in both topologies but not on GPQA. Once topology is held fixed,
+mean $D$ and rounds to consensus show no consistent association.
 
 \begin{table}[H]
 \centering
@@ -530,8 +501,6 @@ HiddenBench & star & 0.540 & 0.574 & 0.578 & \multicolumn{2}{c}{---} \\
 \label{tab:dom:overview}
 \end{table}
 
-
-% ------------------------------------------------------------
 \subsection{Limit Cycles: Detection Funnel and Recurrence Matrices}
 \label{app:lc:supp}
 
@@ -586,8 +555,6 @@ System-level &  30{,}000 &  29{,}609~(98.7\,\%) &  388~(1.3\,\%) & 32 & 0.083 \\
   \label{fig:lc:rec}
 \end{figure}
 
-
-% ------------------------------------------------------------
 \subsection{High-Repetition Analysis: Additional Figures}
 \label{app:highrep}
 
@@ -635,8 +602,6 @@ separate in task-dependent directions.
   \label{fig:app:highrep:distributions}
 \end{figure}
 
-
-% ------------------------------------------------------------
 \subsection{Motifs Beyond the Present Selection}
 \label{app:future_motifs}
 
@@ -659,8 +624,8 @@ On the dynamical side, further regimes of the joint trajectory:
         disagreement into stable subgroups, distinct from across-repetition
         multistability.
   \item \textbf{Negative autoregulation / self-correction}: the sign-flipped twin
-        of self-reinforcement, an agent that damps its own confidence. Since
-        \autoref{sec:results:synthesis} identifies the absence of negative
+        of self-re\-in\-force\-ment, an agent that damps its own confidence. Since
+        \autoref{sec:results:synthesis} identifies the near-absence of negative
         feedback as the mechanism behind the amplifier, this is the most
         immediately consequential of the six.
 \end{itemize}

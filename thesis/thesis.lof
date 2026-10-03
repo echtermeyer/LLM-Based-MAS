@@ -1,5 +1,5 @@
-\contentsline {figure}{\numberline {1}{\ignorespaces The potential $V(x) = (x^2 - 1)^2$ has two stable attractors at $x = \pm 1$, separated by an unstable fixed point at $x = 0$. The shaded regions are the two basins of attraction. Initial conditions in Basin A converge to the left attractor; those in Basin B converge to the right attractor. Which long-run state the system reaches depends on its initial condition and any fluctuations large enough to cross the separatrix.}}{7}{figure.1}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Anatomy and design space of \acs {MAD}. \textbf {(a)} The generic round structure shared across debate variants. Braces mark the steps governed by the \emph {interaction} and \emph {agreement} dimensions of \citet {motger2026taxonomy}; the \emph {participant} dimension concerns the agents themselves and applies throughout. \textbf {(b)} Three communication topologies for four agents. In the star, all communication passes through the shaded hub. \textbf {(c)} A memory window of $W = 2$. At round $t$, each agent sees only the two preceding rounds. The specific protocol used in this thesis, which instantiates these steps, is shown in \autoref {fig:protocol}.}}{10}{figure.2}%
+\contentsline {figure}{\numberline {1}{\ignorespaces Double-well potential with two attractors and their basins of attraction}}{7}{figure.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Anatomy and design space of \acs {MAD}}}{10}{figure.2}%
 \contentsline {figure}{\numberline {3}{\ignorespaces Two-phase synchronous debate protocol}}{20}{figure.3}%
 \contentsline {figure}{\numberline {4}{\ignorespaces Accuracy and rounds by memory window}}{38}{figure.4}%
 \contentsline {figure}{\numberline {5}{\ignorespaces Self-reinforcement slope versus rounds to consensus}}{40}{figure.5}%
@@ -9,7 +9,7 @@
 \contentsline {figure}{\numberline {9}{\ignorespaces Accuracy by ground-truth presence at initialisation}}{47}{figure.9}%
 \contentsline {figure}{\numberline {10}{\ignorespaces Causal dose-response of seeding correct agents}}{48}{figure.10}%
 \contentsline {figure}{\numberline {11}{\ignorespaces Design guidance as a decision procedure}}{57}{figure.11}%
-\contentsline {figure}{\numberline {12}{\ignorespaces Accuracy versus rounds to consensus}}{XI}{figure.12}%
-\contentsline {figure}{\numberline {13}{\ignorespaces Recurrence matrices for two limit cycles}}{XIV}{figure.13}%
-\contentsline {figure}{\numberline {14}{\ignorespaces Accuracy and efficiency by run-level feature}}{XV}{figure.14}%
-\contentsline {figure}{\numberline {15}{\ignorespaces Feature distributions by outcome}}{XVI}{figure.15}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Accuracy versus rounds to consensus}}{79}{figure.12}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Recurrence matrices for two limit cycles}}{83}{figure.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Accuracy and efficiency by run-level feature}}{84}{figure.14}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Feature distributions by outcome}}{85}{figure.15}%
