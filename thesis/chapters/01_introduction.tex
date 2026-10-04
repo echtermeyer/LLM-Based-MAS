@@ -1,0 +1,210 @@
+\subsection{Motivation}
+\label{sec:intro:motivation}
+
+Large language models (\acsp{LLM})\acused{LLM} are increasingly used not as isolated
+models but as interacting agents that reason, argue, and decide in groups.
+A prominent instance of this is \emph{multi-agent debate} (\acs{MAD})\acused{MAD}, in which
+several \ac{LLM} instances independently propose answers, exchange their reasoning
+over multiple rounds, and revise their positions before the group ends up with a 
+final decision \citep{du2024improving}. Across factual and mathematical
+reasoning tasks, this simple protocol has been reported to improve accuracy
+relative to a single model answering alone
+\citep{du2024improving, liang2024encouraging, chen2024reconcile} and to reduce
+hallucination \citep{du2024improving}, and it now
+supports a growing family of collaborative and evaluative systems
+\citep{chan2024chateval}. The appeal is intuitive, since independent agents make
+partially independent errors, and deliberation offers a mechanism for the group
+to identify and correct them.
+
+However, this optimistic reading is almost entirely based on \emph{outcome}
+measurements. The literature evaluates \acp{MAS} mostly by
+final task performance, treating the deliberation itself as a mysterious process
+that either does or does not yield a better answer. Recent critical
+reassessments show that this outcome-centric view is fragile. Debate frequently
+fails to outperform simple single-agent baselines such as chain-of-thought and
+self-consistency \citep{liu2025stopovervaluing}, and does not reliably beat
+simpler alternatives such as majority voting
+\citep{zhang2025debateorvote} or isolated self-correction
+\citep{bertalanic2026costofconsensus}.
+More troublingly, the failures that do occur are not random noise but exhibit
+structure. When two \acp{LLM} debate, both tend to grow \emph{more} confident that
+they have won as the exchange proceeds, with confidence escalating away from a
+rational baseline even in the face of opposing arguments
+\citep{prasad2025certain}. Under distributed information, groups of \ac{LLM} agents
+converge prematurely on the evidence they already share and fail to surface the
+private knowledge needed for the correct answer, so that collective accuracy
+collapses far below what a single agent achieves with complete information
+\citep{li2026hiddenbench}.
+
+What these failures have in common is that they are \emph{dynamical}. Rising
+confidence, premature lock-in, and conformity behaviour are properties of how
+positions evolve and influence one another across rounds, and not of the competence of any single
+agent at a single point in time. An outcome metric, by
+construction, cannot see them, because two systems can reach the same final accuracy
+through entirely different trajectories, one through genuine error correction
+and the other through a confident slide into a shared mistake. Understanding
+\emph{when} and \emph{why} multi-agent deliberation succeeds therefore requires
+a vocabulary for the interaction dynamics themselves. \citet{miehling2025agentic}
+make precisely this argument at a conceptual level, stating that agentic \ac{AI}
+requires a systems-theoretic lens because a focus on individual model capabilities
+underestimates emergent system-level capabilities and risks. However, 
+their work remains conceptual and offers no empirical method for
+detecting such behaviour in practice.
+
+Complex-systems theory supplies exactly such a method. Systems of many
+interacting units that produce ordered collective behaviour without any central
+control, the defining feature of self-organization \citep{camazine2001self},
+are known to fall into a small number of recurring dynamical regimes. These
+regimes have precise names and precise signatures. \emph{Self-reinforcement}
+is the positive feedback by which a state amplifies its own position
+\citep{arthur1989competing}. \emph{Limit cycles} are self-sustained periodic
+oscillations that never settle \citep{strogatz2015nonlinear}.
+\emph{Multistability} is the coexistence of multiple stable outcomes selected by
+initial conditions \citep{feudel2008complex}. Finally, \emph{dominance} is the
+concentration of influence onto a single node \citep{degroot1974consensus,
+jia2015opinion}. Such patterns are studied as \emph{motifs}, which are recurring structural or
+dynamical building blocks whose presence is detectable and informative about the behaviour of a system \citep{milo2002network, alon2007network,
+driscoll2024dynamical}. The failure modes documented in the \ac{MAD} literature read
+naturally as instances of this vocabulary. For instance, escalating confidence is a
+self-reinforcement signature, premature consensus is a fixed-point attractor
+reached through basin selection, and herding to a confident leader is a
+dominance motif. Thus, the connection has begun to be made.
+\citet{ashery2025conventions} demonstrate the spontaneous emergence of
+universally adopted social conventions in decentralised \ac{LLM} populations, show
+that strong collective biases arise even when individual agents exhibit none,
+and find that committed adversarial minorities can impose alternative
+conventions on the majority. \citet{okawa2026biasedconsensus} derives a formal model predicting that once
+conformity pressure among agents exceeds a critical threshold, even small
+individual biases are amplified into a shared collective bias.
+However, these studies mainly use coordination tasks in which no option is correct.
+They can therefore show that a group converges, but not whether it converges on the correct answer.
+
+This thesis addresses that gap. We construct a controlled cooperative
+\ac{MAD} system in which homogeneous \ac{LLM} agents deliberate over
+multiple rounds on tasks with verifiable ground truth. On top of this system, we
+develop a suite of detectors, each grounded in the complex-systems and
+opinion-dynamics literature, that identify self-reinforcement, limit cycles,
+multistability, and dominance in the resulting interaction logs. We run this system across a controlled grid of
+communication topologies and memory configurations on two complementary
+benchmarks. The first is GPQA-Diamond \citep{rein2024gpqa}, a graduate-level science
+question-answering benchmark where agents typically start with above-chance priors.
+The second is HiddenBench \citep{li2026hiddenbench}, a hidden-profile benchmark
+constructed so that agents start systematically wrong and success requires
+genuine information pooling. The contrast between the two isolates whether
+observed dynamics depend on the presence of a reliable individual signal or
+persist even when the group must correct a shared bias. Throughout, we treat
+motif detection not as a competitor to accuracy but as an explanatory layer
+beneath it. We think of it as a way to characterise the trajectory that produces an outcome, and
+thereby use it to understand which design choices shape the deliberative dynamics of
+\ac{LLM} collectives.
+
+This explanatory layer has a practical purpose. As \acp{MAS} are
+deployed in high-risk environments, an operator needs to know not only whether a
+configuration tends to produce correct answers but also whether a given deliberation
+is proceeding soundly or in a broken way, whether the group is genuinely
+correcting an error or just confidently converging on a shared mistake, and whether it
+will terminate at all. Outcome metrics cannot answer these questions alone.
+Related work has started to address this. \citet{fan2026imad} train a classifier
+that predicts, from linguistic features of the self-critique of a single agent,
+whether debate is worth running at all. What is still missing is a tool that names which regime a deliberation
+is in, using the vocabulary of dynamical systems, rather than only flagging that
+something is wrong. Our detectors are meant to fill this gap. Because each detector is computed from
+ordinary interaction logs, it can serve as a candidate \emph{diagnostic} of
+deliberative health. We do not deliver a validated diagnostic tool. Instead,
+we provide the groundwork for one, a set of measurable signatures
+characterised across a controlled grid, together with design principles graded by
+how strongly our data supports them.
+In one sentence, the objective of this thesis is to understand \emph{how} a
+cooperative \ac{LLM} debate arrives at its answer, by measuring the self-organization
+patterns in its trajectory, and to turn that understanding into evidence-based
+guidance for building such \ac{MAD} systems.
+
+\subsection{Research Questions}
+\label{sec:intro:rqs}
+
+The goal of this thesis is to establish whether the dynamical
+vocabulary of complex systems can be applied empirically to \ac{LLM}-based
+\ac{MAD}, and to characterise the conditions under which
+self-organization patterns emerge. We split this goal into three research
+questions, ordered by the class of evidence each requires.
+
+\begin{itemize}
+  \item[\textbf{RQ1}] \textbf{Measurement.} Can self-organization motifs,
+        specifically self-reinforcement, limit cycles, multistability, and
+        dominance, be detected in cooperative \ac{LLM}-based \ac{MAD} using
+        detectors grounded in the complex-systems and opinion-dynamics literature? 
+        And which of these motifs actually occur, at what frequency, and with what structure?
+
+  \item[\textbf{RQ2}] \textbf{Characterisation.} What determines the presence and
+        strength of each motif, and what do they predict about system outcomes?
+        We examine two structural axes, communication topology and
+        memory window, together with the information regime of the task and the
+        composition of the opening votes, and ask what each motif implies for
+        accuracy, convergence speed, and worst-case runtime.
+
+  \item[\textbf{RQ3}] \textbf{Causation.} Is the composition of the opening votes
+        causally responsible for the outcome? Can the system generate a correct
+        answer that no agent initially held, or does deliberation function
+        primarily as an amplifier of the initial vote distribution?
+\end{itemize}
+
+Throughout, every detector is tested against a null
+model that removes the pattern we look for and keeps everything else. This
+matters because our setup is small. With only four agents and three or four voting options,
+votes repeat and influence concentrates by chance alone. Thus, the null models show
+what chance looks like, so a motif with a very low frequency is still a result,
+not a failure. We report the motifs we do not find as well as those we do.
+
+\subsection{Contributions \& Structure}
+\label{sec:intro:contributions}
+
+This thesis makes three main contributions.
+
+\begin{itemize}
+  \item \textbf{Self-Organization Motif Analysis (\suitename{}), a tool for measuring debate dynamics.}
+        A two-phase debate protocol that logs private beliefs and confidence scores
+        separately from public messages (\autoref{sec:exp}), together with four
+        motif detectors, each grounded in the complex-systems or
+        opinion-dynamics literature and tested against its own null model
+        (\autoref{sec:method}).
+
+  \item \textbf{A repeated-run characterisation at scale.} 30{,}000 debates in the main grid
+        across twelve configurations and two contrasting
+        benchmarks, with $R = 50$ repetitions per task and configuration, which
+        makes across-repetition attractor statistics measurable in the first
+        place, plus $14{,}250$ further debates in the follow-up experiments
+        (\autoref{sec:results}).
+
+  \item \textbf{A controlled intervention on the opening votes.} A
+        seeded-initialisation experiment and an adversarial probe that
+        manipulate only the composition of the opening votes while leaving the
+        debate itself unchanged (\autoref{sec:results}).
+\end{itemize}
+
+\noindent All four motifs describe a single mechanism. The debate has positive
+feedback but little negative feedback, so it acts as a selective but lossy amplifier
+of its opening votes. It strengthens what the agents already
+hold, rarely produces an answer none of them started with, and can destroy a
+correct majority. From this we derive evidence-graded design guidance, mapping
+each recommendation to an observable that can be computed from ordinary
+interaction logs (\autoref{sec:discussion}).
+
+\paragraph{Structure of this thesis.}
+The thesis follows the order of the three research questions. \emph{Background}
+(\autoref{sec:infsub}) introduces the vocabulary of self-organization and
+dynamical motifs and fixes what we mean by an \ac{LLM} agent and \ac{MAD}.
+\emph{Related Work} (\autoref{sec:related}) surveys how \acp{MAS} are
+currently analysed and locates the gap this thesis addresses. \suitename{} is
+then built in two steps. Firstly, \emph{System and Experimental Setup}
+(\autoref{sec:exp}) specifies the debate protocol, the two contrasting
+benchmarks, and the experimental grid, and secondly, \emph{Detection Methodology}
+(\autoref{sec:method}) defines the four \suitename{} detectors together with the
+null model each is tested against. \emph{Results} (\autoref{sec:results}) then applies
+\suitename{}, reporting accuracy and efficiency, the four motifs in turn, the
+emergent influence topology, and the seeded-initialisation experiment.
+\emph{Discussion} (\autoref{sec:discussion}) continues by interpreting the motifs as one
+amplifier mechanism, traces it to the near-absence of negative feedback, and derives
+evidence-based design principles. It also states the limits of our claims and
+the future work they imply. \emph{Conclusion} (\autoref{sec:conclusion}) closes
+by answering the three research questions in turn and showing how the
+detectors, the characterisation, and the causal test support each other.

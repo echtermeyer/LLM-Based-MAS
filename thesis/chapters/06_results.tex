@@ -1,0 +1,640 @@
+This section reports results from 30{,}000 debates across GPQA and HiddenBench.
+Because debate plays a fundamentally different role on each benchmark, every result
+is reported per benchmark rather than pooled.
+\autoref{sec:results:perf} establishes the accuracy and efficiency baseline for the system itself.
+\autoref{sec:results:motifs} measures the four self-organization motifs against their
+nulls and links each to accuracy and efficiency, which addresses RQ1 and RQ2.
+\autoref{sec:results:evid} then tests causally whether the opening vote composition
+determines the outcome, which addresses RQ3.
+
+\subsection{Accuracy and Efficiency}
+\label{sec:results:perf}
+
+Before examining the self-organization patterns, we report what the system
+achieves in aggregate and which design choices shape that outcome.
+Accuracy is the fraction of repetitions in which the final plurality vote matches
+the ground truth, and efficiency is the mean number of rounds to consensus.
+Our reference point for debate gain is the \emph{majority-vote baseline},
+which is the plurality of the round-0 answers of the four agents before any exchange occurs.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+Dataset & Per-agent & Majority vote (t\,=\,0) & After debate & Oracle (t\,=\,0) \\
+\midrule
+GPQA        & $38.2\,\%$ & $40.5\,\%$ & $\mathbf{42.2\,\%}$ & $70.6\,\%$ \\
+HiddenBench & $14.9\,\%$ & $\phantom{0}7.6\,\%$ & $\mathbf{26.1\,\%}$ & $46.3\,\%$ \\
+\bottomrule
+\end{tabular}
+\caption[Baseline and debate accuracy by dataset]{Accuracy decomposition at round~0
+         and after debate, pooled over all configurations with $n = 15{,}000$ per
+         dataset. Per-agent is the mean fraction of correct individual answers at
+         round~0. Majority vote is the accuracy of the round-0 plurality vote and
+         serves as the reference point for all debate-gain calculations. Oracle is
+         the fraction of repetitions in which at least one agent is correct at
+         round~0.}
+\label{tab:perf:baseline}
+\end{table}
+
+\autoref{tab:perf:baseline} shows that the two benchmarks operate in qualitatively
+different regimes.
+On GPQA the round-0 majority vote is already $40.5\,\%$, and debate adds a modest
+$+1.7$\,pp to reach $42.2\,\%$. The oracle bound of $70.6\,\%$ shows that the correct
+answer is present among the agents in roughly two-thirds of repetitions. The resulting
+oracle gap \citep{bertalanic2026costofconsensus} is therefore not only a knowledge
+deficit but also a failure of the group to identify and amplify the correct voice.
+HiddenBench is different as a shared model bias makes majority voting
+actively harmful and drags the round-0 plurality well below chance. Debate partly
+corrects this and reaches $26.1\,\%$, a gain of $+18.5$\,pp. Repetitions in which all
+four agents start on the same answer lock in the shared wrong answer almost
+universally, because a unanimous start leaves no disagreement for the corrective
+exchange that the benchmark design requires, as
+\autoref{fig:app:perf:rounds_acc} in Appendix~\ref{app:perf:configs} shows.
+In summary, debate refines a mostly-correct start on GPQA. On HiddenBench it partially
+corrects a systematically wrong one.
+
+With the outcome picture in place, the remaining question is what design choices such
+as memory window and topology contribute. \autoref{fig:perf:memory_window} plots
+accuracy and rounds across all configurations.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\linewidth]{plots/general/fig3_memory_window.png}
+  \caption[Accuracy and rounds by memory window]{Accuracy in the top row and mean
+           rounds to consensus in the bottom row as a function of memory window
+           $W \in \{1,2,5\}$, for GPQA in the left column and HiddenBench in the right
+           column. Each line is one topology, and the gap between the lines in the
+           rounds panels is the topology efficiency effect. The y-axes do not start
+           at zero, and the accuracy differences are not significant.}
+  \label{fig:perf:memory_window}
+\end{figure}
+
+Neither structural axis has a significant effect on accuracy. Topology makes
+no detectable difference on either benchmark. Memory window shows a
+consistent pattern, as $W=2$ yields the highest accuracy for both datasets and
+both topologies. However, the differences are small and do not survive
+multiple-comparison correction, so we read $W=2$ as the best setting in our data
+rather than as an established effect.
+
+Both axes do affect efficiency. The star topology needs more rounds to reach
+consensus on both benchmarks, and especially on HiddenBench, with $p < 0.001$ in
+both cases. The reason is that every spoke must route its messages through a single
+hub. The star partly compensates by sending half as many messages per round, so each
+round costs fewer tokens. Under the star topology, a larger memory window also speeds
+up convergence on HiddenBench. Exact values for all configurations, each with the
+standard error of its accuracy across the 50 tasks, are given in
+Appendix~\ref{app:perf:configs}. This standard error stays below $0.05$ in every
+configuration, so accuracy is reported as a point estimate without a dispersion
+term elsewhere in this thesis.
+
+\subsection{Self-Organization Motifs}
+\label{sec:results:motifs}
+
+Each motif is reported with a three-step template. Detection gives the prevalence
+against a null, drivers cover topology, $W$, and the initial vote composition, and
+outcomes relate the motif to accuracy and rounds to consensus.
+
+\subsubsection{Self-Reinforcement}
+\label{sec:results:sr}
+
+Self-reinforcement asks whether an agent that keeps its vote grows steadily more
+confident in it. We read it from the slope $\beta_{\mathrm{seg}}$ of confidence
+against round number within each \emph{vote-stable segment}, which is a run of at
+least three consecutive rounds on the same vote. We summarise a cell by the prevalence
+$p_{\mathrm{SR}}$, the fraction of segments with a positive slope, against a
+random-walk null of $0.5$. The full construction is given in \autoref{sec:method:sr}.
+Pooled across both benchmarks and all configurations, the segment filter leaves
+$133{,}696$ segments. Three findings follow.
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\roman{enumi})}
+  \item \textbf{It is universal.} $p_{\mathrm{SR}}$ never approaches its null. It
+        ranges from $0.733$ to $0.883$ across the 12 combinations of dataset,
+        topology, and $W$, and all 50 tasks lie individually above $0.5$ in every
+        combination. Per-configuration values are given in
+        Appendix~\ref{app:sr:supp}. Confidence climbs fastest where the debate has
+        least to resolve, in repetitions that never change their votes and in
+        unanimous starts. The initial vote composition drives the slope far more
+        than topology or memory window do. Agents grow more certain in what they
+        already held, not in what the debate revealed. A longer memory window
+        does not strengthen this drift, as an endogenous reading would predict,
+        but slightly weakens it in all four combinations of dataset and
+        topology. The rising confidence therefore more likely reflects
+        agreement from peers than the agent re-reading its own earlier
+        commitments (Appendix~\ref{app:sr:supp}).
+
+  \item \textbf{It goes with faster convergence.} Tasks with steeper confidence slopes reach consensus in fewer
+        rounds in all four combinations of dataset and topology. The task-level
+        Spearman correlation lies between $\rho = -0.82$ and $\rho = -0.73$, as
+        \autoref{fig:sr:efficiency} shows.
+
+  \item \textbf{It is blind to correctness.} Faster convergence is not more accurate
+        convergence. Whether self-reinforcement helps depends entirely on \emph{what}
+        it amplifies. When the correct option is already among the opening votes,
+        stronger reinforcement pushes the group toward it. When no agent starts
+        correct, the same force only locks in a wrong answer sooner.
+        Appendix~\ref{app:sr:supp} gives the corresponding accuracy analysis.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/sr/fig4_sr_efficiency.png}
+  \caption[Self-reinforcement slope versus rounds to consensus]{Mean segment slope
+           $\bar\beta$ against mean rounds to consensus at the task level. Each panel
+           is one combination of dataset and topology, each point is one task, and
+           colours denote the memory window. The dashed line is the pooled \ac{OLS} fit.}
+  \label{fig:sr:efficiency}
+\end{figure}
+
+Self-reinforcement converges the debate, but it converges on whatever the opening votes
+already favour rather than on the correct answer. This matches the position lock-in
+that \citet{oh2026entrenchment} identify as a root cause of belief fixation, that
+\citet{estornell2024multillm} derive from response homogeneity, and it fits the
+observation of \citet{cau2026agreementdrift} that peer pressure strengthens changes
+that are locally consistent. It also mirrors reports that debate confidence rises
+even in the face of opposing arguments \citep{prasad2025certain}. The seeded experiment in
+\autoref{sec:results:evid} confirms causally that the outcome depends on the
+initial composition.
+
+\subsubsection{Multistability}
+\label{sec:results:multistability}
+
+Multistability asks whether a task admits more than one stable consensus outcome, and
+whether the opening vote distribution decides which one the debate reaches. We read
+it per task-configuration cell from two signatures. The first is $N_{\mathrm{eff}}$,
+the inverse-Simpson diversity of the endpoint attractors, which counts how many stable
+outcomes coexist across repetitions. The second is Cramér's $V$, which measures how
+strongly the initial votes select among these outcomes. A cell is \emph{monostable}
+when one attractor dominates with $N_{\mathrm{eff}} < 1.5$, \emph{multistable} when
+several coexist and the initial votes predict the endpoint, and \emph{stochastic}
+when several coexist but the endpoint does not follow from the start. The full
+construction is given in \autoref{sec:method:multistability}. Only repetitions that
+settle on a unanimous endpoint are included. Three findings follow.
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\roman{enumi})}
+  \item \textbf{Most tasks admit more than one outcome, and the structure is set by the question.}
+        Across the 600 task-configuration cells, $76\,\%$ show more than one
+        coexisting attractor with $N_{\mathrm{eff}} \geq 1.5$. This rate is conditioned
+        on the selected task set. Neither topology nor memory window shifts either
+        metric, and per-task $N_{\mathrm{eff}}$ is highly consistent across the six
+        configurations. The structure is therefore a property of the question.
+        Multiple absorbing states are theoretically expected here. Naming-game
+        dynamics admit one equilibrium per available answer option
+        \citep{baronchelli2018consensus, ashery2025conventions}, so a four-option
+        task can in principle land on any of four attractors. Prior \ac{LLM} debate
+        studies do not report which end state each run reaches
+        \citep{cau2026agreementdrift, mehdizadeh2026topologymemory}. Our repeated-runs design makes the full
+        attractor landscape visible.
+
+  \item \textbf{Multistability goes with higher accuracy exactly when the default answer is wrong.} Across
+        tasks, more coexisting attractors go with \emph{higher} accuracy on
+        HiddenBench ($\rho = +0.44$) but slightly \emph{lower}, non-significant
+        accuracy on GPQA ($\rho = -0.16$). The opposition follows from what the
+        dominant attractor is. On GPQA, where agents usually start near the correct
+        answer, a single attractor is already the right one, and extra basins only
+        add wrong-answer traps. On HiddenBench, where the majority attractor is the
+        shared wrong answer, competing basins give the correct minority a foothold
+        from which to win.
+
+  \item \textbf{Fewer attractors produce stronger self-reinforcement.} Monostable cells
+        carry the steepest confidence ramps, and $N_{\mathrm{eff}}$ anticorrelates
+        with the mean self-reinforcement slope at the task level ($\rho = -0.74$ on
+        GPQA and $\rho = -0.44$ on HiddenBench). When one attractor dominates, agents
+        lock in early and confidence climbs unchecked. When several coexist, the
+        reinforcement signal is split across diverging trajectories.
+        Self-reinforcement is the within-basin amplifier, and multistability counts
+        the basins.
+\end{enumerate}
+
+Multistability is thus the structural counterpart of the amplifier. Each task carries a
+small set of stable outcomes fixed by the question itself. Which of those outcomes the
+group reaches depends on where it starts, as the causal analysis in
+\autoref{sec:results:evid} will show. A diversity of attractors therefore helps only when
+the single basin the group would otherwise collapse into is the wrong one. The per-dataset breakdown of monostable, multistable, and stochastic cells is given in Appendix~\ref{app:multistab}.
+
+\subsubsection{Dominance and Effective Topology}
+\label{sec:results:dominance}
+\label{sec:results:eff_topology}
+
+Dominance measures how unequally influence is shared among the agents. We compute it
+from the confidence-weighted conversion-credit graph as the Herfindahl index $D$. A
+value of $0$ means that every agent converts equally many peers, and a value of $1$
+means that a single agent causes every opinion change. The full construction is given
+in \autoref{sec:method:dominance}.
+One structural caveat limits what we can test. In the star topology, a leaf can only
+ever be converted by the centre. Its raw $D$ is therefore inflated by the wiring alone,
+and its surrogate null is degenerate for most repetitions. We report raw $D$ for both
+topologies, but we test for \emph{emergent} concentration only in the fully-connected
+topology, where all agents are structurally equal.
+We also describe the \emph{shape} of the emerging hierarchy. For this, we map the
+conversion-credit graph of each fully-connected run to one of four structural types.
+In a \emph{flat} run, influence is nearly uniform. A \emph{hub} run has one moderately
+dominant agent, and a \emph{two-hub} run has two agents of comparable influence. In a
+\emph{star} run, a single agent holds at least $75\,\%$ of all
+conversion credit. \autoref{fig:efftopo:examples} shows an example of each type. Three
+findings follow.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{plots/eff_topology/fig1_topology_examples.pdf}
+\caption[Effective topology types in FC runs]{%
+  Examples of the four effective topologies observed in fully-connected runs with
+  $N{=}4$. Arrow width is proportional to vote-flip influence weight. The orange
+  node marks the hub, which is the most influential agent. Green borders mark
+  agents that held the correct answer at round~0.}
+\label{fig:efftopo:examples}
+\end{figure}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\roman{enumi})}
+  \item \textbf{A hierarchy emerges without a prescribed hub.} Every agent in a fully-connected
+        run is wired identically, yet influence is almost never uniform. Conversion
+        credit concentrates above the topology-keyed null in 49 of 50 GPQA tasks and
+        in all 50 HiddenBench tasks. Flat runs are rare. By far the most common type
+        is two-hub, in which two agents of comparable influence act as competing
+        faction leaders. This type typically arises from an initial vote split of
+        two against two. A clean star is rare, as \autoref{tab:efftopo:types} shows.
+
+  \item \textbf{A leader helps only when the debate selects it.} When a star forms
+        in a fully-connected debate, the group has chosen a hub that often started
+        with the correct answer. On GPQA the hub started correct in $46.7\,\%$ of
+        star runs and on HiddenBench in $55.7\,\%$, whereas a randomly chosen
+        agent in the same runs started correct only $30.0\,\%$ and $16.7\,\%$ of
+        the time.
+        The group then almost always adopts the answer of the hub. If the hub started
+        correct, about nine in ten runs end correct. If it started wrong, fewer than
+        one in five do. This is why effective stars reach the highest accuracy of all
+        types, with a clear margin on HiddenBench, as \autoref{tab:efftopo:types}
+        shows. The picture reverses when the leader is imposed by the wiring. In the
+        star topology on HiddenBench, the correlation between dominance and accuracy
+        is negative at $\rho = -0.29$. The fixed centre is no more likely to be
+        correct than any other agent, so it spreads the shared initial bias instead
+        of correcting it.
+
+  \item \textbf{Diverse initialisation is the lever that produces stars.} Whether a
+        star forms depends strongly on how diverse the opening votes are. Stars
+        almost never form when all agents start on the same option. When all four
+        agents start on different options, roughly one in five runs becomes a star,
+        as \autoref{fig:efftopo:design} shows. Enforced perspective diversity has
+        already been proposed as a remedy for belief lock-in
+        \citep{oh2026entrenchment}, and it also follows from the theoretical analysis
+        of debate homogeneity \citep{estornell2024multillm}. Our contribution is the
+        mechanism behind it. Diversity raises the chance that the group rallies
+        behind one agent, often one that started correct.
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Share of FC runs} & \multicolumn{2}{c}{Accuracy} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Effective topology & GPQA & HiddenBench & GPQA & HiddenBench \\
+\midrule
+Flat         & $5.4\,\%$  & $6.8\,\%$  & $0.394$ & $0.242$ \\
+Hub          & $11.0\,\%$ & $18.0\,\%$ & $0.393$ & $0.377$ \\
+Two-hub      & $58.7\,\%$ & $59.2\,\%$ & $0.418$ & $0.247$ \\
+Star         & $2.3\,\%$  & $5.4\,\%$  & $\mathbf{0.485}$ & $\mathbf{0.562}$ \\
+Unclassified & $22.6\,\%$ & $10.6\,\%$ & $0.450$ & $0.029$ \\
+\addlinespace
+All FC runs  &            &            & $0.423$ & $0.264$ \\
+\bottomrule
+\end{tabular}
+\caption[Effective topology types, prevalence and accuracy]{Prevalence and accuracy
+         of the four effective topology types in fully-connected runs, with
+         $7{,}500$ runs per dataset. With $p_{(1)} \geq p_{(2)}$ the two largest credit
+         shares, checking the rules in this order, a run is a star if $p_{(1)} \geq 0.75$, two-hub if $p_{(1)} < 0.60$
+         and $p_{(2)}/p_{(1)} > 0.65$, hub if $p_{(1)} \geq 0.45$, and flat otherwise.
+         Unclassified runs contain no conversions and
+         therefore have no conversion-credit graph.}
+\label{tab:efftopo:types}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{plots/eff_topology/fig3_design_guideline.pdf}
+\caption[Initial vote diversity and star topology emergence]{%
+  Probability of an effective star topology as a function of initial vote diversity.
+  $n_\text{unique}$ is the number of distinct votes held at round~0. The
+  maximum-diversity bin contains $144$ GPQA runs but only $6$ HiddenBench runs.}
+\label{fig:efftopo:design}
+\end{figure}
+
+Together, dominance and effective topology show the amplifier from two complementary
+angles. The debate reliably elects an influence hierarchy that the wiring never
+specified, and the answer of the group follows whichever agent wins that election. Accuracy
+is high when the elected hub started correct, and it suffers when a fixed hub
+entrenches a shared error. This is the structural counterpart to the causal test in
+\autoref{sec:results:evid}, which shows the same dependence on the opening votes by
+direct manipulation. It also mirrors reports that \ac{LLM} agents form hub-like structure through preferential-attachment links
+\citep{mehdizadeh2025homophily} and that locally clustered agents coordinate better than high-betweenness bridges
+\citep{mehdizadeh2026topologymemory}. Per-cell concentration values across all
+configurations are in Appendix~\ref{app:dom:supp}.
+
+\subsubsection{Limit Cycles}
+\label{sec:results:lc}
+
+Limit cycles are the rarest motif in this system, and the only one that is a failure
+rather than a variant of convergence. A limit cycle is a debate that never settles and
+oscillates between vote configurations instead of reaching a fixed point. We detect
+them with categorical \ac{RQA}. A sequence is flagged when its
+determinism exceeds a shuffle-null floor and its dominant period lies in a genuine
+oscillatory band with $2 \leq \hat{P} \leq \lfloor L/2 \rfloor$. The full construction
+is given in \autoref{sec:method:lc}. The cooperative design suppresses oscillation
+almost entirely. We test at two levels, the vote sequence of each individual agent
+and the vote composition of the whole group per repetition. At the agent level,
+$99.5\,\%$ of sequences converge to a fixed point, and at the system level
+$98.7\,\%$ do. These converged sequences never enter the test. Three findings follow.
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\roman{enumi})}
+  \item \textbf{They are rare and mostly genuine.} Within the small non-converged remainder,
+        47 agent-level and 32 system-level sequences are flagged, both well above the
+        shuffle-null floor. On inspection, $70\,\%$ of the flagged agent-level cases
+        are clean period-2 orbits whose recurrence matrices show the characteristic
+        checkerboard pattern. The remaining cases are near-convergent artefacts.
+
+  \item \textbf{They occur only in the star topology.} Almost every flagged case sits
+        in a star configuration, 45 of 47 at the agent level and 26 of 32 at the
+        system level. The few flagged fully-connected cases all turn out to be stable
+        revisits or near-convergent artefacts on inspection. Flagged cases also
+        concentrate on HiddenBench, with 34 of 47 at the agent level.
+        \autoref{fig:lc:timelines} shows the two clearest examples.
+
+  \item \textbf{The mechanism is hub-driven majority inversion, primarily an efficiency
+        failure.} As a consequence of the definition, every limit cycle runs to the hard round cap without ever reaching
+        consensus, so early stopping never fires. Inspection suggests a consistent,
+        though uncertified, causal chain. Agents defer to the peer majority they
+        observe. After each flip, the star hub rebroadcasts that majority for the
+        opposite option. With two independently defensible lines of evidence and a
+        hub that starts in the minority, each flip recreates the conditions that
+        caused it. This also explains why the fully-connected topology shows no
+        genuine cycles. Without a single node that aggregates all peer signals, the
+        inversion loop cannot form. In practice, repetitions that reach the cap
+        should therefore be flagged as unresolved rather than reported as a
+        decision. Failure to recognise termination conditions is a catalogued failure
+        mode of deployed \acp{MAS} \citep{cemri2025mast}, and our result
+        names a specific dynamical route to it.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/lc/lc_timelines_new.png}
+  \caption[Vote-sequence timelines for two limit cycles]{Vote-sequence timelines
+         for two limit cycles in the star topology. Each cell shows the vote held
+         by an agent in a given round, and colour encodes the option. Both panels
+         show the same hub-driven majority inversion, in which three agents
+         alternate in phase and one agent alternates in anti-phase. In (a), from
+         GPQA with $W{=}2$ and ground truth B, the cycle starts almost immediately.
+         In (b), from HiddenBench with $W{=}5$ and ground truth A, the group first
+         agrees on B and only falls into the cycle from round~5 onward. Neither
+         repetition reaches consensus, and both run to $T = 15$.}
+  \label{fig:lc:timelines}
+\end{figure}
+
+Limit cycles are therefore the failure mode of the same convergence machinery seen
+elsewhere. When a single aggregator keeps reconstructing the opposite majority,
+self-reinforcement never gets to lock the group in, and the debate oscillates instead
+of settling. That this happens only under the star, and never when every agent sees
+every other, fits the observation that unanimous states are otherwise effectively
+absorbing \citep{li2024sparsetopology}. The full detection funnel and
+representative recurrence matrices are given in Appendix~\ref{app:lc:supp}.
+
+\paragraph{Motif summary.}
+\autoref{tab:motif:summary} collects the four motifs side by side. Three of them
+point back to the opening vote composition. Self-reinforcement amplifies it,
+multistability lets it select the basin, and the formation of an elected hub
+depends on its diversity. Limit cycles are the exception, since they arise from
+the star wiring rather than from the opening votes. \autoref{sec:results:evid}
+then manipulates the opening vote composition directly.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{
+  >{\raggedright\arraybackslash}p{2.6cm}
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{2.2cm}}
+\toprule
+Motif & Detection & Main driver & Accuracy & Rounds \\
+\midrule
+Self-reinforcement
+  & In every cell and task
+  & Opening votes
+  & Helps only if the correct answer is present at the start
+  & Fewer \\
+\addlinespace
+Multistability
+  & More than one outcome in most cells
+  & The task itself
+  & Higher on HiddenBench, no significant link on GPQA
+  & Not tested \\
+\addlinespace
+Dominance and effective topology
+  & Above the null in fully-connected runs
+  & Diversity of the opening votes
+  & Helps if the hub is elected, hurts if it is imposed
+  & No consistent link \\
+\addlinespace
+Limit cycles
+  & Rare, star topology only
+  & Star hub
+  & None, the debate stays unresolved
+  & Always hits the cap \\
+\bottomrule
+\end{tabularx}
+\caption[Summary of self-organization motif findings]{Summary of the four motif
+         findings. Detection refers to prevalence against the respective null,
+         and accuracy and rounds describe the direction of the association.}
+\label{tab:motif:summary}
+\end{table}
+
+\subsection{Causal Test of the Initial-Condition Effect}
+\label{sec:results:evid}
+
+The motif analyses point to the opening vote composition as the factor that decides
+which attractor the debate reaches. This association is confounded, because whether
+the ground truth is present at $t=0$ co-varies with task difficulty, agent confidence,
+and initial vote entropy. Three experiments address this in sequence. A within-task
+observational analysis at $R=1{,}000$ establishes the pattern. A seeded dose-response
+fixes the opening composition directly and tests the causal interpretation. An
+adversarial probe then stress-tests the robustness of the amplifier.
+
+\paragraph{Ground-truth presence in the initial vote distribution.}
+For the observational analysis, three GPQA questions, q84, q125, and q144, were each
+run for $R = 1{,}000$ repetitions at $W = 2$ in the fully-connected topology with
+$N = 4$. They were selected for mid-range accuracy and high initial-vote entropy, so
+that their outcomes are genuinely uncertain. The dominant finding is striking. Whether
+the ground-truth option appears at all in the initial vote distribution is by far the
+strongest predictor of final accuracy, consistently across all three tasks, as
+\autoref{fig:highrep:init_votes_split} and \autoref{tab:highrep:init_votes} show.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{plots/highrep/fig1_init_votes_split.png}
+  \caption[Accuracy by ground-truth presence at initialisation]{System accuracy
+           conditioned on whether the ground-truth option is present in the initial
+           vote distribution at $t=0$. Left bars show repetitions in which at least
+           one agent voted correctly before debate, and right bars show repetitions
+           in which no agent did. The dashed line marks the mean per-agent accuracy
+           at $t=0$. Error bars are Wilson 95\,\% \acp{CI}
+           \citep{wilson1927ci}. The data cover three GPQA tasks with $R=1{,}000$
+           each, $W=2$, and the fully-connected topology.}
+  \label{fig:highrep:init_votes_split}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+Task & Overall & Ground truth absent & Ground truth present & Ground truth is plurality \\
+     & acc.    & (acc., $n$) & (acc., $n$) & (acc., $n$) \\
+\midrule
+q84  & 0.269 & 0.004~(257) & 0.361~(743) & 0.620~(213) \\
+q125 & 0.273 & 0.031~(293) & 0.373~(707) & 0.552~(250) \\
+q144 & 0.509 & 0.069~(144) & 0.583~(856) & 0.717~(403) \\
+\bottomrule
+\end{tabular}
+\caption[Accuracy by ground-truth presence per task]{Accuracy by ground-truth presence
+         in the initial vote distribution, with $R=1{,}000$ per task. Ground truth absent and
+         ground truth present indicate whether the correct option appears in the vote profile
+         at $t=0$. Ground truth is plurality is the subset of present repetitions in which the
+         correct option holds the initial plurality, where a tie goes to the option listed first.}
+\label{tab:highrep:init_votes}
+\end{table}
+
+When the correct answer is absent from all initial votes, the system almost never
+reaches it. Accuracy is $0.4\,\%$, $3.1\,\%$, and $6.9\,\%$ for q84, q125, and
+q144, with $\chi^2 > 120$ and $p < 10^{-27}$ in all cases.
+The rare correct answers in the absent condition are consistent with stochastic
+noise rather than genuine recovery.
+Within the present condition, accuracy is one and a half to two and a half times as high when the correct
+option also holds the initial plurality. For q84, for example, accuracy is $0.620$
+when the correct option leads the opening votes and $0.257$ when it is present but
+does not lead.
+These findings suggest that the system operates primarily as a vote amplifier.
+Debate selectively strengthens options already represented in the initial
+distribution and overwhelmingly reinforces whichever option holds the initial
+plurality. The capacity to surface a correct answer that no agent endorsed at the
+outset is negligible under the present design.
+
+Neither a longer debate nor rising confidence indicates that it is right. Longer debates are no more accurate, and confidence rises monotonically across
+rounds whether the final answer is correct or not. Appendix~\ref{app:highrep} gives
+the full feature-by-outcome correlations. What the outcome does track is the
+opening vote composition, which the next experiment manipulates directly.
+
+\paragraph{Seeded dose-response.}
+\label{sec:results:seeded}
+To isolate the causal contribution of the opening composition, we fix it directly.
+We use $50$ GPQA tasks in the same configuration with $W=2$, the fully-connected
+topology, $N=4$, and $R=50$ repetitions each. For every repetition, we build the
+initial four-agent vote profile by sampling from a pool of genuine, independent
+single-agent responses under a fixed number of correct seeds $k \in \{0,1,2,3\}$.
+Exactly $k$ of the four agents begin on the correct option, and the rest begin on
+real wrong answers. Only the initial composition is manipulated. Every vote is a real
+response, and the debate that follows is unmodified. Sweeping $k$ turns the earlier
+binary contrast into a dose-response curve.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/fig4_seeded_causal.png}
+  \caption[Causal dose-response of seeding correct agents]{Accuracy as a function of
+           the number of correct agents seeded into the initial vote profile,
+           $k \in \{0,1,2,3\}$, on $50$ GPQA tasks with $R=50$ each, $W=2$, and the
+           fully-connected topology. The left panel shows per-task accuracy in grey, one
+           line per task, and the mean over tasks in orange. The right panel shows pooled
+           accuracy in blue against the
+           accuracy that a pure plurality vote at $t=0$ would already achieve, shown
+           as a dashed grey line, where a tie counts as not won. Debate exceeds this amplifier baseline for a
+           correct minority or tie but falls below it for a correct supermajority.}
+  \label{fig:highrep:seeded_causal}
+\end{figure}
+
+Three findings follow.
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\roman{enumi})}
+  \item \textbf{Accuracy rises monotonically with the number of correct seeds.}
+        Pooled over $2{,}500$ repetitions per condition, accuracy climbs from
+        $1.8\,\%$ at $k=0$ to $26.2\,\%$, $63.7\,\%$, and $86.3\,\%$ at $k=1,2,3$,
+        as \autoref{fig:highrep:seeded_causal} shows. This is not merely a pooled
+        average. Adding one correct seed raises per-task accuracy in $50$ of $50$
+        tasks for each of the first two steps and in $47$ of $50$ for the last.
+        Causally, the composition of the opening votes is the dominant lever on the
+        outcome.
+
+  \item \textbf{Debate is a lossy amplifier, not a reasoner.} Comparing each
+        condition against the accuracy that a pure plurality vote at $t=0$ would
+        already achieve isolates what the debate itself contributes. This baseline
+        is the dashed line in \autoref{fig:highrep:seeded_causal}. Where the correct
+        answer starts behind, debate helps. A lone correct minority at $k=1$, where
+        plurality accuracy is $0\,\%$, is carried to the right answer $26\,\%$ of the
+        time. An even split of two against two, the most common start at $k=2$,
+        resolves correctly
+        more often than the coin flip that plurality voting would need to break
+        the tie. Where the correct answer
+        starts ahead, debate \emph{erodes} it. A correct supermajority of three at
+        $k=3$, which plurality voting would preserve with certainty, is talked out of
+        the right answer in roughly one repetition in seven, reaching $86\,\%$ rather
+        than $100\,\%$. From a standing start, debate generates almost nothing. It
+        recovers the answer de novo in only $1.8\,\%$ of $k=0$ repetitions, confined
+        to $21$ of $50$ tasks. Debate amplifies the initial signal while blurring it
+        toward a coin flip, rather than reasoning its way to the truth. Against a
+        neutral copying baseline, under which an option wins as often as its
+        opening share, debate adds only a modest pull toward the correct answer.
+        This baseline follows from the martingale result of
+        \citet{zhang2025debateorvote}.
+
+  \item \textbf{Outcomes are all-or-nothing and decided early.} Every repetition in
+        every condition ends fully unanimous. The correct seeds either convert the
+        whole group or capitulate entirely, and no repetition ends with the ground truth as a surviving minority. When the correct side wins, it wins fast and
+        reaches a plurality within the first one to two rounds, with a mean first
+        round of $1.3$. Persuasion is front-loaded. The opening exchange, not
+        protracted deliberation, decides the outcome.
+\end{enumerate}
+
+\paragraph{Adversarial probe.}
+The amplifier does not care whether it amplifies a correct or a wrong answer, and
+this becomes most visible when one agent acts as an adversary. We re-run the $k=2$
+condition with $R=25$ and $T=10$, but now one of the two agents without the correct answer is
+told to keep arguing for a wrong option throughout the debate. Accuracy drops from
+$63.7\,\%$ to $10.0\,\%$, and it drops in every single one of the $50$ tasks. The group
+now does worse than a single correct agent without any adversary, which still reaches
+$26.2\,\%$ at $k=1$. This happens even though the adversary starts with two correct
+agents against it. Most of these runs still reach unanimity, and when they do, the
+group almost always ends on the wrong answer of the adversary. It is not always, because
+the lock is set only in the prompt and the adversary did change its vote in a few
+runs. Most of the remaining
+correct answers come from runs that reach the cap without unanimity.
+The reason is simple. An agent that never changes its mind looks convinced, and the
+debate rewards conviction. The same mechanism that sometimes lets a correct minority
+win now works for the adversary, so the group follows the most persistent and
+persuasive voice rather than the most correct one. Because the adversary is also
+told to argue as persuasively as possible (\autoref{prompt:devil-persona}), while
+the other agents are told not to yield to disagreement alone
+(\autoref{prompt:persona}), the probe does not separate persistence from
+persuasion effort. Similar effects have been reported for \acp{LLM}.
+\citet{agarwal2025cwpor} show that a forcefully argued falsehood can override a truthful answer in the decision of an \ac{LLM} judge, and \citet{yao2025sycophancy} describe how agents give in to
+each other too early, a problem that prompt-based fixes now try to address
+\citep{pitre2025consensagent}.
+
+Taken together, the three experiments upgrade the amplifier reading from correlation
+to intervention. The \ac{MAS} is a \emph{lossy amplifier of its initial vote
+distribution}. It reliably strengthens whatever the opening votes favour, more so as
+that signal grows, yet it neither manufactures a correct answer that no agent held
+nor protects a correct one that a persistent dissenter attacks. The composition of
+the opening votes, not the length or intensity of the debate, is the dominant lever
+on whether collective reasoning succeeds. This intervention was run on GPQA only. The
+observational ground-truth-presence result holds on both benchmarks. On
+HiddenBench, accuracy in the main grid is about $47\,\%$ when the correct option is
+among the opening votes and about $8\,\%$ when it is not. This de novo recovery is
+far higher than on GPQA in the same grid (about $1\,\%$) and fits the information pooling that HiddenBench requires.
+The extension of the causal claim to HiddenBench
+is discussed in \autoref{sec:discussion:limitations}.

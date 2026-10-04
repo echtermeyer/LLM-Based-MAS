@@ -1,0 +1,266 @@
+This section gives an overview of related literature of this thesis. It begins 
+with \autoref{sec:related:mad} and \autoref{sec:related:dynamics} that survey what
+\ac{MAD} does and how the interaction dynamics inside it have been
+studied. \autoref{sec:related:lenses} continues by weighing the available ways of analysing such
+systems against one another and \autoref{sec:related:gap} finishes by 
+stating the research gap this thesis addresses.
+
+\subsection{Multi-Agent Debate: Design and Critique}
+\label{sec:related:mad}
+
+The \ac{MAD} paradigm was introduced by
+\citet{du2024improving}, who let several instances of a language model
+independently propose answers and then critique and revise them over multiple
+rounds before committing to a collective response. This ``society of minds'' setup
+was reported to improve factual accuracy and mathematical reasoning while
+reducing hallucination, treating the underlying model as a black box. The core
+intuition was that partially independent agents make partially independent errors
+which deliberation can correct. Since then it has motivated a broad family
+of systems, from confidence-weighted round tables across heterogeneous models
+\citep{chen2024reconcile} to evaluation panels that judge text more reliably
+than a single evaluator \citep{chan2024chateval}.
+
+Two design axes are common throughout and are the ones we vary too.
+Communication topology fixes who reads whom. Here, sparse structures can match
+fully-connected debate at substantially lower token cost
+\citep{li2024sparsetopology}, and in scale-free networks, hub nodes biased toward
+a correct or wrong answer shift accuracy substantially \citep{liu2025problemsolving}. Memory
+fixes how much interaction history each agent retains. The two were recently
+crossed in a single setup by \citet{mehdizadeh2026topologymemory}, who find
+no main effect of topology on coordination success but a strong interaction with
+memory. Longer memory slows settling in decentralised networks and accelerates
+it in centralised networks, so the same parameter pushes the system in opposite
+directions depending on the structure of the network. Faster settling in the centralised
+case means locking into a fragmented plateau rather than reaching
+agreement. Beyond these two, the decision protocol itself matters, with voting
+favouring reasoning tasks and consensus favouring knowledge tasks, and adding
+agents helping where adding rounds can hurt \citep{kaesberg2025voting}.
+
+Against this largely optimistic literature, a more critical literature has also emerged.
+\citet{liu2025stopovervaluing} find that \ac{MAD} frequently fails to outperform
+chain-of-thought \citep{wei2022chainofthought} or self-consistency
+\citep{wang2023selfconsistency} despite far greater compute, and report that
+model heterogeneity improves \ac{MAD} frameworks.
+Furthermore, \citet{zhang2025debateorvote} show that majority voting alone accounts for most
+of the attributed gains, and prove that under their setup debate does not
+improve expected correctness on its own, since the beliefs of the agents change from round to
+round but on average do not move toward the correct answer. 
+\citet{estornell2024multillm} supply the mechanism. When agents are
+similar in capability or in the responses they produce, debate dynamics become
+static and the procedure converges to the majority opinion, so that where the
+majority reflects a misconception shared through common training data, debate
+converges to the misconception.
+
+Two 2026 results push this further and are the closest published statements of
+what we measure. \citet{oh2026entrenchment} decompose the failure into a biased
+static initial belief and homogenised dynamics that amplify the majority view
+regardless of correctness. \citet{bertalanic2026costofconsensus} show that
+unguided homogeneous debate matched or underperformed \emph{isolated
+self-correction} at several times the token cost, and that a control injecting
+rationales from unrelated problems performed no worse than genuine peer
+exchange. They name the resulting loss an \emph{oracle gap}, the distance
+between the accuracy achievable from the answers the team itself generates and the
+accuracy the vote actually returns, a quantity we measure directly in
+\autoref{sec:results:perf}.
+
+Almost all of this work, whether it supports or questions debate, judges it by
+its \emph{final outcome}. They largely ignore the deliberative process behind that
+outcome, and whether two systems with the same accuracy reach it through
+different dynamics.
+
+\subsection{Interaction Dynamics in \texorpdfstring{\acs{LLM}}{LLM} Collectives}
+\label{sec:related:dynamics}
+
+Another area of work looks inside the debate at how positions evolve
+and influence one another. Each of our four motifs corresponds to a debate
+phenomenon that this literature documents to a very different degree, and we take
+them in turn, before turning to the opening vote distribution, which is not
+itself a motif but the input on which they all act.
+
+\paragraph{Rising confidence.}
+\citet{prasad2025certain} stage repeated adversarial debates and find pervasive
+miscalibration. Models begin overconfident, grow \emph{more} confident that they
+are winning as the exchange proceeds even in the face of opposing arguments, and
+frequently both claim victory at once, which is logically impossible. 
+These are zero-sum debates, where winning is not determined by correctness.
+\citet{bertalanic2026costofconsensus} show that the confidence of an agent before
+communication barely predicts whether it is right, and that peer exchange even
+further weakens that link. Confidence that keeps rising regardless of correctness
+is a typical sign of positive feedback, which motivates a dynamical treatment.
+
+\paragraph{Conformity and influence concentration.}
+\citet{wynn2025talk} show that debate can \emph{decrease} accuracy over time
+even when stronger models outnumber weaker ones, as agents abandon correct
+answers rather than challenge flawed arguments. Sycophancy
+\citep{sharma2023sycophancy} and social conformity are among the contributing
+factors they examine. \citet{cho2025herd} find that the gap
+between how confident an agent is itself and how confident it perceives its peers to be governs
+how likely it is to conform, and \citet{mehdizadeh2025peerpressure} characterise
+the dose-response as a sigmoid with a model-specific threshold.
+\citet{cau2026agreementdrift} identify an aggregate directional asymmetry they
+call \emph{agreement drift}, which survives in balanced populations and so cannot
+be reduced to a majority effect. When influence concentrates in a few agents, a
+leader-follower structure emerges \citep{chen2023consensus}. The outcome then
+depends heavily on how competent the central agent is
+\citep{conformitydynamics2026}, a dependency our star topology is designed to
+expose.
+
+\paragraph{Premature lock-in.}
+\citet{chuang2025debate} report that role-playing \ac{LLM} groups converge more
+strongly than human groups do, indicating a systematic bias toward
+premature agreement. Purely cooperative framings further sharpen this, since with no dissenting
+pressure a group can collapse into a mutually reinforcing echo chamber. A
+structurally sharper version is captured by HiddenBench
+\citep{li2026hiddenbench}, which adapts the hidden-profile paradigm from social
+psychology \citep{stasser1985pooling, schulzhardt2012synergy}. When the evidence
+needed for the correct answer is distributed across agents, collective accuracy
+collapses far below what a single fully-informed agent achieves, because agents
+lock onto shared information and fail to pool their private knowledge. We adopt
+HiddenBench as our second benchmark for exactly this reason.
+
+\paragraph{Oscillation and non-termination.}
+Sustained oscillation is almost absent from this literature. A debate that
+cycles through the same positions without converging is a limit cycle
+\citep{strogatz2015nonlinear}, yet debate studies typically fix the number of
+rounds and count any run that fails to settle as ``no consensus'', so a cycle
+is never distinguished from slow convergence. This gap is itself informative, as we
+find genuine limit cycles to be rare outside the star topology
+(\autoref{sec:results:lc}).
+
+\paragraph{The opening distribution.}
+That round-zero answers govern the outcome is stated in several forms.
+\citet{hu2025stabilitydetection} make it a formal premise, proving that debate
+improves on majority vote under the assumption that at least one
+initial response is generated under the correct concept.
+\citet{zhu2026demystifying} report that initial answer diversity correlates
+significantly with final accuracy and propose a diversity-aware initialisation
+to raise the chance that a correct hypothesis is present at the start.
+Empirically, \citet{wu2025reallydebate} find that an agent starting inside a
+correct majority is almost perfectly stable while one facing an incorrect
+majority recovers in only a minority of cases. In every case the opening distribution is observed as
+it arises rather than constructed, leaving its effect confounded with task
+difficulty and agent confidence, which is what \autoref{sec:results:evid} is
+designed to separate.
+
+\medskip
+\noindent The vocabulary for describing these phenomena was introduced in
+\autoref{sec:bg:motifs}. What remains open is whether it is more than an analogy
+when applied to \ac{LLM} populations. Recent work suggests it is.
+\citet{ashery2025conventions} show that populations of \ac{LLM} agents spontaneously
+reach consensus on an arbitrary shared choice, that strong collective biases can
+arise even when no individual agent has one, and that a committed minority can
+overturn the majority position. The last effect mirrors the critical-mass threshold
+known from human groups \citep{centola2018tipping}. \citet{okawa2026biasedconsensus}
+adds a mathematical account, adapting a model from physics to debate. It predicts
+that a collective norm emerges once conformity passes a threshold, although at the
+small group sizes typical of debate this threshold is smoothed into a gradual
+transition.
+
+\subsection{Ways of Analysing Multi-Agent Systems}
+\label{sec:related:lenses}
+
+Before stating the gap, it is worth making explicit \emph{why} a
+complex-systems treatment is the right lens, by situating it against
+the alternatives. Each approach answers a different question and has different
+costs.
+
+\paragraph{Outcome evaluation.}
+The dominant approach scores a system by final task performance
+\citep{du2024improving, liu2025stopovervaluing, zhang2025debateorvote}. It is
+objective, comparable across systems, and measures what practitioners care
+about. But an outcome is only a single number summarising a whole trajectory. Two
+systems with the same accuracy look identical, even if one corrected its errors
+and the other slid into a shared mistake. Thus, it only says \emph{whether} a configuration
+worked, not \emph{why}.
+
+\paragraph{Model internals and transcript reading.}
+Opening the models is the wrong level for our question. Consensus, oscillation,
+and influence concentration are properties of the \emph{group} trajectory, not of
+any single forward pass \citep[cf.][]{miehling2025agentic}, and the internals of
+\ac{API}-served models are inaccessible anyway. Reading transcripts is more
+informative, and we use it informally to examine flagged limit-cycle cases
+(\autoref{sec:results:lc}). However, on its own it is subjective, does not scale
+to tens of thousands of repetitions, and cannot be tested against a null.
+
+\paragraph{Influence attribution.}
+Another approach measures how strongly agents influence one another.
+Information-theoretic measures such as semantic transfer entropy track how much
+the messages of one speaker predict those of another. They were developed for human dialogue
+but could be applied to debate transcripts, given any language model that exposes
+log-probabilities \citep{infodynamics2026}. Removal-based attribution instead
+removes or ignores an agent and observes how the outcome changes
+\citep{agentsthatmatter2026}, or approximates this with one extra introspective
+prompting round \citep{cui2025introspecloo}. Both give stronger estimates of
+influence than the adoption-based signature we use, but they cost additional
+model calls, either for scoring or for re-runs. We return to this
+trade-off in \autoref{sec:conclusion:future}.
+
+\paragraph{Learned diagnostics from logs.}
+A very recent approach trains a predictor on features taken from model outputs
+or debate logs. It is used either to decide whether a question needs debate at all
+\citep{fan2026imad} or to decide when a majority vote should be overturned
+\citep{minoritysentinel2026}. This shows that ordinary outputs and logs contain enough signal
+to support useful decisions. However, such predictors do not characterise the
+dynamics behind their decisions. They learn that certain feature patterns precede failure, but do not
+say which dynamical regime the system is in, and they need labelled outcomes for
+training.
+
+\paragraph{The dynamical approach.}
+Our approach treats the debate as a dynamical system and measures
+recurring patterns in its state trajectory \citep{strogatz2015nonlinear,
+driscoll2024dynamical}. Its advantages address the gaps above. It operates at the
+group level, scales to the full dataset, needs only interaction logs and no
+labelled outcomes, and gives each motif a falsifiable signature that can be tested
+against a principled null. However, it also has disadvantages. For instance,
+transferring motif concepts from physical and biological systems to an \ac{LLM}
+collective is a modelling choice, not a law. The detection thresholds are partly
+conventional, and a four-agent group is small for some of these measures. Without
+intervention, the detectors also identify \emph{signatures} and
+\emph{associations} rather than certified attractors or causes. We adopt this
+approach because it is the only one that can name and measure the failure modes
+documented above while remaining applicable to black-box models. We keep its
+limitations in mind when interpreting every result (\autoref{sec:discussion:limitations}).
+
+\subsection{Research Gap}
+\label{sec:related:gap}
+
+The research gap this thesis addresses is that no study has yet measured the
+failure modes of debate as self-organization motifs on tasks that have a correct
+answer.
+Outcome-based evaluation, whether it supports or questions debate,
+only measures where a deliberation ends and ignores how it got there. The
+dynamics literature does look at the trajectory, but documents one failure mode
+at a time (overconfidence, herding, premature consensus) and explains each
+through a property of the model such as sycophancy, rather than as a pattern of
+the group as a whole.
+Few of these findings are tested against a null model that shows what the same
+statistic looks like by chance, so a detection rate alone could simply reflect
+the small, discrete state space.
+
+More importantly, where complex-systems concepts have been applied to \ac{LLM}
+collectives, the tasks were chosen to have no correct answer.
+\citet{ashery2025conventions} study arbitrary choices where any shared label is
+equally good. \citet{mehdizadeh2026topologymemory} check that the model itself
+prefers none of their symbols, so that correctness does not confound the
+dynamics. \citet{cau2026agreementdrift} choose a non-empirical proposition for
+the same reason. This makes those studies clean. If the goal is to understand how
+a group settles on a shared choice, having no better choice available is exactly
+right. But it leaves open the question a practitioner faces, which is not whether
+the group locks in but whether it locks in on the right answer.
+
+This thesis takes up that question. It aims to detect self-organization motifs
+empirically in \emph{truth-valued} deliberation, following the three research
+questions of \autoref{sec:intro:rqs}. For \emph{measurement}, we define detectors
+for self-reinforcement, multistability, dominance, and limit cycles. Each is
+grounded in the literature and has its own null model. We run each configuration
+many times, which makes it possible to compute attractor statistics across
+repetitions. Prior work studies an opinion scale rather than
+truth-valued tasks \citep{cau2026agreementdrift}, or does not report which end
+state each run reaches \citep{mehdizadeh2026topologymemory}, so
+it does not measure multistability. For \emph{characterisation},
+we apply the detectors to tasks with a correct answer, so that every dynamical
+quantity can be split by correctness, across two different information regimes.
+For \emph{causation}, we set the composition of the opening votes ourselves
+instead of observing it, which separates its effect from task difficulty and
+agent confidence. Throughout, we treat the \emph{absence} of a motif as a
+finding, not a failed measurement.

@@ -1,0 +1,635 @@
+\newcommand{\fillin}[1]{\textcolor{red}{\textbf{[FILL: #1]}}}
+
+\subsection{Benchmark Survey}
+\label{app:benchmarks}
+
+\autoref{sec:setup:datasets} requires a benchmark to supply a discrete shared
+decision variable, verifiable ground truth, calibrated difficulty, and sufficient
+initial disagreement. Most existing benchmarks fail the first requirement
+outright. The native multi-agent suites bind agents to sub-tasks or to positions
+in physical space rather than to a common set of options, so there is no shared
+position space in which a vote composition could be defined. REALM-Bench
+\citep{geng2025realmbench} assigns agents to jobs or workflow nodes that compete
+for shared resources, and its communication coordinates schedules rather than
+deliberating over a shared answer. The Database scenario of MultiAgentBench
+\citep{zhu2025multiagentbench} gives each agent a different root cause to
+diagnose, PARTNR \citep{chang2024partnr} hard-codes heterogeneous capabilities and
+is run with two agents, and Collab-Overcooked \citep{sun2025collaboverco} splits chef and
+assistant into distinct action spaces. In BattleAgentBench
+\citep{wang2024battleagentbench} the state of an agent is a coordinate position on a map, and in SPIN-Bench \citep{yao2025spinbench} only the Diplomacy
+environment approaches deliberation, where a position is a spatial supply-centre
+configuration and the authors report coordination degrading sharply beyond two or
+three agents.
+
+The socially framed benchmarks come closer without quite fitting. SOTOPIA
+\citep{zhou2024sotopia} is dyadic in its released scenarios, which is structurally fatal here,
+since dominance requires at least three agents and multistability requires
+competing factions. LLM-Deliberation \citep{abdelnabi2024cooperation} is genuinely
+multi-agent at up to six parties, with a private scratchpad and a public answer, and native adversarial variants,
+but it has no shared ground truth answer and its deal space is too sparse
+for equality-based agreement metrics, which makes it the strongest candidate for a
+future mixed-motive extension rather than a correctness benchmark here.
+HiddenBench \citep{li2026hiddenbench} is the exception. It formalises the
+hidden-profile paradigm \citep{stasser1985pooling, schulzhardt2012synergy} with
+validity criteria that guarantee information pooling is required, and we adopt it
+as our secondary substrate. Two sub-environments of MultiAgentBench, Bargaining and
+Werewolf, do have shared decision variables and could serve the same role in later
+work.
+
+The single-agent reasoning sets that the debate literature has adopted fail on
+difficulty instead. \citet{du2024improving} established the methodology on GSM8K
+\citep{cobbe2021gsm8k} and MMLU \citep{hendrycks2021mmlu}, on which GPT-4
+already scores $92.0\,\%$ and $86.4\,\%$ \citep{achiam2023gpt4}, so the typical
+trajectory is immediate unanimous agreement and there is no dynamical signal to
+detect. Critical reassessments also report that debate frequently fails to beat
+single-agent baselines \citep{liu2025stopovervaluing} and that majority voting
+accounts for most of its gains \citep{zhang2025debateorvote}. MATH \citep{hendrycks2021math} was built to be harder but
+requires non-trivial answer normalisation. GPQA-Diamond \citep{rein2024gpqa} is the instance of this lineage that
+still leaves headroom, which is why we adopt it as primary. Two further systems
+are cited elsewhere in this thesis but were never candidates as substrates.
+AgentVerse \citep{chen2024agentverse} is a framework rather than a benchmark, and
+the DEBATE corpus \citep{chuang2025debate} is a corpus of human public and private
+opinion dynamics used as a reference point rather than an \ac{LLM} task environment.
+
+\subsection{Per-Knob Justification}
+\label{app:knobs}
+
+\autoref{tab:knob-summary} records the verdict, the value, and the key references
+for each tunable component. This appendix supplies only the reasoning behind the
+verdicts that are genuinely contestable, and does not repeat the values or the
+citation lists given there.
+
+\paragraph{Memory window (scan).}
+Retained memory is a design choice rather than neutral bookkeeping.
+\citet{marandi2026protocols} finds a trade-off between peer-referencing and convergence across protocol variants, most clearly between within-round exchange and a rank-adaptive cross-round variant,
+and language models use long contexts unevenly \citep{liu2024lostmiddle}. A
+factorial memory$\times$topology study finds a strong interaction between the two, in that
+memory slows settling in decentralised networks but accelerates it in centralised
+ones, so topology determines the sign of the memory effect
+\citep{mehdizadeh2026topologymemory}. We set
+$W = 1$ as the near-Markov baseline and extend to $W = 5$, short of the round cap,
+so that the window remains a genuine constraint in every configuration.
+
+\paragraph{Number of agents (fix at $N = 4$).}
+The joint answer-profile state space grows as $M^N$, so $N = 4$ is the smallest
+value at which two-against-two factions can form, while the state space stays small enough for
+trajectory statistics at $R = 50$. The canonical baseline is $N = 3$
+\citep{du2024improving}.
+
+\paragraph{Number of rounds (fix at $T = 15$ with $u = 3$).}
+$T$ is an observation budget rather than a structural perturbation, since
+trajectories can be cropped post hoc but not extended. Limit-cycle
+detection requires $T \geq 2 \cdot \text{period}$ and the period is unknown a
+priori, which calls for a generous cap. The early-stopping
+threshold $u$ then trades efficiency against reliability. On the pilot repetitions
+$u = 3$ saves roughly $50\,\%$ of runtime per repetition, while the harmful case,
+in which stopping would have pre-empted a later recovery to the correct answer,
+was rare in the pilot data.
+
+\paragraph{Model and sampling (fix, homogeneous, $\tau = 0.7$).}
+A single homogeneous model removes capability asymmetry as a source of
+dominance-like dynamics, so that influence concentration can be attributed to
+structure. It does not remove conformity, which lowers accuracy in homogeneous
+groups as well \citep{wynn2025talk}. Mixed
+teams often underperform their best homogeneous member
+\citep{bertalanic2026costofconsensus}, so heterogeneity alone would not dissolve
+the dynamics under study. On temperature, deterministic decoding would remove the only
+source of response diversity among identical agents \citep{zhu2026demystifying}.
+
+\paragraph{Framing and execution (fix).}
+\citet{liang2024encouraging} locate the operational sweet spot between pure
+cooperation, which lacks the adversarial pressure needed to overcome
+De\-gen\-er\-a\-tion-of-Thought in single-model reflection, and pure adversarial
+framing, under which accuracy drops again. The defense\slash challenge\slash question scaffold
+implements modest tit-for-tat while the \updatephase{} phase leaves room for
+convergence. The structured output is measurement apparatus rather than
+engineering taste, since the private\slash public split is what makes the dissociation
+observable and the vote-stability rule is what separates argumentation from belief
+update. Synchronous execution with randomised peer-message order removes
+agent-order effects that would otherwise confound dominance detection.
+
+\paragraph{Tool access (defer).}
+For GPQA-Diamond, tools would push single-agent accuracy toward the ceiling and
+remove the dynamical headroom the study depends on, introduce non-reproducibility
+through web search, and violate the Google-proof design rationale of
+\citet{rein2024gpqa}.
+
+\paragraph{Compute budget.}
+Motif detection needs repetitions rather than tasks. Multistability requires enough
+samples per task to surface competing basins, limit cycles enough trajectories to
+confirm period-$\geq 2$ structure, and the dominance surrogate test statistical
+power. At $R = 50$ and an effective $\approx 25$\,s per repetition, with the
+repetitions of each task and configuration running in parallel, running the full
+six-configuration grid on all 198 GPQA-Diamond tasks would require
+$198 \times 6 \times 50 = 59{,}400$ repetitions, that is $\approx 412$\,h. The two-phase procedure of \autoref{sec:setup:design}
+reduces this by roughly a factor of four, since the screening pass costs
+$198 \times 3 = 594$ repetitions ($\approx 4$\,h), and the deep pass on the 50
+retained tasks costs $50 \times 6 \times 50 = 15{,}000$ repetitions
+($\approx 104$\,h). Including HiddenBench, the 30{,}000 repetitions reported in
+\autoref{sec:results} took $\approx 206$\,h in total.
+
+\subsection{Prompt Templates}
+\label{app:prompts}
+
+For reproducibility we reproduce the core prompt components verbatim. The shared
+persona (with \texttt{\{name\}} the agent identifier) frames the task and the
+two-phase protocol (\autoref{prompt:persona}). The prompts refer to the
+\arguephase{} and \updatephase{} phases as Phase~A and Phase~B.
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+You are \{name\}, part of a collaborative group working on a multiple-choice
+problem. Your goal is to help the group find the correct answer, agreement should
+follow from better arguments, not the other way around.
+
+Each round (after round 0) has two phases:
+
+\ Phase A: output three structured fields, defense (a new concrete reason your
+current vote is correct), challenge (dispute a specific current peer claim, or
+concede it and name any remaining disagreement), question (a targeted question to a
+named peer referencing a concrete claim). Do not change your vote in this phase.
+
+\ Phase B: you see your neighbors' Phase A outputs. Produce your updated vote,
+private reasoning, and public message.
+
+Be critical, your neighbors may be wrong, and so may you. Do not change your
+position simply because others disagree; only update if you encounter a specific
+argument you cannot counter.
+\end{quote}
+\caption[Shared agent persona (system prompt)]{Shared agent persona (system prompt), containing the two-phase protocol and the
+anti-conformity instruction, with \texttt{\{name\}} the agent identifier.}
+\label{prompt:persona}
+\end{prompt}
+
+The three per-step instructions appended to the persona and the running context
+are given in \autoref{prompt:steps}.
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+Round 0: Carefully read the question and options. Produce your initial vote,
+private reasoning, and public message.
+
+Phase A: Produce your Phase A structured output. Do not change your vote in this
+phase.
+
+Phase B: Update your belief, private reasoning, and public message. If you change
+your vote, cite the specific argument, from the current Phase A drafts or from the
+conversation history, that caused the update.
+\end{quote}
+\caption[Per-step agent instructions by phase]{Per-step instructions appended to the persona (round~0, \arguephase{} phase, and
+\updatephase{} phase), controlling what each agent is asked to produce at each step.}
+\label{prompt:steps}
+\end{prompt}
+
+In the \updatephase{} phase each agent additionally receives its own \arguephase{}
+draft and the \arguephase{} drafts of its neighbours in randomised order, truncated to
+the memory window $W$, and confidence is elicited as an integer from $1$ to $10$. The
+complete prompt-assembly code is in the electronic appendix.
+
+For the adversarial probe (\autoref{sec:results:evid}), the devil's advocate agent
+receives a different system prompt in place of \autoref{prompt:persona}, shown in \autoref{prompt:devil-persona}.
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+You are \{name\}, a committed advocate participating in a group deliberation.
+Unlike the other participants, you have a fixed position: you will defend your
+initial answer with absolute conviction and will NOT change your vote under any
+circumstances.
+
+Your sole objective is persuasion - craft the most compelling, specific, and
+creative arguments to convince every other group member to adopt your position.
+Be persistent, find new angles, address objections head-on, and never concede a
+point. You may acknowledge that others raise interesting considerations, but
+always maintain that your answer is correct and actively work to bring others to
+your view.
+
+Each round has two phases:
+
+\ Phase A: produce a defense (a new, specific reason your answer is correct),
+a challenge (directly refute a peer's claim), and a question (targeted at a
+peer's weak point).
+
+\ Phase B: write a persuasive public message. Your vote is fixed - focus
+entirely on argumentation designed to shift your peers' positions.
+\end{quote}
+\caption[Devil's advocate persona (system prompt)]{Devil's advocate persona replacing
+\autoref{prompt:persona} for the adversarial probe. The vote of the agent is locked
+and its sole goal is persuasion.}
+\label{prompt:devil-persona}
+\end{prompt}
+
+The devil's advocate uses \autoref{prompt:steps} unchanged for Phase~A but
+receives a different \updatephase{} instruction in place of the standard one (\autoref{prompt:devil-steps}).
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+Your vote is locked and must NOT change. Write a persuasive public message that
+targets your peers' specific objections and advances new arguments for your
+position.
+\end{quote}
+\caption[Devil's advocate \updatephase{} instruction]{Devil's advocate \updatephase{}
+instruction replacing the standard Phase~B entry in \autoref{prompt:steps}. The
+vote cannot change, and the agent focuses solely on persuasion.}
+\label{prompt:devil-steps}
+\end{prompt}
+
+The two benchmark question contexts take different forms. For GPQA-Diamond all
+agents receive the same question text and option labels (options are shuffled
+uniformly at random before assignment), as shown in \autoref{prompt:gpqa-question}.
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+Question:
+\{question\}
+
+Options:
+A: \{option A\}
+B: \{option B\}
+C: \{option C\}
+D: \{option D\}
+
+Reason through the question step by step, then select the correct answer.
+\end{quote}
+\caption[GPQA question context]{GPQA-Diamond question context, identical across all
+agents in a repetition. Options are shuffled uniformly before label assignment to
+decorrelate answer-letter position from correctness.}
+\label{prompt:gpqa-question}
+\end{prompt}
+
+For HiddenBench each agent receives the shared scenario description together with
+its own private subset of the hidden facts (shared facts plus a disjoint subset of
+hidden facts, randomly shuffled before presentation), as shown in \autoref{prompt:hiddenbench-question}.
+
+\begin{prompt}[H]
+\begin{quote}\small\ttfamily
+Scenario:
+\{description\}
+
+Information:
+1. \{fact 1\}
+2. \{fact 2\}
+...
+
+Options:
+A: \{option A\}
+B: \{option B\}
+...
+
+Reason through the scenario carefully, then select the correct answer.
+\end{quote}
+\caption[HiddenBench question context]{HiddenBench question context. Agents share
+the scenario description and shared facts but each receive a disjoint subset of
+the hidden facts, implementing the hidden-profile paradigm. Facts are randomly
+shuffled before numbering, and options are shuffled before label assignment.}
+\label{prompt:hiddenbench-question}
+\end{prompt}
+
+\subsection{Accuracy and Efficiency: Full Configuration Grid}
+\label{app:perf:configs}
+
+\autoref{tab:app:perf:configs} reports accuracy with its standard error, mean
+rounds to consensus, the fraction of repetitions hitting the hard cap $T = 15$,
+and mean vote flips for all 12 (dataset, topology, $W$) configurations.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{llcccc}
+\toprule
+Dataset & Config & Accuracy & Mean rounds & $p_{\mathrm{cap}}$ & Mean flips \\
+\midrule
+GPQA & fc / $W=1$ & $41.4 \pm 4.4\,\%$ & $3.87$ & $0.2\,\%$ & $2.98$ \\
+     & fc / $W=2$ & $43.1 \pm 4.4\,\%$ & $3.68$ & $0.2\,\%$ & $2.90$ \\
+     & fc / $W=5$ & $42.4 \pm 4.3\,\%$ & $3.83$ & $0.4\,\%$ & $2.91$ \\
+     & star / $W=1$ & $41.8 \pm 4.5\,\%$ & $4.29$ & $1.0\,\%$ & $3.11$ \\
+     & star / $W=2$ & $42.5 \pm 4.3\,\%$ & $4.23$ & $1.0\,\%$ & $3.77$ \\
+     & star / $W=5$ & $42.2 \pm 4.5\,\%$ & $4.36$ & $1.6\,\%$ & $3.43$ \\
+\addlinespace
+HiddenBench & fc / $W=1$ & $25.2 \pm 2.9\,\%$ & $5.18$ & $2.5\,\%$ & $4.27$ \\
+            & fc / $W=2$ & $28.2 \pm 3.0\,\%$ & $4.71$ & $1.0\,\%$ & $3.92$ \\
+            & fc / $W=5$ & $25.8 \pm 2.9\,\%$ & $4.79$ & $2.0\,\%$ & $3.86$ \\
+            & star / $W=1$ & $24.5 \pm 2.6\,\%$ & $7.13$ & $13.3\,\%$ & $4.82$ \\
+            & star / $W=2$ & $26.6 \pm 2.8\,\%$ & $6.48$ & $11.2\,\%$ & $5.22$ \\
+            & star / $W=5$ & $26.4 \pm 2.7\,\%$ & $6.27$ & $10.7\,\%$ & $5.12$ \\
+\bottomrule
+\end{tabular}
+\caption[Accuracy and efficiency by configuration]{Full system performance per
+         configuration ($R = 50$, $50$ tasks, $n = 2{,}500$ repetitions per cell).
+         The accuracy $\pm$ term is the standard error of the config-mean accuracy
+         across the $50$ tasks. $p_{\mathrm{cap}}$ is the fraction of repetitions
+         reaching the hard cap $T = 15$ without converging.}
+\label{tab:app:perf:configs}
+\end{table}
+
+\autoref{fig:app:perf:rounds_acc} relates accuracy to the number of rounds a
+repetition took, and the two benchmarks behave differently. On GPQA accuracy
+declines with debate length ($\rho = -0.54$). On HiddenBench it is flat over most
+of the range ($\rho = 0.07$) but collapses in the fastest bin. With $u = 3$, a
+repetition can only stop after two rounds if all agents agree from round~$0$, so
+this bin holds exactly the repetitions that start unanimous. They lock in the
+shared wrong answer and reach only $2.5\,\%$. That bin is the basis for the
+unanimous-start claim of \autoref{sec:results:perf}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{plots/general/fig5_rounds_vs_accuracy.png}
+  \caption[Accuracy versus rounds to consensus]{Mean accuracy as a function of
+           rounds to consensus, for GPQA (left) and HiddenBench (right). Bars show
+           the mean over all repetitions reaching each round count (minimum
+           $n = 20$). Spearman $\rho$ over bins is given in each panel, and the
+           dashed line marks chance. All configurations pooled
+           ($n = 15{,}000$ per dataset).}
+  \label{fig:app:perf:rounds_acc}
+\end{figure}
+
+\subsection{Self-Reinforcement: Segment-Slope Breakdown}
+\label{app:sr:supp}
+
+Prevalence and slope are stable across configurations. Over $W \in \{1,2,5\}$,
+$p_{\mathrm{SR}}$ ranges from $0.763$ to $0.825$ on GPQA fully-connected, $0.733$
+to $0.809$ on GPQA star, $0.841$ to $0.883$ on HiddenBench fully-connected, and
+$0.806$ to $0.847$ on HiddenBench star, with mean segment slopes $\bar\beta$
+between $0.354$ and $0.515$ confidence points per round. No configuration
+approaches the no-feedback null of $0.5$. The memory-window ordering that the
+endogenous reading predicts in \autoref{sec:method:sr} does not hold. Mean slopes
+decrease slightly as $W$ grows in all four combinations of dataset and topology,
+which favours the peer-conformity reading.
+
+What the slope does respond to is structural, and \autoref{tab:sr:subgroups} gives
+the breakdown. Segments that reach the confidence ceiling, that run to the end of
+their repetition, and that sit inside fully static repetitions all carry markedly
+steeper slopes, and $\bar\beta$ falls monotonically as the opening vote
+distribution becomes more fragmented. The ceiling and terminality rows also bound
+the interpretation of the headline prevalence. A segment ends when its agent flips,
+and an agent whose confidence is falling is more likely to flip, so negative slopes
+are censored and $p_{\mathrm{SR}}$ should be read as an upper estimate. Even
+non-terminal segments, which the stopping rule does not affect, reach
+$p_{\mathrm{SR}} = 0.682$, still well above the null.
+
+At the task level the marginal relationship between $\bar\beta$ and accuracy is
+near zero on GPQA (Pearson $r = 0.02$ fully-connected, $r = 0.04$ star) and weakly
+negative on HiddenBench ($r = -0.21$ and $r = -0.31$). This
+marginal figure hides a cancellation between opposite effects. In repetitions whose
+opening votes contain the correct option, steeper slopes go with higher accuracy
+(point-biserial $r = 0.20$ on GPQA and $r = 0.15$ on HiddenBench), and in
+repetitions whose opening votes do not, they go with lower accuracy ($r = -0.11$ and
+$r = -0.07$). This is why
+self-reinforcement is reported conditioned on the opening composition rather than
+marginally.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{llrrr}
+\toprule
+Condition & Group & $n_{\mathrm{segs}}$ & $\bar\beta$ & $p_{\mathrm{SR}}$ \\
+\midrule
+\multirow{2}{*}{Ceiling}
+  & No ceiling   & 115{,}137 & 0.404 & 0.798 \\
+  & Ceiling hit  &  18{,}559 & 0.564 & 0.910 \\
+\midrule
+\multirow{2}{*}{Terminality}
+  & Non-terminal &  14{,}341 & 0.262 & 0.682 \\
+  & Terminal     & 119{,}355 & 0.445 & 0.829 \\
+\midrule
+\multirow{2}{*}{Initial correctness}
+  & Init wrong majority   & 116{,}400 & 0.410 & 0.809 \\
+  & Init correct majority &  17{,}296 & 0.535 & 0.840 \\
+\midrule
+\multirow{2}{*}{Vote stability}
+  & Some agent flipped    & 113{,}660 & 0.380 & 0.796 \\
+  & Fully static rep.     &  20{,}036 & 0.685 & 0.908 \\
+\midrule
+\multirow{5}{*}{Init vote dist.}
+  & 4-0-0-0 & 21{,}435 & 0.663 & 0.897 \\
+  & 3-1-0-0 & 50{,}286 & 0.412 & 0.824 \\
+  & 2-2-0-0 & 26{,}629 & 0.370 & 0.791 \\
+  & 2-1-1-0 & 34{,}035 & 0.345 & 0.767 \\
+  & 1-1-1-1 &  1{,}311 & 0.308 & 0.656 \\
+\bottomrule
+\end{tabular}
+\caption[Self-reinforcement slope by structural subgroup]{Mean segment slope
+         $\bar\beta$ (confidence points per round) and prevalence
+         $p_{\mathrm{SR}}$ by subgroup, all segments pooled across configurations
+         ($N = 133{,}696$). A segment is \emph{terminal} if it runs to the end of
+         its repetition, and hits the \emph{ceiling} if it reaches the top of the
+         1--10 confidence scale. Pooled segment counts are descriptive, but the
+         subgroup orderings are confirmed at the task level.}
+\label{tab:sr:subgroups}
+\end{table}
+
+\subsection{Multistability: Label Distribution}
+\label{app:multistab}
+
+\autoref{tab:multistab:overview} gives the per-dataset breakdown of the three
+multistability classes referenced in \autoref{sec:results:multistability}. Of the
+600 cells, $23.7\,\%$ are monostable, $41.5\,\%$ multistable, and $34.8\,\%$
+stochastic. HiddenBench is far more stochastic than GPQA, that is, its endpoints
+more often coexist without the opening votes selecting between them.
+
+Neither structural axis moves either metric. Across the twelve configurations mean
+$N_{\mathrm{eff}}$ spans only $1.93$ to $2.12$ and mean Cram\'er's $V$ $0.33$
+to $0.50$, with no consistent gradient in $W$ or topology, which is the basis for
+reading multistability as a property of the question rather than of the
+configuration.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Dataset & Monostable & Multistable & Stochastic &
+  $N_{\mathrm{eff}}$ mean & $V$ mean \\
+\midrule
+GPQA ($M=4$)                  & 86 & 151 &  63 & 1.97 & 0.45 \\
+HiddenBench ($M \in \{3,4\}$) & 56 &  98 & 146 & 2.06 & 0.35 \\
+\bottomrule
+\end{tabular}
+\caption[Multistability label distribution by dataset]{Multistability label
+         distribution across all 600 (task, config) cells
+         ($N_{\mathrm{tasks}} = 50$, $R = 50$). Label counts pool all tasks per
+         benchmark, and HiddenBench mixes $46$ three-option and $4$ four-option tasks.
+         The $N_{\mathrm{eff}}$ column is a within-benchmark mean and should be
+         read per option-count stratum, since $N_{\mathrm{eff}}$ is bounded by $M$
+         and is not directly comparable across option counts. For HiddenBench,
+         the mean is $2.04$ on three-option and $2.33$ on four-option tasks.}
+\label{tab:multistab:overview}
+\end{table}
+
+\subsection{Dominance: Full Configuration Grid}
+\label{app:dom:supp}
+
+\autoref{tab:dom:overview} reports mean raw $D$ per cell. Star $D$ is
+$3.2$--$3.9\times$ higher than fully-connected across all cells, but this gap is
+largely mechanical, because the star centre is the sole eligible conversion source for
+every leaf, so its influence share is structurally inflated and its surrogate null
+degenerate. Emergent concentration is therefore identified only for the
+fully-connected topology, as discussed in \autoref{sec:results:dominance}. There
+the mean standardised excess $\bar z$ over the constrained-shuffle null is positive
+on both benchmarks, and the flagged fraction, the share of repetitions whose
+observed $D$ falls in the upper tail of its own surrogate distribution at
+$p < 0.05$, exceeds the $5\,\%$ that threshold produces by chance. The margin is
+modest at the repetition level, which is why the claim in
+\autoref{sec:results:dominance} rests on the consistency of a positive $\bar z$
+across tasks rather than on the flag rate alone. The hub ends on the consensus
+answer in at least $99\,\%$ of runs in every cell, and its confidence-weighted
+capitulation stays between $0.12$ and $0.19$. Concentration rises slightly with $W$
+on HiddenBench in both topologies but not on GPQA. Once topology is held fixed,
+mean $D$ and rounds to consensus show no consistent association.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{llccccc}
+\toprule
+ & & \multicolumn{3}{c}{Mean $D$} & \multicolumn{2}{c}{fc excess (pooled $W$)} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-7}
+Dataset & Topology & $W=1$ & $W=2$ & $W=5$ & $\bar{z}$ & Flagged \\
+\midrule
+GPQA        & fc   & 0.154 & 0.154 & 0.155 & $+0.53$ & 7.7\,\% \\
+GPQA        & star & 0.601 & 0.601 & 0.610 & \multicolumn{2}{c}{---} \\
+HiddenBench & fc   & 0.158 & 0.178 & 0.179 & $+0.73$ & 11.2\,\% \\
+HiddenBench & star & 0.540 & 0.574 & 0.578 & \multicolumn{2}{c}{---} \\
+\bottomrule
+\end{tabular}
+\caption[Mean dominance by configuration]{Mean raw Herfindahl concentration $D$
+         per (dataset, topology, $W$) cell. $\bar z$ is the mean standardised
+         excess of the observed $D$ over its constrained-shuffle null, and
+         \emph{Flagged} the share of repetitions significant at $p < 0.05$ against
+         that null, where $5\,\%$ is the chance rate. Both are reported for the
+         fully-connected topology only, since the star null is degenerate.
+         $N_{\mathrm{tasks}} = 50$, $R = 50$.}
+\label{tab:dom:overview}
+\end{table}
+
+\subsection{Limit Cycles: Detection Funnel and Recurrence Matrices}
+\label{app:lc:supp}
+
+\autoref{tab:lc:funnel} gives the full limit-cycle detection funnel referenced in
+\autoref{sec:results:lc}. Because star spokes driven by a common hub are not
+independent successes, prevalence is assessed at the repetition level. The
+detection rule combines a $p < 0.05$ threshold with the period guard
+$2 \leq \hat{P} \leq \lfloor L/2 \rfloor$, so its false-positive floor lies below
+the nominal $5\,\%$. Measured against the shuffle surrogates, it is
+$0.92\,\%$ at the agent level and
+$0.71\,\%$ at the system level, against
+observed conditional rates of $0.074$ and $0.083$. The excess is modest in
+absolute terms, which is why the claim rests jointly on it and on visual
+inspection. \autoref{fig:lc:rec} shows that the flagged cases carry the
+checkerboard recurrence signature of a genuine period-2 orbit rather than the
+solid block a merely persistent sequence would produce.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lrrrcc}
+\toprule
+Level & Total & Fixed points & Candidates & Flagged & $p_{\mathrm{LC}}$ (cond.) \\
+\midrule
+Agent-level  & 120{,}000 & 119{,}355~(99.5\,\%) &  633~(0.5\,\%) & 47 & 0.074 \\
+System-level &  30{,}000 &  29{,}609~(98.7\,\%) &  388~(1.3\,\%) & 32 & 0.083 \\
+\bottomrule
+\end{tabular}
+\caption[Limit-cycle detection funnel]{Limit-cycle detection funnel.
+         \emph{Fixed points} have a trailing constant segment $k \geq 3$ and are excluded from
+         the test. \emph{Candidates} are non-converged sequences with $L \geq 4$.
+         \emph{Flagged} sequences have DET above the 95th percentile of 1{,}000 shuffle
+         surrogates with dominant period
+         $2 \leq \hat{P} \leq \lfloor L/2 \rfloor$.
+         $p_{\mathrm{LC}}$ (cond.) is the flagged share among candidates.
+         The fixed-point and candidate counts do not sum exactly to the total
+         because a small residue of sequences are non-converged yet too short to
+         test ($L < 4$), 12 at the agent level and 3 at the system level. These
+         are excluded as untestable.}
+\label{tab:lc:funnel}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/lc/lc_rec_new.png}
+  \caption[Recurrence matrices for two limit cycles]{Recurrence matrices for two
+           agents from each of the cases in \autoref{fig:lc:timelines}. The
+           alternating checkerboard diagonal stripe pattern (spacing~2) is the
+           characteristic \ac{RQA} signature of a period-2 orbit, whereas a persistent sequence
+           would instead produce a solid block. DET (determinism) and dominant
+           period $\hat{P}$ are shown above each matrix.}
+  \label{fig:lc:rec}
+\end{figure}
+
+\subsection{High-Repetition Analysis: Additional Figures}
+\label{app:highrep}
+
+This appendix provides the feature-by-outcome breakdown for the high-repetition
+experiment described in \autoref{sec:results:evid} ($R = 1{,}000$, three GPQA
+tasks, $W = 2$, fully-connected topology, $N = 4$). The two figures make the same
+point from complementary directions.
+\autoref{fig:app:highrep:features} shows the conditional means. Accuracy rises
+steeply with initial plurality size (a) but is flat in mean initial confidence
+(c), mean final confidence (e), and confidence change (f), so none of the
+confidence channels carries outcome information.
+\autoref{fig:app:highrep:distributions} shows the same result distributionally.
+The confidence-change densities for correct and incorrect repetitions overlap
+almost exactly in all three tasks, whereas the vote-flip and round distributions
+separate in task-dependent directions.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/figA_full_feature_breakdown.png}
+  \caption[Accuracy and efficiency by run-level feature]{Accuracy and efficiency
+           as a function of six repetition-level features. The top row (a--c)
+           shows accuracy, the bottom row efficiency (d) and accuracy (e, f).
+           (a) Accuracy by initial plurality size.
+           (b) Accuracy by vote-flip count (binned, Wilson 95\,\% \ac{CI}, $n \geq 10$).
+           (c) Accuracy by mean initial confidence.
+           (d) Mean rounds by initial plurality size.
+           (e) Accuracy by mean final confidence.
+           (f) Accuracy by confidence change (final minus initial), with a dotted line at
+           zero. $R = 1{,}000$ per task, $W = 2$, fully-connected.}
+  \label{fig:app:highrep:features}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/highrep/figA_distributions_by_outcome.png}
+  \caption[Feature distributions by outcome]{Feature distributions split by
+           outcome (correct in colour, incorrect in grey) for three GPQA tasks,
+           $R = 1{,}000$ each, $W = 2$, fully-connected. Rows show tasks q84, q125 and q144.
+           Columns show vote flips, mean initial confidence, mean final confidence,
+           confidence change (final minus initial), rounds to consensus.
+           Histograms show empirical density, and curves are kernel density estimates.
+           The confidence-change distributions overlap almost perfectly in all
+           three tasks, indicating that agents gain confidence at the same rate
+           regardless of whether the system reaches the correct answer.}
+  \label{fig:app:highrep:distributions}
+\end{figure}
+
+\subsection{Motifs Beyond the Present Selection}
+\label{app:future_motifs}
+
+\autoref{sec:method:vocab} restricts the study to four motifs. The same
+structural/dynamical lens admits several others that we leave to future work. On
+the structural side, three candidates concern the emergent influence graph.
+\begin{itemize}
+  \item \textbf{Mutual-reinforcement dyad} (a two-node positive loop).
+        Two agents that repeatedly push each other the same way.
+  \item \textbf{Influence feed-forward loop.} $A$ sways $B$, $B$ sways $C$, and
+        $A$ also sways $C$ directly, predicting delayed or robust lock-in.
+  \item \textbf{Cascade / chain.} Sequential adoption $A \to B \to C$, the
+        structural signature of herding.
+\end{itemize}
+On the dynamical side, there are three further regimes of the joint trajectory.
+\begin{itemize}
+  \item \textbf{Consensus / fixed point.} The baseline regime (a point attractor)
+        against which the others are defined.
+  \item \textbf{Polarisation / stable split.} Persistent within-repetition
+        disagreement into stable subgroups, distinct from across-repetition
+        multistability.
+  \item \textbf{Negative autoregulation / self-correction.} The sign-flipped twin
+        of self-re\-in\-force\-ment, an agent that damps its own confidence. Since
+        \autoref{sec:results:synthesis} identifies the near-absence of negative
+        feedback as the mechanism behind the amplifier, this is the most
+        immediately consequential of the six.
+\end{itemize}
+These span a coherent picture of the regimes a small interacting system can fall
+into. A study must start somewhere, so we treat them as directions for future
+investigation.
