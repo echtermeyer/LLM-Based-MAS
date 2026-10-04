@@ -85,5 +85,5 @@ python run_mas.py --dataset gpqa --index 56 --n 4 --t 15 --w 2 --model mistral-m
 
 The tracked `results/` data regenerates every live figure and number in the thesis. Two
 appendix/side sections (`10_linguistic`, `11_appendix_robustness`) are **frozen** — their
-source data was intentionally not committed, so those specific values do not recompute on a
-clone.
+source data was intentionally not committed, so those specific values do not recompute on
+a clone.
